@@ -29,18 +29,25 @@ void validate(const GameConfig& config) {
     if (config.board_cards < 0 || config.board_cards > 5) {
         throw std::invalid_argument("board_cards must be 0..5");
     }
-    // Showdown is best-5-of-all-cards, so the total must fit evaluate_best.
-    const int total = config.hole_cards + config.board_cards;
-    if (total < 5 || total > 7) {
-        throw std::invalid_argument(
-            "hole_cards + board_cards must be 5..7 for best-5 showdown");
+    if (config.showdown == HandConstruction::OmahaTwoAndThree) {
+        // Omaha deals 4 hole + 5 board and constructs exactly 2+3.
+        if (config.hole_cards != 4 || config.board_cards != 5) {
+            throw std::invalid_argument(
+                "omaha showdown needs hole_cards 4 and board_cards 5");
+        }
+    } else {
+        // Best-five showdown needs a total that fits evaluate_best.
+        const int total = config.hole_cards + config.board_cards;
+        if (total < 5 || total > 7) {
+            throw std::invalid_argument(
+                "hole_cards + board_cards must be 5..7 for best-5 showdown");
+        }
     }
     if (config.num_players * config.hole_cards + config.board_cards > 52) {
         throw std::invalid_argument("not enough cards in the deck");
     }
-    if (config.betting != BettingStructure::NoLimit) {
-        throw std::invalid_argument(
-            "only NoLimit betting is implemented so far");
+    if (config.max_raises_per_round < 1) {
+        throw std::invalid_argument("max_raises_per_round must be positive");
     }
 }
 

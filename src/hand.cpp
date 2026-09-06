@@ -115,6 +115,33 @@ HandValue evaluate_five(const std::array<Card, 5>& cards) {
                        sorted[3].rank, sorted[4].rank});
 }
 
+HandValue evaluate_omaha(const std::vector<Card>& hole,
+                         const std::vector<Card>& board) {
+    if (hole.size() != 4 || board.size() != 5) {
+        throw std::invalid_argument("evaluate_omaha needs 4 hole + 5 board");
+    }
+    bool best_set = false;
+    HandValue best;
+    for (std::size_t a = 0; a < 4; ++a) {
+        for (std::size_t b = a + 1; b < 4; ++b) {
+            for (std::size_t c = 0; c < 5; ++c) {
+                for (std::size_t d = c + 1; d < 5; ++d) {
+                    for (std::size_t e = d + 1; e < 5; ++e) {
+                        const std::array<Card, 5> five{
+                            hole[a], hole[b], board[c], board[d], board[e]};
+                        const HandValue value = evaluate_five(five);
+                        if (!best_set || best < value) {
+                            best = value;
+                            best_set = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return best;
+}
+
 HandValue evaluate_best(const std::vector<Card>& cards) {
     if (cards.size() < 5 || cards.size() > 7) {
         throw std::invalid_argument("evaluate_best needs 5 to 7 cards");

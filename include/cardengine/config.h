@@ -2,10 +2,14 @@
 
 namespace cardengine {
 
-// How bets may grow. Only NoLimit is implemented; Limit and PotLimit are
-// declared so variant configs can name them — validate() rejects them with
-// a clear error until their rules modules land.
+// How bets may grow. NoLimit: any amount from the minimum to all-in.
+// Limit: fixed sizes (big blind preflop/flop, twice after) with a per-round
+// raise cap. PotLimit: raises capped at the pot-sized raise.
 enum class BettingStructure { NoLimit, Limit, PotLimit };
+
+// How the showdown winner is found. BestFiveOfAll is Hold'em-style (any
+// five). OmahaTwoAndThree is Omaha-style: exactly 2 from hand + 3 from board.
+enum class HandConstruction { BestFiveOfAll, OmahaTwoAndThree };
 
 // Everything a variant needs to change about a game, as data.
 // Defaults describe standard no-limit Texas Hold'em, which is the test case
@@ -21,6 +25,8 @@ struct GameConfig {
     int board_cards = 5;     // Community cards, dealt 3-1-1 across streets
                              // (scaled down when fewer are configured).
     BettingStructure betting = BettingStructure::NoLimit;
+    HandConstruction showdown = HandConstruction::BestFiveOfAll;
+    int max_raises_per_round = 4;  // Limit betting only (bet + raises cap).
 };
 
 // Throws std::invalid_argument unless the config is sane AND implemented.

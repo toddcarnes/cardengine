@@ -19,6 +19,7 @@ Verified 2026-09-05: configure + build + `ctest` pass with CMake 4.3.4 / VS 2026
 - `game_file.h` (key=value `GameFile` parse/save, line-numbered errors; `games/*.txt` examples) + `protocol.h` (`Session::execute`, never throws; `run_protocol` stream loop).
 - `bot.h` (`BotFile` personalities + `Bot` interface; `RandomBot` baseline, `HeuristicBot` with mistake/aggression/looseness sliders; `SeatView` so bots can't peek; `bots/*.txt` examples). Session seats bots in-process via `addbot`/`step`/`bots` until per-seat protocol views allow out-of-process bots.
 - `bot_runner.h` + `cardengine_bot` exe (out-of-process seat runner: `state <seat>` + `options` in, one `act` line out; parses only its own hole). `examples/match.py` hosts engine + N runners. Deal loop counts participants, not seats (busted-out seats sit out without duplicating cards).
+- M8 variants: `HandConstruction` (`holdem` best-5 / `omaha` exact 2+3 via `evaluate_omaha`) selected in `GameConfig`/`showdown` file key; `Limit` (fixed BB / 2×BB sizes, `max_raises` cap, short all-ins consume nothing) and `PotLimit` (`bet + pot + 2×call` max) in `Table::options`/`act`; `games/omaha-plo-6max.txt`, `games/holdem-limit-6max.txt`.
 - `examples/cli.py` — hotseat reference client (stdlib-only Python, not in CTest); framing: only `state` is a block (`end`-terminated), `settle` ends with `ok`.
 - `tests/` — dependency-free CTest executables via `cardengine_add_test(name source)` (stdlib only, no gtest/Catch2).
 - `.github/workflows/ci.yml` — Windows + macOS + Linux build/test.
@@ -33,6 +34,7 @@ ctest --test-dir build --output-on-failure -C Release
 
 - Single test: `ctest --test-dir build -R <TestNameRegex> --output-on-failure -C Release`
 - After a fix: rebuild + `ctest -R` above, then full suite before finishing.
+- Incremental builds during work (full rebuilds cost minutes); clean `build/` + rebuild before final verify and commit. If a binary ever behaves behind its sources, delete the stale exe (MSBuild has skipped relinking against a newer static lib).
 - Out-of-source builds only; `build/` is git-ignored. `CMAKE_BUILD_TYPE` is unused with the VS generator (multi-config) — harmless warning.
 - Throwaway scripts, probes, and captured logs go in `.scratch/` (git-ignored). Never commit them, and never leave temp files elsewhere in the tree.
 

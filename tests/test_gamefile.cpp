@@ -100,6 +100,15 @@ int main() {
         expect_throw(
             [] { parse_text("format_version = 1\nbetting = fixed\n"); },
             "bad betting");
+        expect_throw(
+            [] { parse_text("format_version = 1\nshowdown = draw\n"); },
+            "bad showdown");
+        const GameFile omaha = parse_text(
+            "format_version = 1\nshowdown = Omaha\nhole_cards = 4\n"
+            "betting = PotLimit\nmax_raises = 3\n");
+        check(omaha.config.showdown == HandConstruction::OmahaTwoAndThree,
+              "omaha parses");
+        check(omaha.config.max_raises_per_round == 3, "max raises parses");
     }
 
     // Struct validation failures surface as config errors, not silence.
@@ -120,12 +129,21 @@ int main() {
         game.description = "d";
         game.config.num_players = 2;
         game.config.ante = 10;
+        game.config.betting = BettingStructure::PotLimit;
+        game.config.showdown = HandConstruction::OmahaTwoAndThree;
+        game.config.hole_cards = 4;
+        game.config.max_raises_per_round = 3;
         std::ostringstream out;
         save_game_file(game, out);
         std::istringstream in(out.str());
         const GameFile back = parse_game(in);
         check(back.name == "Heads-up" && back.config.num_players == 2 &&
-                  back.config.ante == 10,
+                  back.config.ante == 10 &&
+                  back.config.betting == BettingStructure::PotLimit &&
+                  back.config.showdown ==
+                      HandConstruction::OmahaTwoAndThree &&
+                  back.config.hole_cards == 4 &&
+                  back.config.max_raises_per_round == 3,
               "string round-trip");
 
         const char* path = "tmp_test_game_roundtrip.txt";

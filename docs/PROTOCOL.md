@@ -72,7 +72,8 @@ Shareable variants, `key = value` lines (`#` comments allowed). `games/`
 holds examples. Required key: `format_version = 1`. Optional keys fall back
 to standard Hold'em defaults: `name`, `description`, `num_players`,
 `starting_stack`, `small_blind`, `big_blind`, `ante`, `hole_cards`,
-`board_cards`, `betting = nolimit|limit|potlimit`. Unknown keys, bad values,
+`board_cards`, `betting = nolimit|limit|potlimit`,
+`showdown = holdem|omaha` (exactly 2+3), `max_raises` (limit cap). Unknown keys, bad values,
 and rule combinations the engine can't run are rejected with a line number —
 a friend's hand-edited file can error, never corrupt a game.
 

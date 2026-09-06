@@ -44,4 +44,10 @@ HandValue evaluate_five(const std::array<Card, 5>& cards);
 // Throws std::invalid_argument for any other size.
 HandValue evaluate_best(const std::vector<Card>& cards);
 
+// Omaha construction: exactly 2 cards from a 4-card hand plus exactly 3
+// from a 5-card board (6 * 10 = 60 combos, best wins).
+// Throws std::invalid_argument for any other counts.
+HandValue evaluate_omaha(const std::vector<Card>& hole,
+                         const std::vector<Card>& board);
+
 }  // namespace cardengine

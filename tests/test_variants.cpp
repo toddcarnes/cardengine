@@ -132,6 +132,29 @@ int main() {
         check(t.stack(1) == 9900, "brick loses");
     }
 
+    // Omaha table hand: 4 hole each, royal-over-trips at showdown.
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaTwoAndThree;
+        Table t(c);
+        // Deal: seat1 <- Qh, seat0 <- As, seat1 <- Qd, seat0 <- Ks, ...
+        // seat1: Qh Qd 4c 5d (trip queens); seat0: As Ks 2c 3d (royal).
+        // Board: Qs Js Ts 9h 2h.
+        t.start_hand_from_deck(shoe({"Qh", "As", "Qd", "Ks", "4c", "2c",
+                                     "5d", "3d", "Qs", "Js", "Ts", "9h",
+                                     "2h"}));
+        check(t.hole_cards(0).size() == 4, "four hole cards dealt");
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.went_to_showdown(), "omaha showdown");
+        check(t.stack(0) == 10100 && t.stack(1) == 9900, "royal beats trips");
+    }
+
     std::cout << "test_variants ok\n";
     return 0;
 }

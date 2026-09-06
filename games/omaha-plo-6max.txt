@@ -1,0 +1,14 @@
+# CardEngine game file (format 1)
+format_version = 1
+name = "Pot-Limit Omaha 6-max"
+description = "4 hole cards, exactly 2 play with exactly 3 board cards; pot-limit betting"
+num_players = 6
+starting_stack = 10000
+small_blind = 50
+big_blind = 100
+ante = 0
+hole_cards = 4
+board_cards = 5
+betting = potlimit
+showdown = omaha
+max_raises = 4

@@ -87,15 +87,34 @@ ActionOptions Table::options(int seat) const {
     out.can_check = (call == 0);
     out.call_amount = call < s.stack ? call : s.stack;
     const bool reopened = !s.acted || s.seen_seq < round_seq_;
-    if (s.stack > 0 && s.bet + s.stack > current_bet_ && reopened) {
-        out.can_raise = true;
-        const int max_to = s.bet + s.stack;
-        const int min_full = current_bet_ + last_raise_size_;
-        // An all-in short of a full raise is still legal (it just doesn't
-        // reopen betting for others).
-        out.min_raise_to = max_to < min_full ? max_to : min_full;
-        out.max_raise_to = max_to;
+    if (s.stack == 0 || s.bet + s.stack <= current_bet_ || !reopened) {
+        return out;
     }
+    if (config_.betting == BettingStructure::Limit &&
+        raises_this_round_ >= config_.max_raises_per_round) {
+        return out;  // Capped: call or fold only.
+    }
+    out.can_raise = true;
+    int min_full = current_bet_ + last_raise_size_;
+    if (config_.betting == BettingStructure::Limit) {
+        min_full = current_bet_ + fixed_bet_size();
+    }
+    int max_to = s.bet + s.stack;
+    if (config_.betting == BettingStructure::PotLimit) {
+        // Pot-sized raise: call first (pot grows by to_call), then raise
+        // the pot on top: max total = bet + call + (pot + call).
+        const int pot_max = s.bet + 2 * call + pot_total();
+        if (pot_max < max_to) max_to = pot_max;
+    }
+    if (config_.betting == BettingStructure::Limit && max_to >= min_full) {
+        // Exactly one legal raise size — unless the stack can't reach it,
+        // in which case the all-in short below stands.
+        max_to = min_full;
+    }
+    // An all-in short of a full raise is still legal (it just doesn't
+    // reopen betting for others).
+    out.min_raise_to = max_to < min_full ? max_to : min_full;
+    out.max_raise_to = max_to;
     return out;
 }
 
@@ -204,6 +223,9 @@ void Table::act(int seat, const Action& action) {
                 last_raise_size_ = increment;
                 ++round_seq_;
                 s.seen_seq = round_seq_;
+                if (config_.betting == BettingStructure::Limit) {
+                    ++raises_this_round_;  // Short all-ins don't consume cap.
+                }
             } else {
                 // Short all-in: current bet rises, action stays closed.
                 s.seen_seq = round_seq_;
@@ -280,7 +302,6 @@ std::vector<Payout> Table::settle() {
         std::sort(levels.begin(), levels.end());
         levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
 
-        std::vector<Card> seven = board_;
         int prev = 0;
         for (int level : levels) {
             int contributors = 0;
@@ -299,10 +320,8 @@ std::vector<Payout> Table::settle() {
             HandValue best;
             bool have_best = false;
             for (int i : eligible) {
-                seven.resize(board_.size());
                 const Seat& s = seats_[static_cast<std::size_t>(i)];
-                seven.insert(seven.end(), s.hole.begin(), s.hole.end());
-                const HandValue value = evaluate_best(seven);
+                const HandValue value = showdown_value(s.hole, board_);
                 if (!have_best || best < value) {
                     best = value;
                     have_best = true;
@@ -310,10 +329,8 @@ std::vector<Payout> Table::settle() {
             }
             std::vector<int> winners;
             for (int i : eligible) {
-                seven.resize(board_.size());
                 const Seat& s = seats_[static_cast<std::size_t>(i)];
-                seven.insert(seven.end(), s.hole.begin(), s.hole.end());
-                if (evaluate_best(seven) == best) winners.push_back(i);
+                if (showdown_value(s.hole, board_) == best) winners.push_back(i);
             }
             // Odd chips go clockwise from the button.
             std::sort(winners.begin(), winners.end(), [&](int a, int b) {
@@ -362,8 +379,17 @@ std::vector<Payout> Table::settle() {
     return payouts;
 }
 
-void Table::record_hand_started(std::uint64_t seed, bool seeded) {
-    HandStartedEvent started;
+HandValue Table::showdown_value(const std::vector<Card>& hole,
+                                 const std::vector<Card>& board) const {
+    if (config_.showdown == HandConstruction::OmahaTwoAndThree) {
+        return evaluate_omaha(hole, board);
+    }
+    std::vector<Card> all = board;
+    all.insert(all.end(), hole.begin(), hole.end());
+    return evaluate_best(all);
+}
+
+void Table::record_hand_started(std::uint64_t seed, bool seeded) {    HandStartedEvent started;
     started.config = config_;
     started.button = button_;
     started.seed = seed;
@@ -434,8 +460,16 @@ void Table::begin_round() {
         s.seen_seq = round_seq_;
     }
     current_bet_ = 0;
-    last_raise_size_ = config_.big_blind;
+    last_raise_size_ = fixed_bet_size();
+    raises_this_round_ = 0;
     advance_acting(button_ + 1);
+}
+
+int Table::fixed_bet_size() const {
+    if (street_ == Street::Turn || street_ == Street::River) {
+        return 2 * config_.big_blind;
+    }
+    return config_.big_blind;
 }
 
 void Table::start_hand_common() {
@@ -490,6 +524,7 @@ void Table::start_hand_common() {
     current_bet_ = config_.big_blind;
     last_raise_size_ = config_.big_blind;
     round_seq_ = 0;
+    raises_this_round_ = 0;
     advance_acting(bb + 1);
 }
 

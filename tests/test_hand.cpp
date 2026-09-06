@@ -142,6 +142,61 @@ int main() {
     }
     check(threw, "four cards throws");
 
+    // Omaha: exactly 2 from 4 hole + exactly 3 from 5 board.
+    {
+        // Finds the royal among all 60 combos.
+        const HandValue royal = evaluate_omaha(
+            cards({"Ah", "Kh", "Qs", "Qd"}), cards({"Qh", "Jh", "Th", "2c", "3d"}));
+        check(royal.category == HandCategory::StraightFlush, "omaha royal");
+
+        // Four spades on board plus one suited hole card is NOT a flush:
+        // exactly two hole cards must play. (Hold'em would call this a
+        // royal flush; Omaha calls it ace-high.)
+        const HandValue noflush = evaluate_omaha(
+            cards({"Ts", "8c", "4h", "3d"}),
+            cards({"As", "Ks", "Qs", "Js", "2d"}));
+        check(noflush.category == HandCategory::HighCard, "no four-flush");
+        check(noflush.tiebreak[0] == Rank::Ace &&
+                  noflush.tiebreak[3] == Rank::Ten,
+              "ace-high kickers");
+
+        // Trips on board don't give everyone quads: only Qc plays with them.
+        const HandValue quads = evaluate_omaha(
+            cards({"Qc", "Jc", "4d", "6h"}),
+            cards({"Qs", "Qd", "Qh", "2c", "5s"}));
+        const HandValue trips = evaluate_omaha(
+            cards({"Ac", "Kd", "7h", "8c"}),
+            cards({"Qs", "Qd", "Qh", "2c", "5s"}));
+        check(quads.category == HandCategory::FourOfAKind, "pocket pair quads");
+        check(quads > trips, "quads beat board-trip trips");
+
+        // A straight on board counterfeits to trips-vs-pair in Omaha.
+        const HandValue pair_aces = evaluate_omaha(
+            cards({"Ac", "Ad", "2h", "3h"}),
+            cards({"Ks", "Qs", "Js", "Ts", "9c"}));
+        const HandValue trip_kings = evaluate_omaha(
+            cards({"Kc", "Kd", "4h", "5h"}),
+            cards({"Ks", "Qs", "Js", "Ts", "9c"}));
+        check(trip_kings > pair_aces, "trips beat pair on straight board");
+
+        bool bad = false;
+        try {
+            evaluate_omaha(cards({"As", "Ks"}),
+                           cards({"Qs", "Js", "Ts", "9c", "8d"}));
+        } catch (const std::invalid_argument&) {
+            bad = true;
+        }
+        check(bad, "omaha needs 4 hole");
+        bad = false;
+        try {
+            evaluate_omaha(cards({"As", "Ks", "Qd", "Jd"}),
+                           cards({"Qs", "Js", "Ts", "9c"}));
+        } catch (const std::invalid_argument&) {
+            bad = true;
+        }
+        check(bad, "omaha needs 5 board");
+    }
+
     std::cout << "test_hand ok\n";
     return 0;
 }

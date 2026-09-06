@@ -70,12 +70,25 @@ int main() {
     c.hole_cards = 2;
     validate(c);  // 10*2+5 = 25: fine.
 
-    // Named-but-unimplemented structures fail loudly, not silently.
+    // All three betting structures validate; the engine implements each.
     c = GameConfig{};
     c.betting = BettingStructure::Limit;
-    expect_throw([&] { validate(c); }, "limit not implemented");
+    validate(c);
     c.betting = BettingStructure::PotLimit;
-    expect_throw([&] { validate(c); }, "pot-limit not implemented");
+    validate(c);
+
+    // Omaha construction needs exactly 4+5.
+    c = GameConfig{};
+    c.showdown = HandConstruction::OmahaTwoAndThree;
+    expect_throw([&] { validate(c); }, "omaha needs 4 hole cards");
+    c.hole_cards = 4;
+    validate(c);
+    c.board_cards = 4;
+    expect_throw([&] { validate(c); }, "omaha needs 5 board cards");
+
+    c = GameConfig{};
+    c.max_raises_per_round = 0;
+    expect_throw([&] { validate(c); }, "max raises positive");
 
     std::cout << "test_config ok\n";
     return 0;

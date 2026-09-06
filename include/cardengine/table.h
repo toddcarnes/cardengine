@@ -7,6 +7,7 @@
 #include "cardengine/card.h"
 #include "cardengine/config.h"
 #include "cardengine/event.h"
+#include "cardengine/hand.h"
 #include "cardengine/types.h"
 
 namespace cardengine {
@@ -104,8 +105,13 @@ private:
     void post_blind(int seat, int amount);
     void begin_round();
     void start_hand_common();
+    // Limit betting unit: big blind preflop/flop, twice after.
+    int fixed_bet_size() const;
     // Snapshots the just-dealt hand (pre-hand stacks are stack + committed).
     void record_hand_started(std::uint64_t seed, bool seeded);
+    // Showdown value under the configured construction rule.
+    HandValue showdown_value(const std::vector<Card>& hole,
+                             const std::vector<Card>& board) const;
 
     GameConfig config_;
     std::vector<Seat> seats_;
@@ -117,6 +123,7 @@ private:
     int current_bet_ = 0;
     int last_raise_size_ = 0;
     int round_seq_ = 0;  // Bumped by every full raise.
+    int raises_this_round_ = 0;  // Complete raises (Limit cap).
     bool showdown_ = false;
     std::vector<Payout> last_payouts_;
     std::vector<Event> events_;

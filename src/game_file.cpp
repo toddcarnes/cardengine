@@ -72,6 +72,19 @@ GameFile parse_game(std::istream& in) {
                     "line " + std::to_string(lineno) +
                     ": betting must be nolimit, limit, or potlimit");
             }
+        } else if (key == "showdown") {
+            const std::string s = lower(value);
+            if (s == "holdem") {
+                game.config.showdown = HandConstruction::BestFiveOfAll;
+            } else if (s == "omaha") {
+                game.config.showdown = HandConstruction::OmahaTwoAndThree;
+            } else {
+                throw std::invalid_argument(
+                    "line " + std::to_string(lineno) +
+                    ": showdown must be holdem or omaha");
+            }
+        } else if (key == "max_raises") {
+            game.config.max_raises_per_round = parse_int(value, lineno);
         } else {
             throw std::invalid_argument("line " + std::to_string(lineno) +
                                         ": unknown key '" + key + "'");
@@ -124,6 +137,16 @@ void save_game_file(const GameFile& game, std::ostream& out) {
             out << "potlimit\n";
             break;
     }
+    out << "showdown = ";
+    switch (game.config.showdown) {
+        case HandConstruction::BestFiveOfAll:
+            out << "holdem\n";
+            break;
+        case HandConstruction::OmahaTwoAndThree:
+            out << "omaha\n";
+            break;
+    }
+    out << "max_raises = " << game.config.max_raises_per_round << "\n";
 }
 
 }  // namespace cardengine
