@@ -45,6 +45,9 @@ void validate_bot(const BotFile& file) {
     if (file.adapt_rate < 0.0 || file.adapt_rate > 2.0) {
         throw std::invalid_argument("adapt_rate must be 0..2");
     }
+    if (file.barrels < 0.0 || file.barrels > 2.0) {
+        throw std::invalid_argument("barrels must be 0..2");
+    }
 }
 
 BotFile parse_bot(std::istream& in) {
@@ -111,6 +114,8 @@ BotFile parse_bot(std::istream& in) {
             bot.position_weight = parse_double(value, lineno);
         } else if (key == "adapt_rate") {
             bot.adapt_rate = parse_double(value, lineno);
+        } else if (key == "barrels") {
+            bot.barrels = parse_double(value, lineno);
         } else if (key == "seed") {
             try {
                 std::size_t used = 0;
@@ -178,6 +183,7 @@ void save_bot_file(const BotFile& bot, std::ostream& out) {
     out << "defense = " << bot.defense << "\n";
     out << "position_weight = " << bot.position_weight << "\n";
     out << "adapt_rate = " << bot.adapt_rate << "\n";
+    out << "barrels = " << bot.barrels << "\n";
     out << "seed = " << bot.seed << "\n";
 }
 
@@ -458,7 +464,38 @@ public:
         if (unit(rng_) < file_.mistake_rate) {
             return random_.decide(view);
         }
+        Action action = decide_inner(view, unit);
+        // Track the story: our bets keep us the aggressor; anything else
+        // hands the story to the table.
+        prior_aggressor_ = (action.type == ActionType::Raise);
+        return action;
+    }
+
+    const std::string& name() const override { return file_.name; }
+
+protected:
+    // AdaptiveBot retunes looseness as it profiles the table.
+    BotFile file_;
+
+    void observe(int, const HandSummary&) override {
+        // A new hand starts a new story: last hand's line is over.
+        prior_aggressor_ = false;
+    }
+
+    // The baseline decision without story tracking.
+    Action decide_inner(const SeatView& view,
+                        std::uniform_real_distribution<double>& unit) {
         const double s = strength(view, file_.position_weight);
+        // Continuation: the prior street's aggressor keeps firing with
+        // hands too weak to bet fresh — double-barrels, delayed c-bets,
+        // and bluffs with a story. Scales with barrels (0 = off), gated
+        // on real equity so air still gives up.
+        if (view.to_call == 0 && view.can_raise && prior_aggressor_ &&
+            file_.barrels > 0.0 && s > 0.30 &&
+            s <= 0.60 - file_.aggression * 0.15 &&
+            unit(rng_) < file_.barrels * 0.5) {
+            return {ActionType::Raise, size_bet(view)};
+        }
         // Survival (ICM-lite): short stacks demand a risk premium on
         // elimination-risk calls — tournament chips lost are worth more
         // than chips gained, so marginal continues become folds. Zero when
@@ -491,12 +528,6 @@ public:
         return {ActionType::Fold, 0};
     }
 
-    const std::string& name() const override { return file_.name; }
-
-protected:
-    // AdaptiveBot retunes looseness as it profiles the table.
-    BotFile file_;
-
 private:
     // Fraction of the stack at risk, scaled by shortness: deep stacks risk
     // little per call, short stacks risk everything. Premium peaks when a
@@ -526,6 +557,9 @@ private:
         return target;
     }
 
+    // This hand's story: true while our bets are the last aggression
+    // (we bet/raise and face no bet since). Reset by observe each hand.
+    bool prior_aggressor_ = false;
     std::mt19937_64 rng_;
     RandomBot random_;
 };
@@ -565,6 +599,7 @@ public:
     }
 
     void observe(int own_seat, const HandSummary& summary) override {
+        HeuristicBot::observe(own_seat, summary);  // New hand: story resets.
         for (std::size_t i = 0; i < summary.seats.size(); ++i) {
             if (static_cast<int>(i) == own_seat) continue;
             const SeatSummary& seat = summary.seats[i];

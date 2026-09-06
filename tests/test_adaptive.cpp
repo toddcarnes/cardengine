@@ -416,6 +416,59 @@ int main() {
               "survival zero preserves baseline");
     }
 
+    // barrels: the prior aggressor keeps firing medium hands that would
+    // check fresh; barrels = 0 never continues without a fresh reason.
+    {
+        auto story_file = [](double barrels) {
+            std::ostringstream text;
+            text << "format_version = 1\nname = C\nstyle = heuristic\n"
+                    "mistake_rate = 0.0\naggression = 0.0\n"
+                    "looseness = 0.3\nbluff_rate = 0.0\nbarrels = "
+                 << barrels << "\nseed = 11\n";
+            return parse_text(text.str());
+        };
+        SeatView flop = base_view();
+        flop.hole = {card("Ah"), card("2d")};
+        flop.board = {card("As"), card("Kd"), card("7c")};
+        flop.street = Street::Flop;
+        flop.num_seats = 6;
+        flop.position = 0;
+        flop.pot = 300;
+        flop.to_call = 0;
+        flop.can_check = true;
+        flop.can_raise = true;
+        flop.call_amount = 0;
+        flop.current_bet = 0;
+        flop.min_raise_to = 100;
+        flop.max_raise_to = 8000;
+
+        // Fresh (no prior aggression): medium pair checks at zero
+        // aggression, no bluffs.
+        auto fresh = make_bot(story_file(2.0));
+        check(fresh->decide(flop).type == ActionType::Check,
+              "fresh medium pair checks");
+
+        // Same bot, but it raised preflop (seed the story by deciding an
+        // open first): now the flop bet continues the story.
+        auto story = make_bot(story_file(2.0));
+        SeatView open = flop;
+        open.board = {};
+        open.street = Street::Preflop;
+        open.hole = {card("Ah"), card("Kd")};
+        open.pot = 150;
+        check(story->decide(open).type == ActionType::Raise,
+              "premiums open the story");
+        check(story->decide(flop).type == ActionType::Raise,
+              "barrels continue the story");
+
+        // barrels = 0: the same story checks the flop.
+        auto plain = make_bot(story_file(0.0));
+        check(plain->decide(open).type == ActionType::Raise,
+              "plain still opens premiums");
+        check(plain->decide(flop).type == ActionType::Check,
+              "barrels zero checks flop");
+    }
+
     std::cout << "test_adaptive ok\n";
     return 0;
 }
