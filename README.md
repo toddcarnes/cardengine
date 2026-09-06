@@ -54,7 +54,7 @@ python examples/match.py --auto --bots 1:bots/tight.txt --tournament tournaments
 - `bots/` — shareable bot-personality files (same format family)
 - `examples/cli.py` — hotseat reference client; proves any language can drive the engine over pipes
 - `examples/match.py` — match host: engine + one bot process per seat (the listen-server shape)
-- `docs/` — protocol spec and game-file format
+- `docs/` — protocol spec (`PROTOCOL.md`) and config-file reference (`CONFIG_FILES.md`)
 - `tests/` — dependency-free CTest executables (no external test framework)
 - `.github/workflows/ci.yml` — builds + tests on Windows, macOS, Linux
 

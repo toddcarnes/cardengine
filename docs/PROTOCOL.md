@@ -7,9 +7,9 @@ bindings) for the reference client.
 ## Framing rules (clients must follow these)
 
 - One command per line, one reply per command.
-- Replies are a single line (`ok ...` / `error ...` / `bye`), except:
-  - `state` replies with a block terminated by an `end` line.
-  - `settle` replies with `showdown` + `payout` lines, then a final `ok`.
+- Most replies are a single line (`ok ...` / `error ...` / `bye`). Three
+  commands reply multi-line: `state` and `log` send a block terminated by
+  an `end` line; `settle` and `tstatus` send prelude lines and a final `ok`.
 - The engine flushes after every reply, so piped clients never deadlock.
   The first line on startup is a banner (`cardengine 0.1.0`), not a reply.
 - An `error` reply never changes session state — retry or send `quit`.
@@ -77,7 +77,8 @@ to standard Hold'em defaults: `name`, `description`, `num_players`,
 `board_cards`, `betting = nolimit|limit|potlimit`,
 `showdown = holdem|omaha` (exactly 2+3), `max_raises` (limit cap). Unknown keys, bad values,
 and rule combinations the engine can't run are rejected with a line number —
-a friend's hand-edited file can error, never corrupt a game.
+a friend's hand-edited file can error, never corrupt a game. Full key
+reference (mandatory vs optional, defaults, effects): `docs/CONFIG_FILES.md`.
 
 ## Bot files
 
@@ -87,7 +88,8 @@ sliders `mistake_rate` (decisions replaced by a random legal action),
 `aggression` (sizing and thin value), `looseness` (how weak a hand
 continues), and integer `seed` for determinism. New *strategies* still need
 C++ behind the `Bot` interface; new *personalities* are just files
-(`tag`/`lag`/`nit` presets included).
+(`tag`/`lag`/`nit`/`gto`/`adaptive` presets included; full key reference in
+`docs/CONFIG_FILES.md`).
 
 Bots live in the session for now (same machine, local trust — they see only
 their own hole cards by construction via `SeatView`). In-process bots study
@@ -133,7 +135,8 @@ ok
 
 Tournament files (`tournaments/`) share the game-file conventions. A `game`
 key composes a game file (path relative to the tournament file); any game
-keys alongside override it. The rest is schedule and money:
+keys alongside override it. The rest is schedule and money (full key
+reference in `docs/CONFIG_FILES.md`):
 
 ```
 format_version = 1
@@ -149,9 +152,10 @@ remainder goes to the champion. Manual level advances for GUI clocks are a
 library call today (`Tournament::advance_level`); the matching protocol
 command arrives when a GUI needs it. Rebuys likewise (`Tournament::rebuy`).
 
-## Example session (real transcript)```
+## Example session (real transcript)
+```
 > help
-ok commands: help load start state options act deal settle quit
+ok commands: help load tload tstatus start state options act deal settle log addbot bots step quit
 > start 7
 ok
 > options
@@ -163,6 +167,7 @@ street preflop
 button 0
 acting -1
 pot 150
+current 100
 board -
 seat 0 stack 10000 bet 0 committed 0 in folded hole --
 seat 1 stack 9950 bet 50 committed 50 in folded hole --
@@ -173,6 +178,12 @@ end
 showdown no
 payout 2 150
 ok
+> log
+begin_hand button 0 seed 7 stacks 10000,10000,10000,10000,10000,10000 hole 9d,4c|8h,Js|8s,Ac|Jc,Tc|Ad,9h|2h,As
+action 3 fold pot 150
+...
+settle showdown no payouts 2:150 committed 0,50,100,0,0,0
+end
 > quit
 bye
 ```
