@@ -21,7 +21,8 @@ bindings) for the reference client.
 | `help` | `ok commands: ...` | |
 | `load <game-file>` | `ok` | Re-tables with fresh stacks. Path may contain spaces. |
 | `start <seed>` | `ok` | Starts a hand; stacks and button carry over between hands. |
-| `state` | block, then `end` | Full table dump (below). |
+| `state` | block, then `end` | Full table dump — local trust only (below). |
+| `state <seat>` | block, then `end` | That seat's view: own hole cards shown, all other seats `--`. |
 | `options` | `options seat S check yes\|no call N raise yes\|no [min M max X]` | For the acting seat; `error no action pending` otherwise. |
 | `act fold\|check\|call` | `ok` | Acts for the current seat. |
 | `act raise <amount>` | `ok` | Amount is the target *total* bet for the round. |
@@ -40,6 +41,7 @@ street preflop|flop|turn|river|none|complete
 button <seat>
 acting <seat|-1>
 pot <chips>
+current <highest total bet this round>
 board -|<cards...>
 seat <i> stack <s> bet <b> committed <c> in|out live|folded hole <cards...|-->
 ... (one line per seat)
@@ -49,10 +51,20 @@ end
 `bet` is committed this round, `committed` this hand. Folded or out-of-hand
 seats show `hole --`.
 
-> **Trust note (v0):** `state` shows every live seat's hole cards. That is
+> **Trust note (v0):** bare `state` shows every live seat's hole cards. That is
 > correct for local play (hotseat UI, bots on the same machine) and wrong
-> for networked play. Per-seat filtered views arrive with remote opponents;
-> until then, never expose this stream to an untrusted client.
+> for networked play. `state <seat>` is the filtered form remote clients get;
+> until then, never expose the bare stream to an untrusted client.
+
+## Out-of-process bots
+
+`cardengine_bot --seat N --bot <file>` plays one seat over its own stdin/stdout.
+The host relays one `state <seat>` block plus one `options` line per decision;
+the runner prints one `act ...` line back (strict alternation, EOF exits,
+`error ...` + nonzero exit on malfunction). The runner parses only its own
+seat's hole cards, so even a compromised bot process can't see more than its
+filtered view. `examples/match.py` is the reference host: engine + N runners,
+the listen-server shape that a network gateway will reuse with sockets.
 
 ## Game files
 

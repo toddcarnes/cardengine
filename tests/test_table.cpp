@@ -211,6 +211,31 @@ int main() {
         check(total_chips(t) == 3500, "side-pot chips conserved");
     }
 
+    // Bust-outs don't corrupt the next deal: survivors get exactly
+    // hole_cards each (the deal loop counts participants, not seats).
+    {
+        Table t(three_max());
+        t.set_stack(0, 60);
+        t.set_button(2);
+        // seat0: 7c 2d; seat1: As Ks; seat2: Qd Qh.
+        // Board Ah Kh 9c 5d 3s pairs everyone's ace-king except seat 0.
+        t.start_hand_from_deck(shoe({"7c", "As", "Qd", "2d", "Ks", "Qh",
+                                     "Ah", "Kh", "9c", "5d", "3s"}));
+        raise_to(t, 2, 5000);
+        call(t, 0);  // All in for 60 total.
+        call(t, 1);
+        check(t.acting() == -1, "round done");
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 0, "short stack busts");
+
+        t.start_hand(99);
+        check(!t.in_hand(0), "broke seat sits out");
+        check(t.hole_cards(1).size() == 2, "survivor dealt two");
+        check(t.hole_cards(2).size() == 2, "survivor dealt two");
+        check(total_chips(t) == 20060, "chips conserved around bust");
+    }
+
     // A short all-in raise does not reopen betting for players who acted.
     {
         Table t(three_max());

@@ -49,7 +49,7 @@ class Engine:
         self.proc.stdin.write(command + "\n")
         self.proc.stdin.flush()
         lines = []
-        block = command == "state"
+        block = command.split()[0] in ("state", "log")
         while True:
             line = self.proc.stdout.readline()
             if not line:
@@ -162,9 +162,10 @@ def play_hand(engine, seed, auto, botted):
         if acting == -1:
             if engine.send("deal") == ["ok"]:
                 continue
-            for line in engine.send("settle"):
+            settle = engine.send("settle")
+            for line in settle:
                 print(f"  {line}")
-            return True
+            return settle[-1] == "ok"
         if acting in botted:
             print(f"  bot seat {acting}: {engine.send('step')}")
             continue

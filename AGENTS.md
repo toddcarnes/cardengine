@@ -18,6 +18,7 @@ Verified 2026-09-05: configure + build + `ctest` pass with CMake 4.3.4 / VS 2026
 - `src/main.cpp` — `cardengine` entrypoint (target `cardengine_app`, `OUTPUT_NAME cardengine`); speaks `docs/PROTOCOL.md` on stdin/stdout, flushes every reply.
 - `game_file.h` (key=value `GameFile` parse/save, line-numbered errors; `games/*.txt` examples) + `protocol.h` (`Session::execute`, never throws; `run_protocol` stream loop).
 - `bot.h` (`BotFile` personalities + `Bot` interface; `RandomBot` baseline, `HeuristicBot` with mistake/aggression/looseness sliders; `SeatView` so bots can't peek; `bots/*.txt` examples). Session seats bots in-process via `addbot`/`step`/`bots` until per-seat protocol views allow out-of-process bots.
+- `bot_runner.h` + `cardengine_bot` exe (out-of-process seat runner: `state <seat>` + `options` in, one `act` line out; parses only its own hole). `examples/match.py` hosts engine + N runners. Deal loop counts participants, not seats (busted-out seats sit out without duplicating cards).
 - `examples/cli.py` — hotseat reference client (stdlib-only Python, not in CTest); framing: only `state` is a block (`end`-terminated), `settle` ends with `ok`.
 - `tests/` — dependency-free CTest executables via `cardengine_add_test(name source)` (stdlib only, no gtest/Catch2).
 - `.github/workflows/ci.yml` — Windows + macOS + Linux build/test.

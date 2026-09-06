@@ -22,6 +22,7 @@ add_library(cardengine STATIC
     src/game_file.cpp
     src/protocol.cpp
     src/bot.cpp
+    src/bot_runner.cpp
     src/event.cpp
 )
 target_include_directories(cardengine PUBLIC
@@ -43,6 +44,14 @@ if(MSVC)
     target_compile_options(cardengine_app PRIVATE /W4)
 else()
     target_compile_options(cardengine_app PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_executable(cardengine_bot src/bot_main.cpp)
+target_link_libraries(cardengine_bot PRIVATE cardengine)
+if(MSVC)
+    target_compile_options(cardengine_bot PRIVATE /W4)
+else()
+    target_compile_options(cardengine_bot PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 include(CTest)

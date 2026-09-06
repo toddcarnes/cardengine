@@ -102,7 +102,21 @@ std::string Session::execute(const std::string& raw_line) {
             table_.start_hand(static_cast<std::uint64_t>(seed));
             return "ok";
         }
-        if (command == "state") return do_state();
+        if (command == "state") {
+            if (rest.empty()) return do_state(-1);
+            std::size_t used = 0;
+            int seat = -1;
+            try {
+                seat = std::stoi(rest, &used);
+            } catch (const std::exception&) {
+                return "error bad seat '" + rest + "'";
+            }
+            if (used != rest.size() || seat < 0 ||
+                seat >= table_.num_seats()) {
+                return "error bad seat '" + rest + "'";
+            }
+            return do_state(seat);
+        }
         if (command == "log") {
             std::ostringstream out;
             for (const Event& e : table_.events()) {
@@ -220,12 +234,13 @@ std::string Session::execute(const std::string& raw_line) {
     }
 }
 
-std::string Session::do_state() const {
+std::string Session::do_state(int view_seat) const {
     std::ostringstream out;
     out << "street " << street_name(table_.street()) << "\n";
     out << "button " << table_.button() << "\n";
     out << "acting " << table_.acting() << "\n";
     out << "pot " << table_.pot_total() << "\n";
+    out << "current " << table_.current_bet() << "\n";
     out << "board";
     if (table_.board().empty()) {
         out << " -";
@@ -238,7 +253,12 @@ std::string Session::do_state() const {
             << table_.bet(i) << " committed " << table_.committed(i) << " "
             << (table_.in_hand(i) ? "in" : "out") << " "
             << (table_.has_folded(i) ? "folded" : "live") << " hole";
-        if (table_.in_hand(i) && !table_.has_folded(i)) {
+        // Filtered views hide every other seat's cards; bare `state` is the
+        // local-trust full dump. Folded and out seats always show `--`.
+        const bool show =
+            table_.in_hand(i) && !table_.has_folded(i) &&
+            (view_seat < 0 || view_seat == i);
+        if (show) {
             for (const Card& c : table_.hole_cards(i)) {
                 out << " " << to_string(c);
             }

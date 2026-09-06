@@ -2,6 +2,7 @@
 
 // Umbrella header: pulls in the whole engine API.
 #include "cardengine/bot.h"
+#include "cardengine/bot_runner.h"
 #include "cardengine/card.h"
 #include "cardengine/config.h"
 #include "cardengine/deck.h"

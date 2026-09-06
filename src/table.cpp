@@ -106,10 +106,15 @@ void Table::start_hand(std::uint64_t seed) {
     while (!deck.empty()) shoe.push_back(deck.deal());
     start_hand_common();
     shoe_ = std::move(shoe);
-    // Deal hole_cards rounds starting left of the button.
+    const int participants = static_cast<int>(
+        std::count_if(seats_.begin(), seats_.end(),
+                      [](const Seat& s) { return s.in_hand; }));
+    // Deal hole_cards rounds starting left of the button. The inner loop
+    // runs participants times, not seats times: busted-out seats sit out
+    // and must not duplicate anyone else's cards.
     int s = button_;
     for (int round = 0; round < config_.hole_cards; ++round) {
-        for (int k = 0; k < num_seats(); ++k) {
+        for (int k = 0; k < participants; ++k) {
             s = next_in_hand(s + 1);
             Seat& seat = seats_[static_cast<std::size_t>(s)];
             seat.hole.push_back(shoe_.front());
@@ -133,9 +138,12 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
     }
     start_hand_common();
     shoe_ = std::move(top_first);
+    const int participants = static_cast<int>(
+        std::count_if(seats_.begin(), seats_.end(),
+                      [](const Seat& s) { return s.in_hand; }));
     int s = button_;
     for (int round = 0; round < config_.hole_cards; ++round) {
-        for (int k = 0; k < num_seats(); ++k) {
+        for (int k = 0; k < participants; ++k) {
             s = next_in_hand(s + 1);
             Seat& seat = seats_[static_cast<std::size_t>(s)];
             seat.hole.push_back(shoe_.front());

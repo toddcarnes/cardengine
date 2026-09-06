@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "cardengine/protocol.h"
 
@@ -22,6 +23,23 @@ void check(bool condition, const std::string& message) {
 
 bool contains(const std::string& haystack, const std::string& needle) {
     return haystack.find(needle) != std::string::npos;
+}
+
+std::string find_line(const std::string& text, const std::string& prefix) {
+    std::istringstream in(text);
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.rfind(prefix, 0) == 0) return line;
+    }
+    return "";
+}
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> out;
+    std::istringstream in(line);
+    std::string word;
+    while (in >> word) out.push_back(word);
+    return out;
 }
 
 }  // namespace
@@ -112,6 +130,25 @@ int main() {
         check(contains(text, "ok commands"), "help relayed");
         check(contains(text, "bye"), "quit relayed");
         check(!contains(text, "street"), "stops at quit");
+    }
+
+    // Filtered views: your cards shown, opponents hidden, current posted.
+    {
+        Session s;
+        check(s.execute("start 7") == "ok", "start");
+        const std::string full = s.execute("state");
+        check(contains(full, "current 100"), "current bet posted");
+        const std::string seat3 = find_line(full, "seat 3 ");
+        const std::vector<std::string> toks = split(seat3);
+        check(toks.size() == 13, "full seat line has hole cards");
+        const std::string hole = toks[11] + " " + toks[12];
+
+        const std::string view = s.execute("state 3");
+        check(contains(find_line(view, "seat 3 "), hole), "own cards shown");
+        check(find_line(view, "seat 4 ").rfind("hole --") != std::string::npos,
+              "opponents hidden");
+        check(contains(s.execute("state 9"), "error"), "seat out of range");
+        check(contains(s.execute("state x"), "error"), "bad seat text");
     }
 
     std::cout << "test_protocol ok\n";

@@ -34,7 +34,9 @@ public:
     std::string execute(const std::string& line);
 
 private:
-    std::string do_state() const;
+    // view_seat < 0 is the full local-trust dump; otherwise that seat's
+    // hole cards are shown and every other seat is hidden.
+    std::string do_state(int view_seat) const;
 
     GameConfig config_;
     Table table_;
