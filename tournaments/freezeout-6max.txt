@@ -1,7 +1,7 @@
 # CardEngine tournament file (format 1)
 format_version = 1
 name = "Friday Freezeout"
-description = "6-max no-limit Hold'em freezeout, 10k stacks, 10-hand levels"
+description = "No-limit Hold'em tournament, 6 seats, 10000 chips each, blinds rise every 10 hands"
 game = ../games/holdem-6max.txt
 num_players = 6
 starting_stack = 10000

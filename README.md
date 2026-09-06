@@ -29,19 +29,22 @@ Out-of-source builds only; `build/` is git-ignored.
 
 ## Play
 
-The engine is a UCI-style process: any UI drives it over stdin/stdout
-(full spec in `docs/PROTOCOL.md`). Fastest ways to try it:
+The engine runs as its own program in the background, and any user
+interface talks to it by exchanging simple text lines (full spec in
+`docs/PROTOCOL.md`; every setting is explained in `docs/CONFIG_FILES.md`).
+Fastest ways to try it:
 
 ```sh
-# Hotseat client (Python 3, stdlib only): all seats human by default.
+# Shared-screen client (Python 3, nothing to install): every seat is played
+# by a human taking turns at this computer.
 python examples/cli.py --game games/holdem-headsup.txt
-# Non-interactive smoke test: check-or-call bots, N hands.
+# Automatic demo: simple built-in players check and call, 3 hands.
 python examples/cli.py --auto --hands 3 --seed 42
-# Seat engine-side bots (seat 0 stays human, or --auto plays it).
+# Seat built-in bots (seat 0 stays human, or --auto plays it too).
 python examples/cli.py --auto --bots bots/tight.txt,bots/random.txt --hands 2
-# Out-of-process bots, one OS process per seat, views filtered by the engine.
+# Separate bot programs, one per seat, each seeing only its own cards.
 python examples/match.py --auto --bots 1:bots/tight.txt --bots 2:bots/random.txt --hands 2
-# Tournament (busts, places, prizes; stops at the champion).
+# Tournament (players bust out, places and prizes awarded, stops at the champion).
 python examples/match.py --auto --bots 1:bots/tight.txt --tournament tournaments/freezeout-6max.txt --hands 30
 ```
 
@@ -52,8 +55,8 @@ python examples/match.py --auto --bots 1:bots/tight.txt --tournament tournaments
 - `games/` — shareable game-variant files (`key = value`, see `docs/PROTOCOL.md`)
 - `tournaments/` — shareable tournament files (levels, prizes, buy-ins; compose game files)
 - `bots/` — shareable bot-personality files (same format family)
-- `examples/cli.py` — hotseat reference client; proves any language can drive the engine over pipes
-- `examples/match.py` — match host: engine + one bot process per seat (the listen-server shape)
+- `examples/cli.py` — shared-screen reference client; proves any programming language can talk to the engine using only typed and printed lines
+- `examples/match.py` — match host: one engine plus one bot program per seat (the same shape a future network version will reuse)
 - `docs/` — protocol spec (`PROTOCOL.md`) and config-file reference (`CONFIG_FILES.md`)
 - `tests/` — dependency-free CTest executables (no external test framework)
 - `.github/workflows/ci.yml` — builds + tests on Windows, macOS, Linux

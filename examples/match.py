@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Match driver: one engine, one cardengine_bot process per botted seat.
+"""Match driver: one engine, one cardengine_bot program per botted seat.
 
-This is the listen-server shape in miniature. The driver (standing in for
-the future host GUI) relays filtered `state <seat>` views to bot processes
-and their `act ...` lines back to the engine. Bots never see another seat's
-cards — the engine filters before the bytes leave. Replace these pipes with
-sockets and this file becomes the network gateway.
+This is the same shape a future network version will use. The driver
+(standing in for a future host screen) passes each bot only its own
+filtered view of the table and carries its moves back to the engine.
+Bots never see another seat's cards — the engine filters before the words
+leave. Replace these local message pipes with internet connections and
+this file becomes the network host.
 
 Usage:
     python examples/match.py --bots 1:bots/tight.txt --bots 2:bots/random.txt

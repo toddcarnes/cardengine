@@ -1,8 +1,12 @@
-# CardEngine Text Protocol (v0)
+# CardEngine Text Protocol
 
-UCI-style: the engine is a child process, the UI talks lines on stdin/stdout.
-Any language can drive it — see `examples/cli.py` (Python, ~150 lines, no
-bindings) for the reference client.
+How outside programs talk to the engine. The engine runs as its own program
+in the background; a user interface (or a bot, or a script) starts it, sends
+it one text line per command, and reads back replies. This works the same
+from any programming language — see `examples/cli.py` (about 150 lines of
+Python, using nothing but typed and printed lines) for the reference example.
+(The design follows the same idea as chess engines, which is part of why
+this project is called CardEngine.)
 
 ## Framing rules (clients must follow these)
 
@@ -53,20 +57,25 @@ end
 `bet` is committed this round, `committed` this hand. Folded or out-of-hand
 seats show `hole --`.
 
-> **Trust note (v0):** bare `state` shows every live seat's hole cards. That is
-> correct for local play (hotseat UI, bots on the same machine) and wrong
-> for networked play. `state <seat>` is the filtered form remote clients get;
-> until then, never expose the bare stream to an untrusted client.
+> **Trust note (v0):** bare `state` shows every seated player's hole cards. That is
+> correct for local play (several humans sharing one screen, or bots running
+> on the same computer) and wrong for play over the internet. `state <seat>`
+> is the filtered form remote players get; until then, never expose the bare
+> stream to anyone you would not show your cards to.
 
-## Out-of-process bots
+## Separate bot programs
 
-`cardengine_bot --seat N --bot <file>` plays one seat over its own stdin/stdout.
-The host relays one `state <seat>` block plus one `options` line per decision;
-the runner prints one `act ...` line back (strict alternation, EOF exits,
-`error ...` + nonzero exit on malfunction). The runner parses only its own
-seat's hole cards, so even a compromised bot process can't see more than its
-filtered view. `examples/match.py` is the reference host: engine + N runners,
-the listen-server shape that a network gateway will reuse with sockets.
+`cardengine_bot --seat N --bot <file>` is a small program that plays a single
+seat. It holds its own typed-in/printed-out conversation with whichever
+program started it (the *host*): for every decision, the host forwards that
+seat's cards-and-table view plus the legal moves, and the bot prints back one
+move. The two strictly take turns; when the input ends the bot exits, and if
+anything goes wrong it prints an error and stops with a failure signal
+instead of guessing a move. The bot program reads only its own seat's private
+cards, so even a tampered-with bot cannot see more than its filtered view
+allows. `examples/match.py` is the reference host: one engine plus one bot
+program per seat. A future network version would reuse exactly this shape,
+with internet connections in place of these local message pipes.
 
 ## Game files
 
@@ -118,7 +127,8 @@ settle showdown yes payouts 0:300 committed 200,100
   (pot accounting for analysis and learning bots). Never contains hole cards —
   folders' cards appear in `begin_hand` and nowhere else.
 
-Same trust model as `state`: omniscient, for local eyes only.
+Same caution as `state`: this log records everybody's private cards, so keep
+it on this computer.
 
 ## Tournaments
 

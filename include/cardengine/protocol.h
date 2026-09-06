@@ -13,7 +13,7 @@
 
 namespace cardengine {
 
-// UCI-style text protocol (spec: docs/PROTOCOL.md). One line in, one reply
+// Text protocol for outside programs (spec: docs/PROTOCOL.md). One line in, one reply
 // out (`state` replies with a block terminated by `end`). Every reply is
 // exactly one of:
 //

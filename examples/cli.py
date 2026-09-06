@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Hotseat reference client for CardEngine.
+"""Shared-screen reference client for CardEngine.
 
 The point of this script is architectural, not luxurious: it proves that ANY
-program in ANY language can drive the engine. It spawns cardengine.exe, talks
-text lines on stdin/stdout (see docs/PROTOCOL.md), and plays poker. No shared
-code, no bindings — just pipes.
+program in ANY language can drive the engine. It starts cardengine, talks
+text lines with it (see docs/PROTOCOL.md), and plays poker. No shared
+code, no special connections — just typed and printed lines.
 
 Usage:
     python examples/cli.py [--engine PATH] [--game FILE] [--seed N]
                            [--hands N] [--auto] [--bots F1,F2,...]
 
-    --auto plays every human seat with a check-or-call policy (no prompts),
-    handy for smoke-testing the engine. Without it, non-botted seats are
-    hotseat humans. --bots seats engine-side bots in seats 1..N from the
+    --auto plays every human seat with a simple check-or-call stand-in (no
+    questions asked), handy for a quick hands-free check that the engine
+    works. Without it, every non-botted seat is a human taking turns at
+    this screen. --bots seats built-in bots in seats 1..N from the
     given personality files (see bots/).
 """
 
@@ -190,7 +191,7 @@ def play_hand(engine, seed, auto, botted):
 def main():
     # Line-buffered so piped logs stay live.
     sys.stdout.reconfigure(line_buffering=True)
-    parser = argparse.ArgumentParser(description="CardEngine hotseat client")
+    parser = argparse.ArgumentParser(description="CardEngine shared-screen client")
     parser.add_argument("--engine", default=str(DEFAULT_ENGINE))
     parser.add_argument("--game", default=None)
     parser.add_argument("--seed", type=int, default=1)

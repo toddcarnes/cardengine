@@ -1,7 +1,7 @@
 # CardEngine bot file (format 1)
 format_version = 1
 name = "TAG"
-description = "Tight-aggressive preset: few hands, played hard"
+description = "Tight but aggressive: few hands, played hard"
 style = heuristic
 mistake_rate = 0.03
 aggression = 0.65

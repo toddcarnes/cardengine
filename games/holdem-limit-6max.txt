@@ -1,7 +1,7 @@
 # CardEngine game file (format 1)
 format_version = 1
 name = "Limit Hold'em 6-max"
-description = "Fixed bets (big blind preflop/flop, double after), 4 bets per round max"
+description = "Fixed-size bets that double on the last two rounds, at most 4 bets per round"
 num_players = 6
 starting_stack = 10000
 small_blind = 50

@@ -1,7 +1,7 @@
 # CardEngine bot file (format 1)
 format_version = 1
 name = "LAG"
-description = "Loose-aggressive preset: many hands, maximum pressure"
+description = "Loose and aggressive: many hands, maximum pressure"
 style = heuristic
 mistake_rate = 0.06
 aggression = 0.75
