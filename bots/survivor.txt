@@ -1,0 +1,10 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Survivor"
+description = "TAG core with ICM-lite survival: marginal bust-out calls become folds when short"
+style = heuristic
+mistake_rate = 0.03
+aggression = 0.65
+looseness = 0.2
+survival = 1.0
+seed = 51

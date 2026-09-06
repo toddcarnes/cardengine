@@ -42,6 +42,12 @@ cardengine::Card card(const char* text) {
     return cardengine::parse_card(text);
 }
 
+cardengine::BotFile survival_file() {
+    return parse_text("format_version = 1\nname = S\nstyle = heuristic\n"
+                      "mistake_rate = 0.0\naggression = 0.5\n"
+                      "looseness = 0.3\nsurvival = 1.0\nseed = 12\n");
+}
+
 SeatView base_view() {
     SeatView view;
     view.seat = 0;
@@ -237,6 +243,49 @@ int main() {
         two_pair.max_raise_to = 8000;
         check(bot->decide(two_pair).type == ActionType::Fold,
               "omaha bottom two folds to pressure");
+    }
+
+    // Survival: a short stack folds a marginal continue a deep stack
+    // takes, but still calls with a premium. Pair of 7s (s ~ 0.38) facing
+    // 30 into 370 calls deep (heuristic baseline) and folds short.
+    {
+        SeatView view = base_view();
+        view.hole = {card("7h"), card("2d")};
+        view.board = {card("7s"), card("Kd"), card("Qc")};
+        view.pot = 370;
+        view.to_call = 30;
+        view.call_amount = 30;
+        view.current_bet = 30;
+        view.min_raise_to = 130;
+        view.max_raise_to = 8000;
+
+        auto deep = make_bot(survival_file());
+        view.stack = 8000;
+        view.max_raise_to = 8030;
+        check(deep->decide(view).type == ActionType::Call,
+              "survival deep still calls");
+
+        auto short_stack = make_bot(survival_file());
+        view.stack = 60;
+        view.call_amount = 30;
+        view.max_raise_to = 90;
+        check(short_stack->decide(view).type == ActionType::Fold,
+              "survival short folds marginal");
+
+        // Aces (s ~ 0.9) still continue short: premium beats the premium.
+        auto premium = make_bot(survival_file());
+        view.hole = {card("Ah"), card("Ad")};
+        view.board = {card("7s"), card("Kd"), card("Qc")};
+        view.stack = 60;
+        check(premium->decide(view).type != ActionType::Fold,
+              "survival short keeps premiums");
+
+        // survival = 0 preserves the old call (round-trip default).
+        auto classic = make_bot(heuristic_file());
+        view.hole = {card("7h"), card("2d")};
+        view.stack = 60;
+        check(classic->decide(view).type == ActionType::Call,
+              "survival zero preserves baseline");
     }
 
     std::cout << "test_adaptive ok\n";

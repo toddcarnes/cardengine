@@ -26,6 +26,7 @@ enum class BotStyle { Random, Heuristic, Adaptive, Gto };
 //   mistake_rate = 0.05      # 0..1: decisions replaced by a random action
 //   aggression = 0.6         # 0..1: bet sizing and thin-value frequency
 //   looseness = 0.3          # 0..1: how weak a hand still continues
+//   survival = 0.0           # 0..1: risk premium when short (ICM-lite)
 //   seed = 7                 # mistake/random RNG seed (deterministic)
 struct BotFile {
     int format_version = 1;
@@ -35,6 +36,7 @@ struct BotFile {
     double mistake_rate = 0.0;
     double aggression = 0.5;
     double looseness = 0.3;
+    double survival = 0.0;
     std::uint64_t seed = 0;
 };
 

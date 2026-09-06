@@ -30,6 +30,9 @@ void validate_bot(const BotFile& file) {
     if (file.looseness < 0.0 || file.looseness > 1.0) {
         throw std::invalid_argument("looseness must be 0..1");
     }
+    if (file.survival < 0.0 || file.survival > 1.0) {
+        throw std::invalid_argument("survival must be 0..1");
+    }
 }
 
 BotFile parse_bot(std::istream& in) {
@@ -86,6 +89,8 @@ BotFile parse_bot(std::istream& in) {
             bot.aggression = parse_double(value, lineno);
         } else if (key == "looseness") {
             bot.looseness = parse_double(value, lineno);
+        } else if (key == "survival") {
+            bot.survival = parse_double(value, lineno);
         } else if (key == "seed") {
             try {
                 std::size_t used = 0;
@@ -148,6 +153,7 @@ void save_bot_file(const BotFile& bot, std::ostream& out) {
     out << "mistake_rate = " << bot.mistake_rate << "\n";
     out << "aggression = " << bot.aggression << "\n";
     out << "looseness = " << bot.looseness << "\n";
+    out << "survival = " << bot.survival << "\n";
     out << "seed = " << bot.seed << "\n";
 }
 
@@ -428,22 +434,31 @@ public:
             return random_.decide(view);
         }
         const double s = strength(view);
+        // Survival (ICM-lite): short stacks demand a risk premium on
+        // elimination-risk calls — tournament chips lost are worth more
+        // than chips gained, so marginal continues become folds. Zero when
+        // deep or when survival = 0 (cash-game default).
+        const double premium = risk_premium(view);
         if (view.to_call == 0) {
             if (view.can_raise &&
-                s > 0.60 - file_.aggression * 0.15) {
+                s > 0.60 - file_.aggression * 0.15 + premium * 0.5) {
                 return {ActionType::Raise, size_bet(view)};
             }
             if (view.can_check) return {ActionType::Check, 0};
             return {ActionType::Call, 0};  // Zero-cost call, same as check.
         }
-        if (s >= 0.62 && view.can_raise) return {ActionType::Raise, size_bet(view)};
+        if (s >= 0.62 + premium && view.can_raise) {
+            return {ActionType::Raise, size_bet(view)};
+        }
         const double pot_odds =
             static_cast<double>(view.to_call) /
             static_cast<double>(view.pot + view.to_call);
-        if (view.can_raise && s + file_.looseness * 0.25 >= pot_odds * 2.0) {
+        if (view.can_raise &&
+            s + file_.looseness * 0.25 >= pot_odds * 2.0 + premium) {
             return {ActionType::Call, 0};
         }
-        if (!view.can_raise && s + file_.looseness * 0.25 >= pot_odds) {
+        if (!view.can_raise &&
+            s + file_.looseness * 0.25 >= pot_odds + premium) {
             return {ActionType::Call, 0};
         }
         return {ActionType::Fold, 0};
@@ -456,6 +471,24 @@ protected:
     BotFile file_;
 
 private:
+    // Fraction of the stack at risk, scaled by shortness: deep stacks risk
+    // little per call, short stacks risk everything. Premium peaks when a
+    // call costs a large share of a below-starting stack. The 2x weight on
+    // shortness keeps deep-stack premiums negligible (a 1% call must not
+    // fold) while letting half-stack calls demand real hands.
+    double risk_premium(const SeatView& view) const {
+        if (file_.survival <= 0.0 || view.stack <= 0 || view.to_call <= 0) {
+            return 0.0;
+        }
+        const double at_risk =
+            static_cast<double>(view.call_amount) /
+            static_cast<double>(view.stack + view.call_amount);
+        const double shortness =
+            static_cast<double>(view.to_call) /
+            static_cast<double>(view.stack + view.to_call);
+        return file_.survival * at_risk * (2.0 * shortness + at_risk);
+    }
+
     int size_bet(const SeatView& view) const {
         const double frac = 0.5 + 0.5 * file_.aggression;
         const int target =
