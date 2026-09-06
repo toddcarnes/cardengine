@@ -1,11 +1,13 @@
 #pragma once
 
-// Shared key=value file helpers for game/bot configs. Internal, but lives in
-// include/ so every config parser uses identical rules (trimming, CRLF,
-// strict integers, quoted strings). Tested indirectly via those parsers.
+// Shared key=value file helpers for game/bot/tournament configs. Internal,
+// but lives in include/ so every config parser uses identical rules.
+// Tested indirectly via those parsers.
 #include <cctype>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace cardengine::detail {
 
@@ -53,6 +55,21 @@ inline std::string unquote(std::string value) {
         return value.substr(1, value.size() - 2);
     }
     return value;
+}
+
+inline std::vector<int> parse_int_list(const std::string& value, int line) {
+    std::vector<int> out;
+    std::string item;
+    std::istringstream in(value);
+    while (std::getline(in, item, ',')) {
+        item = trim(item);
+        if (item.empty()) {
+            throw std::invalid_argument("line " + std::to_string(line) +
+                                        ": empty list entry");
+        }
+        out.push_back(parse_int(item, line));
+    }
+    return out;
 }
 
 // Strict: the whole value must be a number, nothing trailing.

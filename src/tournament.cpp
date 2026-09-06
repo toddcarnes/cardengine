@@ -13,27 +13,13 @@ namespace cardengine {
 
 using detail::lower;
 using detail::parse_int;
+using detail::parse_int_list;
 using detail::trim;
 using detail::unquote;
 
 namespace {
 
 namespace fs = std::filesystem;
-
-std::vector<int> parse_int_list(const std::string& value, int lineno) {
-    std::vector<int> out;
-    std::string item;
-    std::istringstream in(value);
-    while (std::getline(in, item, ',')) {
-        item = trim(item);
-        if (item.empty()) {
-            throw std::invalid_argument("line " + std::to_string(lineno) +
-                                        ": empty list entry");
-        }
-        out.push_back(parse_int(item, lineno));
-    }
-    return out;
-}
 
 BlindLevel parse_level(const std::string& value, int lineno) {
     const std::vector<int> parts = parse_int_list(value, lineno);

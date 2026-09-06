@@ -23,6 +23,7 @@ add_library(cardengine STATIC
     src/protocol.cpp
     src/bot.cpp
     src/bot_runner.cpp
+    src/championship.cpp
     src/event.cpp
     src/tournament.cpp
 )
@@ -55,12 +56,20 @@ else()
     target_compile_options(cardengine_bot PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
+add_executable(cardengine_stress src/stress_main.cpp)
+target_link_libraries(cardengine_stress PRIVATE cardengine)
+if(MSVC)
+    target_compile_options(cardengine_stress PRIVATE /W4)
+else()
+    target_compile_options(cardengine_stress PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
-install(TARGETS cardengine cardengine_app cardengine_bot
+install(TARGETS cardengine cardengine_app cardengine_bot cardengine_stress
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

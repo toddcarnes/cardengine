@@ -1,0 +1,9 @@
+# CardEngine championship file (format 1)
+format_version = 1
+name = "Novice Cup"
+description = "Depth-2 heads-up bracket, one game file for every table"
+game = ../games/holdem-headsup.txt
+depth = 2
+buy_in = 1000
+prizes = 70, 30
+champion_prize = 5000

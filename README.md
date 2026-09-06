@@ -48,12 +48,24 @@ python examples/match.py --auto --bots 1:bots/tight.txt --bots 2:bots/random.txt
 python examples/match.py --auto --bots 1:bots/tight.txt --tournament tournaments/freezeout-6max.txt --hands 30
 ```
 
+Brackets double as stress tests: `cardengine_stress` plays whole
+championships with rotating bots and logs every table to CSV for analysis
+(bot strength, edge-case hunting). Large brackets print their game count
+first and need `--yes`; `--max-hands` caps a run instead of letting it
+run forever:
+
+```sh
+# cardengine_stress lives in build/Release on Windows, build elsewhere.
+cardengine_stress --championship championships/novice-cup.txt --bots bots/tight.txt,bots/random.txt --seed 7 --out results.csv
+```
+
 ## Layout
 
 - `include/cardengine/` — public engine headers (`card.h`, `deck.h`, `hand.h`, `config.h`, `types.h`, `table.h`, `event.h`, `game_file.h`, `protocol.h`, `bot.h`, `bot_runner.h`; `cardengine.h` umbrella)
-- `src/` — `cardengine` static library + `cardengine` entrypoint (target `cardengine_app`, `OUTPUT_NAME cardengine`; speaks `docs/PROTOCOL.md` on stdin/stdout) + `cardengine_bot` seat runner
+- `src/` — `cardengine` static library + `cardengine` entrypoint (target `cardengine_app`, `OUTPUT_NAME cardengine`; speaks `docs/PROTOCOL.md` on stdin/stdout) + `cardengine_bot` seat runner + `cardengine_stress` bracket runner
 - `games/` — shareable game-variant files (`key = value`, see `docs/PROTOCOL.md`)
 - `tournaments/` — shareable tournament files (levels, prizes, buy-ins; compose game files)
+- `championships/` — shareable brackets (explicit stages or one-game `depth` shortcut)
 - `bots/` — shareable bot-personality files (same format family)
 - `examples/cli.py` — shared-screen reference client; proves any programming language can talk to the engine using only typed and printed lines
 - `examples/match.py` — match host: one engine plus one bot program per seat (the same shape a future network version will reuse)

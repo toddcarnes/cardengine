@@ -168,3 +168,22 @@ Tournament rules the file implies:
 - Buying back in (`rebuy`) and moving levels by the clock instead of by
   hand count are features of the engine's library for now; the matching
   on-screen commands arrive with the graphical interface.
+
+## Championship files (`championships/`)
+
+A championship is a fixed bracket of ordinary tournaments: each stage's
+winners fill the next stage's seats in order, and the winner of the single
+final table is the champion. Chips reset every stage, so a championship is
+pure bracket math plus scheduling — no new poker rules.
+
+| Key | Default | Effect |
+|---|---|---|
+| `format_version` | **required** | Must be `1`. |
+| `name` / `description` | `""` | For game lists. |
+| `champion_prize` | `0` | Flat award recorded for the champion, on top of whatever the stage tournaments pay. |
+| `stage` | (none) | Repeatable: `tournament file, tables`, with the file path read relative to the championship file. Stages play in order; every stage must produce exactly as many winners (one per table) as the next stage has seats, and the final stage must be one table. |
+| `game` + `depth` | (none) | Shortcut instead of `stage` lines: run a level-`depth` bracket where every table plays the same game file. Depth 0 is a single tournament; depth 2 heads-up opens 4 tables, then 2, then a final. Never combined with `stage` lines. |
+| `buy_in`, `prizes`, `level`, any game key | (game/defaults) | Shortcut only: applied to every generated table (`level` follows the game's blinds when omitted). |
+
+Examples: `winter-classic.txt` (two 6-seat semifinal freezeouts into a
+heads-up final) and `novice-cup.txt` (the depth-2 shortcut).

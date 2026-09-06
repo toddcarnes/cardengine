@@ -3,6 +3,15 @@
 All notable changes to CardEngine, newest first. Versions are pre-1.0:
 minor bumps add features, patches fix bugs.
 
+## Unreleased
+
+- Championships: fixed brackets of tournaments with winner advancement,
+  `game`+`depth` shortcut generation, game-count estimates, and the
+  `cardengine_stress` runner (rotating bots, CSV results, `--yes` gate,
+  `--max-hands` cap) for edge-case hunting and bot strength ranging.
+- Tournaments: levels, eliminations with places, prize pool, rebuys.
+- Docs: plain-English pass; config-file reference; name conventions.
+
 ## 0.2.0
 
 - Engine: Omaha showdown construction, limit and pot-limit betting,

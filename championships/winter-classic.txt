@@ -1,0 +1,7 @@
+# CardEngine championship file (format 1)
+format_version = 1
+name = "Winter Classic"
+description = "Two 6-max semifinal freezeouts feed one heads-up final"
+champion_prize = 50000
+stage = ../tournaments/freezeout-6max.txt, 2
+stage = ../tournaments/final-headsup.txt, 1
