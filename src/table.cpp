@@ -23,6 +23,9 @@ int Table::stack(int seat) const {
 
 void Table::set_stack(int seat, int chips) {
     check_seat(seat);
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("cannot change stacks mid-hand");
+    }
     if (chips < 0) throw std::invalid_argument("chips cannot be negative");
     seats_[static_cast<std::size_t>(seat)].stack = chips;
 }
@@ -47,6 +50,9 @@ void Table::set_ante(int ante) {
 
 void Table::set_button(int seat) {
     check_seat(seat);
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("cannot move the button mid-hand");
+    }
     button_ = seat;
 }
 
@@ -335,20 +341,18 @@ std::vector<Payout> Table::settle() {
             prev = level;
             if (amount == 0 || eligible.empty()) continue;
 
-            HandValue best;
-            bool have_best = false;
+            std::vector<HandValue> values;
             for (int i : eligible) {
                 const Seat& s = seats_[static_cast<std::size_t>(i)];
-                const HandValue value = showdown_value(s.hole, board_);
-                if (!have_best || best < value) {
-                    best = value;
-                    have_best = true;
-                }
+                values.push_back(showdown_value(s.hole, board_));
+            }
+            HandValue best = values[0];
+            for (const HandValue& value : values) {
+                if (best < value) best = value;
             }
             std::vector<int> winners;
-            for (int i : eligible) {
-                const Seat& s = seats_[static_cast<std::size_t>(i)];
-                if (showdown_value(s.hole, board_) == best) winners.push_back(i);
+            for (std::size_t k = 0; k < eligible.size(); ++k) {
+                if (values[k] == best) winners.push_back(eligible[k]);
             }
             // Odd chips go clockwise from the button.
             std::sort(winners.begin(), winners.end(), [&](int a, int b) {
@@ -411,7 +415,8 @@ HandValue Table::showdown_value(const std::vector<Card>& hole,
     return evaluate_best(all);
 }
 
-void Table::record_hand_started(std::uint64_t seed, bool seeded) {    HandStartedEvent started;
+void Table::record_hand_started(std::uint64_t seed, bool seeded) {
+    HandStartedEvent started;
     started.config = config_;
     started.button = button_;
     started.seed = seed;

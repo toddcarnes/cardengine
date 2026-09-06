@@ -5,6 +5,7 @@
 function(cardengine_add_test name source)
     add_executable(${name} ${source})
     target_link_libraries(${name} PRIVATE cardengine)
+    target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     if(MSVC)
         target_compile_options(${name} PRIVATE /W4)
     else()

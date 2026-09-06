@@ -18,3 +18,9 @@ jobs:
         run: cmake --build build --config Release
       - name: Test
         run: ctest --test-dir build --output-on-failure -C Release
+      - name: Python examples smoke test
+        shell: bash
+        run: |
+          PY="$(command -v python || command -v python3)"
+          "$PY" examples/cli.py --auto --hands 2 --seed 42
+          "$PY" examples/match.py --auto --bots 1:bots/tight.txt --bots 2:bots/random.txt --hands 2 --seed 7

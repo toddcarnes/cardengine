@@ -7,23 +7,12 @@
 #include <vector>
 
 #include "cardengine/protocol.h"
+#include "helpers.h"
 
 namespace {
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-void check(bool condition, const std::string& message) {
-    check(condition, message.c_str());
-}
-
-bool contains(const std::string& haystack, const std::string& needle) {
-    return haystack.find(needle) != std::string::npos;
-}
+using testutil::check;
+using testutil::contains;
 
 std::string find_line(const std::string& text, const std::string& prefix) {
     std::istringstream in(text);
@@ -63,6 +52,8 @@ int main() {
         check(s.execute("start") == "error usage: start <seed>",
               "start usage");
         check(s.execute("start abc") == "error bad seed 'abc'", "bad seed");
+        check(s.execute("start -5") == "error bad seed '-5'",
+              "negative seed");
         check(s.execute("load") == "error usage: load <game-file>",
               "load usage");
         check(contains(s.execute("load tmp_missing_xyz.txt"), "error"),
@@ -111,7 +102,8 @@ int main() {
             file << "format_version = 1\nname = HU\nnum_players = 2\n";
         }
         Session s;
-        check(s.execute(std::string("load ") + path) == "ok", "load");
+        check(s.execute(std::string("load \"") + path + "\"") == "ok",
+              "quoted path loads");
         check(s.execute("start 1") == "ok", "start heads-up");
         const std::string state = s.execute("state");
         check(contains(state, "seat 1 stack"), "two seats listed");

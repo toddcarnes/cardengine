@@ -4,19 +4,14 @@
 #include <stdexcept>
 
 #include "cardengine/card.h"
+#include "helpers.h"
 
 namespace {
 
 using cardengine::Card;
 using cardengine::Rank;
 using cardengine::Suit;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::check;
 
 }  // namespace
 

@@ -1,19 +1,17 @@
 // Bot runner contract: text in, action out, opponents' cards ignored.
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include "cardengine/bot.h"
 #include "cardengine/bot_runner.h"
+#include "helpers.h"
 
 namespace {
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::check;
+using testutil::expect_throws;
 
 bool starts_with(const std::string& text, const std::string& prefix) {
     return text.compare(0, prefix.size(), prefix) == 0;
@@ -24,17 +22,6 @@ cardengine::BotFile heuristic_file() {
                           "mistake_rate = 0.0\naggression = 0.5\n"
                           "looseness = 0.3\nseed = 3\n");
     return cardengine::parse_bot(in);
-}
-
-template <typename F>
-void expect_throw(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::invalid_argument&) {
-        return;
-    }
-    std::cerr << "FAIL (expected invalid_argument): " << message << "\n";
-    std::exit(1);
 }
 
 }  // namespace
@@ -97,16 +84,16 @@ int main() {
             "end\n";
         const std::string options =
             "options seat 0 check no call 50 raise yes min 200 max 10000";
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [&] { decide_from_text(*bot, 0, state, "nonsense"); },
             "bad options line");
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [&] {
                 decide_from_text(*bot, 0, state,
                                  "options seat 1 check no call 50 raise no");
             },
             "options for another seat");
-        expect_throw([&] { decide_from_text(*bot, 0, "street preflop\nend\n",
+        expect_throws<std::invalid_argument>([&] { decide_from_text(*bot, 0, "street preflop\nend\n",
                                             options); },
                      "incomplete state");
         const std::string hidden =
@@ -114,7 +101,7 @@ int main() {
             "board -\n"
             "seat 0 stack 9950 bet 50 committed 50 in live hole --\n"
             "end\n";
-        expect_throw([&] { decide_from_text(*bot, 0, hidden, options); },
+        expect_throws<std::invalid_argument>([&] { decide_from_text(*bot, 0, hidden, options); },
                      "hidden own hole");
     }
 

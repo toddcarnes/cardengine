@@ -49,7 +49,7 @@ public:
     void begin_hand_from_deck(std::vector<Card> top_first);
 
     // Books a settled hand: eliminations, prizes, level progress.
-    // Throws std::logic_error unless the table hand is settled.
+    // Throws std::logic_error unless the table hand is settled and unbooked.
     void finish_hand();
 
     // Manual level advance for GUI clocks. Sticks at the final level.
@@ -60,7 +60,7 @@ public:
     void rebuy(int seat);
 
     bool complete() const;
-    int winner() const;  // Valid only when complete().
+    int winner() const;  // Throws std::logic_error unless complete().
     int level_index() const { return level_index_; }
     BlindLevel level() const { return config_.levels[static_cast<std::size_t>(level_index_)]; }
     int hands_into_level() const { return hands_into_level_; }
@@ -82,6 +82,7 @@ private:
     int hands_into_level_ = 0;
     int prize_pool_ = 0;
     int prize_awarded_ = 0;
+    bool hand_open_ = false;  // A dealt hand awaits finish_hand().
     std::vector<bool> eliminated_;
     std::vector<int> places_;
     std::vector<int> prizes_;

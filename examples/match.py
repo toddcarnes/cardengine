@@ -19,11 +19,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from cli import Engine, parse_options, parse_state  # noqa: E402
-
-REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_ENGINE = REPO_ROOT / "build" / "Release" / "cardengine.exe"
-DEFAULT_BOT = REPO_ROOT / "build" / "Release" / "cardengine_bot.exe"
+from cli import DEFAULT_BOT, DEFAULT_ENGINE, Engine, parse_options  # noqa: E402
+from cli import parse_state  # noqa: E402
 
 
 class Runner:

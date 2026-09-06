@@ -6,19 +6,14 @@
 #include <vector>
 
 #include "cardengine/hand.h"
+#include "helpers.h"
 
 namespace {
 
 using cardengine::Card;
 using cardengine::HandCategory;
 using cardengine::HandValue;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::check;
 
 std::array<Card, 5> five(std::initializer_list<const char*> texts) {
     std::array<Card, 5> cards{};

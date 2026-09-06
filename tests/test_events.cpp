@@ -5,25 +5,13 @@
 
 #include "cardengine/event.h"
 #include "cardengine/protocol.h"
+#include "helpers.h"
 
 namespace {
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-bool contains(const std::string& haystack, const std::string& needle) {
-    return haystack.find(needle) != std::string::npos;
-}
-
-std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
-    std::vector<cardengine::Card> out;
-    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
-    return out;
-}
+using testutil::cards;
+using testutil::check;
+using testutil::contains;
 
 void fold(cardengine::Table& t, int s) {
     t.act(s, {cardengine::ActionType::Fold, 0});
@@ -50,7 +38,7 @@ int main() {
         GameConfig config;
         config.num_players = 3;
         Table table(config);
-        table.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d",
+        table.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d",
                                          "8h", "9s", "Tc", "Jd", "Qh"}));
         fold(table, 0);
         fold(table, 1);
@@ -103,7 +91,7 @@ int main() {
         GameConfig config;
         config.num_players = 2;
         Table table(config);
-        table.start_hand_from_deck(shoe({"7c", "As", "2d", "Ad", "Ks", "Qh",
+        table.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
                                          "Jh", "9c", "3d"}));
         call(table, 0);
         chk(table, 1);

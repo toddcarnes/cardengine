@@ -97,6 +97,7 @@ void Tournament::begin_hand(std::uint64_t seed) {
     table_.set_blinds(current.small_blind, current.big_blind);
     table_.set_ante(current.ante);
     table_.start_hand(seed);
+    hand_open_ = true;
 }
 
 void Tournament::begin_hand_from_deck(std::vector<Card> top_first) {
@@ -105,9 +106,13 @@ void Tournament::begin_hand_from_deck(std::vector<Card> top_first) {
     table_.set_blinds(current.small_blind, current.big_blind);
     table_.set_ante(current.ante);
     table_.start_hand_from_deck(std::move(top_first));
+    hand_open_ = true;
 }
 
 void Tournament::finish_hand() {
+    if (!hand_open_) {
+        throw std::logic_error("no open hand to finish");
+    }
     if (table_.street() != Street::Complete) {
         throw std::logic_error("settle the hand first");
     }
@@ -139,6 +144,7 @@ void Tournament::finish_hand() {
         ++level_index_;
         hands_into_level_ = 0;
     }
+    hand_open_ = false;
 }
 
 void Tournament::advance_level() {
@@ -177,6 +183,7 @@ bool Tournament::complete() const {
 }
 
 int Tournament::winner() const {
+    if (!complete()) throw std::logic_error("tournament is not complete");
     for (int i = 0; i < config_.game.num_players; ++i) {
         if (!eliminated_[static_cast<std::size_t>(i)]) return i;
     }

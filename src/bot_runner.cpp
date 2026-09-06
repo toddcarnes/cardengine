@@ -80,6 +80,13 @@ std::string decide_from_text(Bot& bot, int seat,
         if (toks[0] == "street" && toks.size() == 2) {
             view.street = parse_street(toks[1]);
             saw_street = true;
+        } else if (toks[0] == "showdown" && toks.size() == 2) {
+            // Absent in older streams: holdem construction is the default.
+            if (toks[1] == "omaha") {
+                view.showdown = cardengine::HandConstruction::OmahaTwoAndThree;
+            } else if (toks[1] != "holdem") {
+                throw std::invalid_argument("bad showdown '" + toks[1] + "'");
+            }
         } else if (toks[0] == "board" && toks.size() >= 2) {
             for (std::size_t i = 1; i < toks.size(); ++i) {
                 if (toks[i] == "-") continue;

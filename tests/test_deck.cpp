@@ -7,15 +7,11 @@
 #include <vector>
 
 #include "cardengine/deck.h"
+#include "helpers.h"
 
 namespace {
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::check;
 
 std::vector<std::string> deal_all(cardengine::Deck& deck) {
     std::vector<std::string> seen;

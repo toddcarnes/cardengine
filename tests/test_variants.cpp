@@ -5,6 +5,7 @@
 
 #include "cardengine/config.h"
 #include "cardengine/table.h"
+#include "helpers.h"
 
 namespace {
 
@@ -12,19 +13,8 @@ using cardengine::Action;
 using cardengine::ActionType;
 using cardengine::GameConfig;
 using cardengine::Table;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
-    std::vector<cardengine::Card> out;
-    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
-    return out;
-}
+using testutil::cards;
+using testutil::check;
 
 void chk(Table& t, int s) { t.act(s, {ActionType::Check, 0}); }
 void call(Table& t, int s) { t.act(s, {ActionType::Call, 0}); }
@@ -50,7 +40,7 @@ int main() {
         c.num_players = 3;
         c.ante = 10;
         Table t(c);
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
         check(t.committed(0) == 10, "UTG ante only");
         check(t.committed(1) == 60, "SB ante plus blind");
@@ -66,7 +56,7 @@ int main() {
         Table t(c);
         t.set_stack(0, 10);
         // seat1: 7c 2d; seat0: As Ad. Board bricks for seat 1.
-        t.start_hand_from_deck(shoe({"7c", "As", "2d", "Ad", "Ks", "Qh", "Jh",
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh", "Jh",
                                      "9c", "3d"}));
         check(t.is_all_in(0), "ante all in");
         check(t.in_hand(0), "short stack still in");
@@ -90,7 +80,7 @@ int main() {
         Table t(c);
         // seat1: 7c 7d 7h (trips); seat0: As Ks Qs.
         // Board Js Ts 2d 3c gives seat 0 a royal flush.
-        t.start_hand_from_deck(shoe({"7c", "As", "7d", "Ks", "7h", "Qs", "Js",
+        t.start_hand_from_deck(cards({"7c", "As", "7d", "Ks", "7h", "Qs", "Js",
                                      "Ts", "2d", "3c"}));
         check(t.hole_cards(0).size() == 3, "three hole cards dealt");
         call(t, 0);
@@ -119,7 +109,7 @@ int main() {
         c.board_cards = 0;
         Table t(c);
         // seat1 bricks; seat0 is dealt a royal.
-        t.start_hand_from_deck(shoe({"2c", "As", "3d", "Ks", "4h", "Qs", "5s",
+        t.start_hand_from_deck(cards({"2c", "As", "3d", "Ks", "4h", "Qs", "5s",
                                      "Js", "7c", "Ts"}));
         check(t.hole_cards(1).size() == 5, "five hole cards dealt");
         call(t, 0);
@@ -143,7 +133,7 @@ int main() {
         // Deal: seat1 <- Qh, seat0 <- As, seat1 <- Qd, seat0 <- Ks, ...
         // seat1: Qh Qd 4c 5d (trip queens); seat0: As Ks 2c 3d (royal).
         // Board: Qs Js Ts 9h 2h.
-        t.start_hand_from_deck(shoe({"Qh", "As", "Qd", "Ks", "4c", "2c",
+        t.start_hand_from_deck(cards({"Qh", "As", "Qd", "Ks", "4c", "2c",
                                      "5d", "3d", "Qs", "Js", "Ts", "9h",
                                      "2h"}));
         check(t.hole_cards(0).size() == 4, "four hole cards dealt");

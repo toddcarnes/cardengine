@@ -1,11 +1,13 @@
 // Limit and pot-limit betting: fixed sizes, caps, pot-sized max.
 #include <cstdint>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include "cardengine/config.h"
 #include "cardengine/table.h"
+#include "helpers.h"
 
 namespace {
 
@@ -14,35 +16,14 @@ using cardengine::ActionType;
 using cardengine::BettingStructure;
 using cardengine::GameConfig;
 using cardengine::Table;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-template <typename F>
-void expect_invalid_argument(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::invalid_argument&) {
-        return;
-    }
-    std::cerr << "FAIL (expected invalid_argument): " << message << "\n";
-    std::exit(1);
-}
-
-std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
-    std::vector<cardengine::Card> out;
-    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
-    return out;
-}
+using testutil::cards;
+using testutil::check;
+using testutil::expect_throws;
 
 // 11-card shoe; contents never reach showdown in these tests.
 std::vector<cardengine::Card> any_shoe() {
-    return shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
-                 "9s", "Tc", "Jd", "Qh"});
+    return cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+                  "9s", "Tc", "Jd", "Qh"});
 }
 
 void fold(Table& t, int s) { t.act(s, {ActionType::Fold, 0}); }
@@ -80,7 +61,7 @@ int main() {
         check(opts0.can_raise && opts0.min_raise_to == 200 &&
                   opts0.max_raise_to == 200,
               "limit open is exactly 200");
-        expect_invalid_argument([&] { raise_to(t, 0, 250); },
+        expect_throws<std::invalid_argument>([&] { raise_to(t, 0, 250); },
                                 "limit off-size raise");
         raise_to(t, 0, 200);
         check(t.options(1).min_raise_to == 300, "second raise 300");
@@ -91,7 +72,7 @@ int main() {
         raise_to(t, 0, 500);
         const ActionOptions capped = t.options(1);
         check(!capped.can_raise && capped.call_amount == 200, "cap reached");
-        expect_invalid_argument([&] { raise_to(t, 1, 600); },
+        expect_throws<std::invalid_argument>([&] { raise_to(t, 1, 600); },
                                 "raise past cap");
         call(t, 1);
         call(t, 2);
@@ -147,7 +128,7 @@ int main() {
         const ActionOptions u = t.options(0);
         check(u.can_raise && u.min_raise_to == 200 && u.max_raise_to == 350,
               "plo max 350");
-        expect_invalid_argument([&] { raise_to(t, 0, 400); },
+        expect_throws<std::invalid_argument>([&] { raise_to(t, 0, 400); },
                                 "plo over max");
         raise_to(t, 0, 350);
         call(t, 1);

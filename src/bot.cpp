@@ -125,6 +125,32 @@ BotFile load_bot_file(const std::string& path) {
     }
 }
 
+void save_bot_file(const BotFile& bot, std::ostream& out) {
+    out << "# CardEngine bot file (format " << bot.format_version << ")\n";
+    out << "format_version = " << bot.format_version << "\n";
+    out << "name = \"" << bot.name << "\"\n";
+    out << "description = \"" << bot.description << "\"\n";
+    out << "style = ";
+    switch (bot.style) {
+        case BotStyle::Random:
+            out << "random\n";
+            break;
+        case BotStyle::Heuristic:
+            out << "heuristic\n";
+            break;
+        case BotStyle::Adaptive:
+            out << "adaptive\n";
+            break;
+        case BotStyle::Gto:
+            out << "gto\n";
+            break;
+    }
+    out << "mistake_rate = " << bot.mistake_rate << "\n";
+    out << "aggression = " << bot.aggression << "\n";
+    out << "looseness = " << bot.looseness << "\n";
+    out << "seed = " << bot.seed << "\n";
+}
+
 SeatView make_view(const Table& table, int seat) {
     SeatView view;
     view.seat = seat;
@@ -144,6 +170,7 @@ SeatView make_view(const Table& table, int seat) {
     view.num_seats = table.num_seats();
     view.position = (seat - table.button() + table.num_seats()) %
                     table.num_seats();
+    view.showdown = table.config().showdown;
     return view;
 }
 
@@ -192,6 +219,8 @@ double card_points(Rank r) {
 
 // Rough 0..1 made-hand strength: Chen-style points preflop,
 // category-based after.
+HandValue omaha_current(const std::vector<Card>& hole,
+                        const std::vector<Card>& board);
 double made_strength(const SeatView& view) {
     if (view.board.empty()) {
         std::vector<Rank> ranks;
@@ -216,7 +245,13 @@ double made_strength(const SeatView& view) {
     }
     std::vector<Card> all = view.board;
     all.insert(all.end(), view.hole.begin(), view.hole.end());
-    const HandValue value = evaluate_best(all);
+    HandValue value;
+    if (view.showdown == HandConstruction::OmahaTwoAndThree &&
+        view.hole.size() == 4 && view.board.size() >= 3) {
+        value = omaha_current(view.hole, view.board);
+    } else {
+        value = evaluate_best(all);
+    }
     double base = 0.15;
     switch (value.category) {
         case HandCategory::HighCard: base = 0.15; break;
@@ -236,19 +271,56 @@ double made_strength(const SeatView& view) {
     return total;
 }
 
+// Best five right now under exact-2-from-hand rules, for a 3-5 card board.
+// At 5 board cards this is exactly evaluate_omaha; earlier streets judge
+// the made hand so far (draws are scored separately).
+HandValue omaha_current(const std::vector<Card>& hole,
+                        const std::vector<Card>& board) {
+    bool best_set = false;
+    HandValue best;
+    for (std::size_t a = 0; a < hole.size(); ++a) {
+        for (std::size_t b = a + 1; b < hole.size(); ++b) {
+            for (std::size_t c = 0; c < board.size(); ++c) {
+                for (std::size_t d = c + 1; d < board.size(); ++d) {
+                    for (std::size_t e = d + 1; e < board.size(); ++e) {
+                        const std::array<Card, 5> five{hole[a], hole[b],
+                                                       board[c], board[d],
+                                                       board[e]};
+                        const HandValue value = evaluate_five(five);
+                        if (!best_set || best < value) {
+                            best = value;
+                            best_set = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return best;
+}
+
 // Drawing equity: 9 outs per four-flush, 8 per open-ender, times ~4% per
 // street to come. Conservative on purpose; combined with made strength.
 double draw_equity(const SeatView& view) {
     if (view.board.empty() || view.board.size() >= 5) return 0.0;
     int suited[4] = {};
+    int hole_suited[4] = {};
     auto count_suit = [&](const Card& c) {
         ++suited[static_cast<int>(c.suit)];
     };
-    for (const Card& c : view.hole) count_suit(c);
+    for (const Card& c : view.hole) {
+        count_suit(c);
+        ++hole_suited[static_cast<int>(c.suit)];
+    }
     for (const Card& c : view.board) count_suit(c);
     int outs = 0;
-    for (int count : suited) {
-        if (count == 4) outs += 9;
+    const bool omaha = view.showdown == HandConstruction::OmahaTwoAndThree;
+    for (int suit = 0; suit < 4; ++suit) {
+        // Omaha needs exactly 2 from hand: a four-flush is only live with
+        // 2+ hole cards of the suit.
+        if (suited[suit] == 4 && (!omaha || hole_suited[suit] >= 2)) {
+            outs += 9;
+        }
     }
     bool present[15] = {};
     auto mark_rank = [&](Rank r) {

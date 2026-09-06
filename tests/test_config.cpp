@@ -1,27 +1,14 @@
 // GameConfig validation: ranges, deck math, unimplemented structures.
 #include <iostream>
+#include <stdexcept>
 
 #include "cardengine/config.h"
+#include "helpers.h"
 
 namespace {
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-template <typename F>
-void expect_throw(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::invalid_argument&) {
-        return;
-    }
-    std::cerr << "FAIL (expected invalid_argument): " << message << "\n";
-    std::exit(1);
-}
+using testutil::check;
+using testutil::expect_throws;
 
 }  // namespace
 
@@ -32,28 +19,28 @@ int main() {
 
     GameConfig c;
     c.ante = -1;
-    expect_throw([&] { validate(c); }, "negative ante");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "negative ante");
 
     c = GameConfig{};
     c.hole_cards = 0;
-    expect_throw([&] { validate(c); }, "zero hole cards");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "zero hole cards");
     c.hole_cards = 8;
-    expect_throw([&] { validate(c); }, "eight hole cards");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "eight hole cards");
 
     c = GameConfig{};
     c.board_cards = -1;
-    expect_throw([&] { validate(c); }, "negative board cards");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "negative board cards");
     c.board_cards = 6;
-    expect_throw([&] { validate(c); }, "six board cards");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "six board cards");
 
     // Showdown needs best 5 of 5..7 total cards.
     c = GameConfig{};
     c.hole_cards = 4;
     c.board_cards = 5;  // 9 total: Omaha needs its own construction rule.
-    expect_throw([&] { validate(c); }, "nine cards no construction rule");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "nine cards no construction rule");
     c.hole_cards = 1;
     c.board_cards = 3;  // 4 total: nothing to make a hand from.
-    expect_throw([&] { validate(c); }, "four cards no hand");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "four cards no hand");
     c.hole_cards = 1;
     c.board_cards = 4;  // 5 total: fine.
     validate(c);
@@ -66,7 +53,7 @@ int main() {
     c.num_players = 10;
     c.hole_cards = 5;
     c.board_cards = 5;  // 55 > 52.
-    expect_throw([&] { validate(c); }, "deck math");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "deck math");
     c.hole_cards = 2;
     validate(c);  // 10*2+5 = 25: fine.
 
@@ -80,15 +67,15 @@ int main() {
     // Omaha construction needs exactly 4+5.
     c = GameConfig{};
     c.showdown = HandConstruction::OmahaTwoAndThree;
-    expect_throw([&] { validate(c); }, "omaha needs 4 hole cards");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "omaha needs 4 hole cards");
     c.hole_cards = 4;
     validate(c);
     c.board_cards = 4;
-    expect_throw([&] { validate(c); }, "omaha needs 5 board cards");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "omaha needs 5 board cards");
 
     c = GameConfig{};
     c.max_raises_per_round = 0;
-    expect_throw([&] { validate(c); }, "max raises positive");
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "max raises positive");
 
     std::cout << "test_config ok\n";
     return 0;

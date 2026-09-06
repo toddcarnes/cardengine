@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(cardengine VERSION 0.1.0 LANGUAGES CXX)
+project(cardengine VERSION 0.2.0 LANGUAGES CXX)
 
 # Portable ISO C++ only: no compiler extensions, no platform-only APIs in core.
 set(CMAKE_CXX_STANDARD 23)
@@ -60,7 +60,7 @@ if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
-install(TARGETS cardengine cardengine_app
+install(TARGETS cardengine cardengine_app cardengine_bot
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

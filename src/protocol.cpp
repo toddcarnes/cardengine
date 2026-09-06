@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "cardengine/detail/kv.h"
 #include "cardengine/game_file.h"
 
 namespace cardengine {
@@ -93,7 +94,7 @@ std::string Session::execute(const std::string& raw_line) {
         if (command == "quit") return "bye";
         if (command == "load") {
             if (rest.empty()) return "error usage: load <game-file>";
-            const GameFile game = load_game_file(rest);
+            const GameFile game = load_game_file(detail::unquote(rest));
             config_ = game.config;
             table_ = Table(config_);
             tournament_.reset();
@@ -103,7 +104,7 @@ std::string Session::execute(const std::string& raw_line) {
         }
         if (command == "tload") {
             if (rest.empty()) return "error usage: tload <tournament-file>";
-            TournamentFile file = load_tournament_file(rest);
+            TournamentFile file = load_tournament_file(detail::unquote(rest));
             config_ = file.config.game;
             tournament_ = std::make_unique<Tournament>(file.config);
             bots_.clear();
@@ -139,6 +140,7 @@ std::string Session::execute(const std::string& raw_line) {
         }
         if (command == "start") {
             if (rest.empty()) return "error usage: start <seed>";
+            if (rest[0] == '-') return "error bad seed '" + rest + "'";
             std::size_t used = 0;
             unsigned long long seed = 0;
             try {
@@ -243,7 +245,8 @@ std::string Session::execute(const std::string& raw_line) {
             return out.str();
         }
         if (command == "addbot") {
-            const auto [seat_text, path] = split_first(rest);
+            const auto [seat_text, raw_path] = split_first(rest);
+            const std::string path = detail::unquote(raw_path);
             if (seat_text.empty() || path.empty()) {
                 return "error usage: addbot <seat> <bot-file>";
             }
@@ -302,6 +305,12 @@ std::string Session::execute(const std::string& raw_line) {
 std::string Session::do_state(int view_seat) const {
     std::ostringstream out;
     out << "street " << street_name(active_table().street()) << "\n";
+    out << "showdown "
+        << (active_table().config().showdown ==
+                    HandConstruction::OmahaTwoAndThree
+                ? "omaha"
+                : "holdem")
+        << "\n";
     out << "button " << active_table().button() << "\n";
     out << "acting " << active_table().acting() << "\n";
     out << "pot " << active_table().pot_total() << "\n";

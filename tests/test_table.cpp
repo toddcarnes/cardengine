@@ -7,6 +7,7 @@
 
 #include "cardengine/config.h"
 #include "cardengine/table.h"
+#include "helpers.h"
 
 namespace {
 
@@ -14,42 +15,9 @@ using cardengine::Action;
 using cardengine::ActionType;
 using cardengine::GameConfig;
 using cardengine::Table;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-template <typename F>
-void expect_invalid_argument(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::invalid_argument&) {
-        return;
-    }
-    std::cerr << "FAIL (expected invalid_argument): " << message << "\n";
-    std::exit(1);
-}
-
-template <typename F>
-void expect_logic_error(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::logic_error&) {
-        return;
-    }
-    std::cerr << "FAIL (expected logic_error): " << message << "\n";
-    std::exit(1);
-}
-
-// Builds a shoe from compact notation, front = top of deck.
-std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
-    std::vector<cardengine::Card> out;
-    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
-    return out;
-}
+using testutil::cards;
+using testutil::check;
+using testutil::expect_throws;
 
 GameConfig three_max() {
     GameConfig c;
@@ -90,27 +58,27 @@ int main() {
     {
         GameConfig bad;
         bad.num_players = 1;
-        expect_invalid_argument([&] { validate(bad); }, "1 player");
+        expect_throws<std::invalid_argument>([&] { validate(bad); }, "1 player");
         bad.num_players = 11;
-        expect_invalid_argument([&] { validate(bad); }, "11 players");
+        expect_throws<std::invalid_argument>([&] { validate(bad); }, "11 players");
         GameConfig ok;
         validate(ok);
         ok.starting_stack = 0;
-        expect_invalid_argument([&] { validate(ok); }, "zero stack");
+        expect_throws<std::invalid_argument>([&] { validate(ok); }, "zero stack");
         ok.starting_stack = 50;
-        expect_invalid_argument([&] { validate(ok); }, "stack under BB");
+        expect_throws<std::invalid_argument>([&] { validate(ok); }, "stack under BB");
         ok = GameConfig{};
         ok.small_blind = 0;
-        expect_invalid_argument([&] { validate(ok); }, "zero small blind");
+        expect_throws<std::invalid_argument>([&] { validate(ok); }, "zero small blind");
         ok = GameConfig{};
         ok.small_blind = 200;
-        expect_invalid_argument([&] { validate(ok); }, "SB bigger than BB");
+        expect_throws<std::invalid_argument>([&] { validate(ok); }, "SB bigger than BB");
     }
 
     // 3-max blinds: SB seat 1, BB seat 2, UTG seat 0 acts first.
     {
         Table t(three_max());
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
         check(t.bet(1) == 50 && t.committed(1) == 50, "SB posts 50");
         check(t.bet(2) == 100 && t.committed(2) == 100, "BB posts 100");
@@ -124,7 +92,7 @@ int main() {
         GameConfig c;
         c.num_players = 2;
         Table t(c);
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc"}));
         check(t.bet(0) == 50 && t.bet(1) == 100, "heads-up blinds");
         check(t.acting() == 0, "button acts first preflop heads-up");
@@ -137,7 +105,7 @@ int main() {
     // Everyone folds to the big blind: wins without showdown.
     {
         Table t(three_max());
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
         fold(t, 0);
         fold(t, 1);
@@ -156,13 +124,13 @@ int main() {
     // Minimum raise rules preflop.
     {
         Table t(three_max());
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
         const ActionOptions o = t.options(0);
         check(!o.can_check && o.call_amount == 100, "UTG faces 100");
         check(o.can_raise && o.min_raise_to == 200 && o.max_raise_to == 10000,
               "min open is 2x BB");
-        expect_invalid_argument([&] { raise_to(t, 0, 150); },
+        expect_throws<std::invalid_argument>([&] { raise_to(t, 0, 150); },
                                 "raise below minimum");
         raise_to(t, 0, 200);
         check(t.to_call(1) == 150, "SB faces 150 after min-raise");
@@ -175,7 +143,7 @@ int main() {
         Table t(c);
         // Deal: seat1 <- 7c, seat0 <- As, seat1 <- 2d, seat0 <- Ad.
         // Board: Ks Qh Jh 9c 3d. Seat 0's aces beat seat 1's K-high.
-        t.start_hand_from_deck(shoe({"7c", "As", "2d", "Ad", "Ks", "Qh", "Jh",
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh", "Jh",
                                      "9c", "3d"}));
         call(t, 0);
         chk(t, 1);
@@ -197,7 +165,7 @@ int main() {
         t.set_stack(2, 2000);
         // seat1: As Ah; seat2: Qs Qh; seat0: Ks Kd.
         // Board: 2c 5d 9h Jc 3s. Aces > kings > queens.
-        t.start_hand_from_deck(shoe({"As", "Qs", "Ks", "Ah", "Qh", "Kd", "2c",
+        t.start_hand_from_deck(cards({"As", "Qs", "Ks", "Ah", "Qh", "Kd", "2c",
                                      "5d", "9h", "Jc", "3s"}));
         raise_to(t, 0, 1000);  // All in.
         call(t, 1);            // All in for 500 total.
@@ -219,7 +187,7 @@ int main() {
         t.set_button(2);
         // seat0: 7c 2d; seat1: As Ks; seat2: Qd Qh.
         // Board Ah Kh 9c 5d 3s pairs everyone's ace-king except seat 0.
-        t.start_hand_from_deck(shoe({"7c", "As", "Qd", "2d", "Ks", "Qh",
+        t.start_hand_from_deck(cards({"7c", "As", "Qd", "2d", "Ks", "Qh",
                                      "Ah", "Kh", "9c", "5d", "3s"}));
         raise_to(t, 2, 5000);
         call(t, 0);  // All in for 60 total.
@@ -240,7 +208,7 @@ int main() {
     {
         Table t(three_max());
         t.set_stack(0, 280);
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
         call(t, 0);  // 100, stack 180.
         call(t, 1);
@@ -252,7 +220,7 @@ int main() {
         const ActionOptions o = t.options(1);
         check(!o.can_check && o.call_amount == 80 && !o.can_raise,
               "action not reopened");
-        expect_invalid_argument([&] { raise_to(t, 1, 500); },
+        expect_throws<std::invalid_argument>([&] { raise_to(t, 1, 500); },
                                 "re-raise over short all-in");
         call(t, 1);
         call(t, 2);
@@ -269,7 +237,7 @@ int main() {
         // seat1: Ah 3d; seat2: Ks 9d; seat0: As 2d.
         // Board Ac Kd Qh Jc 5s: seats 0+1 tie with AAKQJ, seat 2 has KK.
         // Pot 75 splits 38/37 with the odd chip to seat 0 (the button).
-        t.start_hand_from_deck(shoe({"Ah", "Ks", "As", "3d", "9d", "2d", "Ac",
+        t.start_hand_from_deck(cards({"Ah", "Ks", "As", "3d", "9d", "2d", "Ac",
                                      "Kd", "Qh", "Jc", "5s"}));
         call(t, 0);
         chk(t, 1);
@@ -295,7 +263,7 @@ int main() {
         t.set_stack(0, 2000);
         t.set_stack(1, 200);
         // seat1: As Ad; seat0: Ks Qd. Board bricks out for seat 0.
-        t.start_hand_from_deck(shoe({"As", "Ks", "Ad", "Qd", "2c", "5d", "9h",
+        t.start_hand_from_deck(cards({"As", "Ks", "Ad", "Qd", "2c", "5d", "9h",
                                      "Jc", "3s"}));
         call(t, 0);
         chk(t, 1);
@@ -319,7 +287,7 @@ int main() {
     // Postflop action starts left of the button.
     {
         Table t(three_max());
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
         call(t, 0);
         call(t, 1);
@@ -331,13 +299,16 @@ int main() {
     // Turn enforcement and illegal-action errors.
     {
         Table t(three_max());
-        t.start_hand_from_deck(shoe({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
                                      "9s", "Tc", "Jd", "Qh"}));
-        expect_logic_error([&] { chk(t, 1); }, "act out of turn");
-        expect_invalid_argument([&] { chk(t, 0); }, "check facing blind");
-        expect_logic_error([&] { t.deal_next_street(); }, "deal mid-round");
-        expect_logic_error([&] { t.settle(); }, "settle mid-hand");
-        expect_invalid_argument([&] { t.act(9, {ActionType::Fold, 0}); },
+        expect_throws<std::logic_error>([&] { chk(t, 1); }, "act out of turn");
+        expect_throws<std::invalid_argument>([&] { chk(t, 0); }, "check facing blind");
+        expect_throws<std::logic_error>([&] { t.deal_next_street(); }, "deal mid-round");
+        expect_throws<std::logic_error>([&] { t.settle(); }, "settle mid-hand");
+        expect_throws<std::logic_error>([&] { t.set_stack(0, 500); }, "stack mid-hand");
+        expect_throws<std::logic_error>([&] { t.set_button(1); }, "button mid-hand");
+        expect_throws<std::logic_error>([&] { t.set_blinds(50, 100); }, "blinds mid-hand");
+        expect_throws<std::invalid_argument>([&] { t.act(9, {ActionType::Fold, 0}); },
                                 "seat out of range");
     }
 

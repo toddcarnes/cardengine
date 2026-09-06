@@ -23,7 +23,26 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_ENGINE = REPO_ROOT / "build" / "Release" / "cardengine.exe"
+
+
+def _find_exe(stem):
+    """Locate a built executable across generators: Visual Studio puts
+    cardengine.exe under build/Release, single-config generators (Make,
+    Ninja on macOS/Linux) put cardengine directly under build/."""
+    candidates = [
+        REPO_ROOT / "build" / "Release" / (stem + ".exe"),
+        REPO_ROOT / "build" / (stem + ".exe"),
+        REPO_ROOT / "build" / "Release" / stem,
+        REPO_ROOT / "build" / stem,
+    ]
+    for path in candidates:
+        if path.is_file():
+            return path
+    return candidates[0]  # Best guess; Popen reports a clear error.
+
+
+DEFAULT_ENGINE = _find_exe("cardengine")
+DEFAULT_BOT = _find_exe("cardengine_bot")
 
 
 class Engine:

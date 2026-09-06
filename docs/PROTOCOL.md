@@ -15,7 +15,7 @@ this project is called CardEngine.)
   commands reply multi-line: `state` and `log` send a block terminated by
   an `end` line; `settle` and `tstatus` send prelude lines and a final `ok`.
 - The engine flushes after every reply, so piped clients never deadlock.
-  The first line on startup is a banner (`cardengine 0.1.0`), not a reply.
+  The first line on startup is a banner (`cardengine <version>`), not a reply.
 - An `error` reply never changes session state — retry or send `quit`.
 
 ## Commands

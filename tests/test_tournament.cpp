@@ -3,11 +3,13 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include "cardengine/protocol.h"
 #include "cardengine/tournament.h"
+#include "helpers.h"
 
 namespace {
 
@@ -15,31 +17,12 @@ using cardengine::BlindLevel;
 using cardengine::Table;
 using cardengine::Tournament;
 using cardengine::TournamentConfig;
+using testutil::cards;
+using testutil::check;
+using testutil::contains;
+using testutil::expect_throws;
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
-
-bool contains(const std::string& haystack, const std::string& needle) {
-    return haystack.find(needle) != std::string::npos;
-}
-
-template <typename F>
-void expect_throw(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::exception&) {
-        return;
-    }
-    std::cerr << "FAIL (expected throw): " << message << "\n";
-    std::exit(1);
-}
-
-void play_out(Table& table) {
-    using cardengine::ActionType;
+void play_out(Table& table) {    using cardengine::ActionType;
     while (!table.hand_complete()) {
         if (table.acting() != -1) {
             const int seat = table.acting();
@@ -53,12 +36,6 @@ void play_out(Table& table) {
         }
     }
     table.settle();
-}
-
-std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
-    std::vector<cardengine::Card> out;
-    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
-    return out;
 }
 
 TournamentConfig two_player() {
@@ -78,20 +55,20 @@ int main() {
         TournamentConfig bad;
         bad.game.num_players = 2;
         bad.levels.clear();
-        expect_throw([&] { validate_tournament(bad); }, "empty levels");
+        expect_throws<std::exception>([&] { validate_tournament(bad); }, "empty levels");
         bad = TournamentConfig{};
         bad.game.num_players = 2;
         bad.levels = {BlindLevel{50, 100, 0, 0}};
-        expect_throw([&] { validate_tournament(bad); }, "zero-length level");
+        expect_throws<std::exception>([&] { validate_tournament(bad); }, "zero-length level");
         bad.levels = {BlindLevel{100, 50, 0, 5}};
-        expect_throw([&] { validate_tournament(bad); }, "inverted blinds");
+        expect_throws<std::exception>([&] { validate_tournament(bad); }, "inverted blinds");
         bad.levels = {BlindLevel{50, 100, 0, 5}};
         bad.prizes = {60, 50};
-        expect_throw([&] { validate_tournament(bad); }, "prizes over 100");
+        expect_throws<std::exception>([&] { validate_tournament(bad); }, "prizes over 100");
         bad.prizes = {50};
         bad.buy_in = -1;
-        expect_throw([&] { validate_tournament(bad); }, "negative buy-in");
-        expect_throw(
+        expect_throws<std::exception>([&] { validate_tournament(bad); }, "negative buy-in");
+        expect_throws<std::exception>(
             [] {
                 TournamentConfig c;
                 c.game.num_players = 11;
@@ -122,6 +99,22 @@ int main() {
         tournament.finish_hand();
         tournament.advance_level();  // Already last: sticks.
         check(tournament.level_index() == 1, "level capped");
+        expect_throws<std::exception>(
+            [&] {
+                TournamentConfig config;
+                config.game.num_players = 2;
+                Tournament fresh(config);
+                fresh.finish_hand();
+            },
+            "finish without a hand");
+        expect_throws<std::exception>(
+            [&] {
+                TournamentConfig config;
+                config.game.num_players = 2;
+                Tournament fresh(config);
+                fresh.winner();
+            },
+            "winner before complete");
     }
 
     // Busts take places and prizes; the champion takes the remainder.
@@ -134,7 +127,7 @@ int main() {
         check(tournament.prize_pool() == 3000, "pool is 3 buy-ins");
         tournament.table().set_stack(2, 150);
         // seat1: 3c 4d; seat2: 7c 2d; seat0: As Ad. Board bricks everyone else.
-        tournament.begin_hand_from_deck(shoe({"3c", "7c", "As", "4d", "2d",
+        tournament.begin_hand_from_deck(cards({"3c", "7c", "As", "4d", "2d",
                                               "Ad", "Ks", "Qh", "Jh", "9c",
                                               "3d"}));
         tournament.table().act(0, {ActionType::Raise, 10000});
@@ -142,6 +135,7 @@ int main() {
         tournament.table().act(2, {ActionType::Call, 0});  // All in short.
         play_out(tournament.table());
         tournament.finish_hand();
+        expect_throws<std::exception>([&] { tournament.finish_hand(); }, "double finish");
         auto standings = tournament.standings();
         check(standings[2].eliminated && standings[2].finish_place == 3 &&
                   standings[2].prize == 600,
@@ -151,7 +145,7 @@ int main() {
         tournament.table().set_stack(1, 150);
         // Heads-up now (button to seat 1): seat1 <- 7c 2d, seat0 <- As Ad.
         // Seat 1 shoves short, seat 0 calls, aces hold.
-        tournament.begin_hand_from_deck(shoe({"As", "7c", "Ad", "2d", "Ks",
+        tournament.begin_hand_from_deck(cards({"As", "7c", "Ad", "2d", "Ks",
                                               "Qh", "Jh", "9c", "3d"}));
         tournament.table().act(1, {ActionType::Raise, 150});
         tournament.table().act(0, {ActionType::Call, 0});
@@ -164,7 +158,7 @@ int main() {
               "second takes 30%");
         check(standings[0].finish_place == 1 && standings[0].prize == 1500,
               "champion takes the remainder");
-        expect_throw([&] { tournament.begin_hand(9); }, "no hands when over");
+        expect_throws<std::exception>([&] { tournament.begin_hand(9); }, "no hands when over");
     }
 
     // Rebuys restore stacks (and the pool), vacate finishes, never mid-hand.
@@ -176,7 +170,7 @@ int main() {
         check(tournament.prize_pool() == 3000, "pool is 3 buy-ins");
         // Bust seat 2 first (same rig as the prize test).
         tournament.table().set_stack(2, 150);
-        tournament.begin_hand_from_deck(shoe({"3c", "7c", "As", "4d", "2d",
+        tournament.begin_hand_from_deck(cards({"3c", "7c", "As", "4d", "2d",
                                               "Ad", "Ks", "Qh", "Jh", "9c",
                                               "3d"}));
         tournament.table().act(0, {ActionType::Raise, 10000});
@@ -199,7 +193,7 @@ int main() {
                   tournament.table().in_hand(1) &&
                   tournament.table().in_hand(2),
               "rebought seat plays on");
-        expect_throw([&] { tournament.rebuy(0); }, "no rebuys mid-hand");
+        expect_throws<std::exception>([&] { tournament.rebuy(0); }, "no rebuys mid-hand");
     }
 
     // Table blind controls validate and refuse mid-hand changes.
@@ -209,11 +203,11 @@ int main() {
         Table table(game);
         table.set_blinds(100, 200);
         table.set_ante(25);
-        expect_throw([&] { table.set_blinds(200, 100); }, "inverted blinds");
-        expect_throw([&] { table.set_ante(-5); }, "negative ante");
+        expect_throws<std::exception>([&] { table.set_blinds(200, 100); }, "inverted blinds");
+        expect_throws<std::exception>([&] { table.set_ante(-5); }, "negative ante");
         table.start_hand(1);
-        expect_throw([&] { table.set_blinds(100, 200); }, "mid-hand blinds");
-        expect_throw([&] { table.set_ante(25); }, "mid-hand ante");
+        expect_throws<std::exception>([&] { table.set_blinds(100, 200); }, "mid-hand blinds");
+        expect_throws<std::exception>([&] { table.set_ante(25); }, "mid-hand ante");
     }
 
     // Tournament files: game refs, overrides, levels, prizes, errors.
@@ -253,19 +247,19 @@ int main() {
                   back.config.game.starting_stack == 5000,
               "tournament round-trip");
 
-        expect_throw(
+        expect_throws<std::exception>(
             [] {
                 std::istringstream bad("format_version = 1\nlevel = 1, 2\n");
                 parse_tournament(bad);
             },
             "short level");
-        expect_throw(
+        expect_throws<std::exception>(
             [] {
                 std::istringstream bad("format_version = 1\nmystery = 1\n");
                 parse_tournament(bad);
             },
             "unknown tournament key");
-        expect_throw([] { load_tournament_file("tmp_missing_xyz.txt"); },
+        expect_throws<std::exception>([] { load_tournament_file("tmp_missing_xyz.txt"); },
                      "missing tournament file");
         std::remove(game_path);
         std::remove(path);

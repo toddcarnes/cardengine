@@ -3,36 +3,20 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 #include "cardengine/game_file.h"
+#include "helpers.h"
 
 namespace {
 
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::check;
+using testutil::contains;
+using testutil::expect_throws;
 
 cardengine::GameFile parse_text(const std::string& text) {
     std::istringstream in(text);
     return cardengine::parse_game(in);
-}
-
-template <typename F>
-void expect_throw(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::invalid_argument&) {
-        return;
-    }
-    std::cerr << "FAIL (expected invalid_argument): " << message << "\n";
-    std::exit(1);
-}
-
-bool contains(const std::string& haystack, const std::string& needle) {
-    return haystack.find(needle) != std::string::npos;
 }
 
 }  // namespace
@@ -88,19 +72,19 @@ int main() {
             reported = contains(e.what(), "line 2");
         }
         check(reported, "bad integer names line 2");
-        expect_throw([] { parse_text("num_players = 6\n"); },
+        expect_throws<std::invalid_argument>([] { parse_text("num_players = 6\n"); },
                      "missing version");
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [] { parse_text("format_version = 2\n"); }, "version 2 rejected");
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [] { parse_text("format_version = 1\nbogus_key = 1\n"); },
             "unknown key");
-        expect_throw([] { parse_text("format_version\n"); }, "no equals");
-        expect_throw([] { parse_text("format_version = \n"); }, "no value");
-        expect_throw(
+        expect_throws<std::invalid_argument>([] { parse_text("format_version\n"); }, "no equals");
+        expect_throws<std::invalid_argument>([] { parse_text("format_version = \n"); }, "no value");
+        expect_throws<std::invalid_argument>(
             [] { parse_text("format_version = 1\nbetting = fixed\n"); },
             "bad betting");
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [] { parse_text("format_version = 1\nshowdown = draw\n"); },
             "bad showdown");
         const GameFile omaha = parse_text(
@@ -155,7 +139,7 @@ int main() {
         check(from_disk.name == "Heads-up", "file round-trip");
         std::remove(path);
 
-        expect_throw([] { load_game_file("tmp_missing_game_xyz.txt"); },
+        expect_throws<std::invalid_argument>([] { load_game_file("tmp_missing_game_xyz.txt"); },
                      "missing file");
     }
 

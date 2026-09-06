@@ -5,7 +5,7 @@ Texas Hold'em is the first game, built as the test case for the engine's game-co
 
 ## Goals
 
-- Correct, portable Texas Hold'em engine (Windows, macOS, Linux).
+- Correct, portable card game engine (Windows, macOS, Linux); Texas Hold'em first.
 - Standard C++23 only: `CMAKE_CXX_EXTENSIONS OFF`, no compiler extensions, no POSIX/Win32-only code in core.
 - Minimal dependencies: standard library only by default. Any added library must be MIT-compatible.
 

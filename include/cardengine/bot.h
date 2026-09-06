@@ -43,6 +43,7 @@ void validate_bot(const BotFile& file);
 // Throws std::invalid_argument with line numbers, like parse_game.
 BotFile parse_bot(std::istream& in);
 BotFile load_bot_file(const std::string& path);
+void save_bot_file(const BotFile& bot, std::ostream& out);
 
 // Everything a bot may see: its own hole cards plus public table state.
 // Built from the authoritative Table, so bots cannot peek by construction.
@@ -64,6 +65,9 @@ struct SeatView {
     // best seat). Heuristics use it to tighten early and loosen late.
     int position = -1;
     int num_seats = 0;
+    // Hand-construction rule for made-hand evaluation (Omaha bots must use
+    // exactly 2 from hand; holdem bots use best-any-five).
+    HandConstruction showdown = HandConstruction::BestFiveOfAll;
 };
 
 SeatView make_view(const Table& table, int seat);

@@ -14,13 +14,9 @@
 namespace cardengine {
 
 // Text protocol for outside programs (spec: docs/PROTOCOL.md). One line in, one reply
-// out (`state` replies with a block terminated by `end`). Every reply is
-// exactly one of:
-//
-//   ok [payload...]        — the command worked
-//   error <message>        — it didn't; session state is unchanged
-//   <state block...> end   — reply to `state`
-//   bye                    — reply to `quit`
+// out: `ok ...`, `error ...`, or `bye` on one line; `state` and `log` reply
+// with blocks terminated by `end`; `settle` and `tstatus` reply with prelude
+// lines and a final `ok`. Every reply is exactly one of those shapes.
 //
 // Session is the testable unit: drive it line by line with execute().
 // run_protocol() wraps it around streams for the real engine process and
@@ -46,8 +42,8 @@ private:
     Table table_;
     // Tournament mode replaces the cash table (null = cash game).
     std::unique_ptr<Tournament> tournament_;
-    // Automated seats. Bots live in the session (same machine, local trust)
-    // until per-seat protocol views allow out-of-process bots.
+    // Automated seats for same-machine bots (in-process convenience;
+    // out-of-process runners use filtered views instead).
     std::map<int, std::unique_ptr<Bot>> bots_;
     // Event-log index where the current hand began (for post-hand observe).
     std::size_t hand_events_begin_ = 0;

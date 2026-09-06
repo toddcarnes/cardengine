@@ -1,38 +1,22 @@
 // Bots: file parsing, decision sanity, and heuristic-vs-random edge.
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 #include "cardengine/bot.h"
+#include "helpers.h"
 
 namespace {
 
 using cardengine::ActionType;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::cards;
+using testutil::check;
+using testutil::contains;
+using testutil::expect_throws;
 
 cardengine::BotFile parse_text(const std::string& text) {
     std::istringstream in(text);
     return cardengine::parse_bot(in);
-}
-
-template <typename F>
-void expect_throw(F&& f, const char* message) {
-    try {
-        f();
-    } catch (const std::invalid_argument&) {
-        return;
-    }
-    std::cerr << "FAIL (expected invalid_argument): " << message << "\n";
-    std::exit(1);
-}
-
-bool contains(const std::string& haystack, const std::string& needle) {
-    return haystack.find(needle) != std::string::npos;
 }
 
 cardengine::BotFile heuristic_file() {
@@ -46,10 +30,23 @@ cardengine::BotFile random_file() {
         "format_version = 1\nname = R\nstyle = random\nseed = 5\n");
 }
 
-std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
-    std::vector<cardengine::Card> out;
-    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
-    return out;
+void check_legal(const cardengine::Table& table, int seat,
+                 const cardengine::Action& action) {
+    const cardengine::ActionOptions options = table.options(seat);
+    switch (action.type) {
+        case cardengine::ActionType::Fold:
+        case cardengine::ActionType::Call:
+            break;  // Always acceptable (calls cover all-in and zero).
+        case cardengine::ActionType::Check:
+            check(options.can_check, "bot check is legal");
+            break;
+        case cardengine::ActionType::Raise:
+            check(options.can_raise &&
+                      action.amount >= options.min_raise_to &&
+                      action.amount <= options.max_raise_to,
+                  "bot raise is legal");
+            break;
+    }
 }
 
 }  // namespace
@@ -70,12 +67,12 @@ int main() {
         const BotFile def = parse_text("format_version = 1\n");
         check(def.style == BotStyle::Heuristic, "default style");
 
-        expect_throw([] { parse_text("style = heuristic\n"); },
+        expect_throws<std::invalid_argument>([] { parse_text("style = heuristic\n"); },
                      "missing version");
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [] { parse_text("format_version = 1\nstyle = psychic\n"); },
             "bad style");
-        expect_throw(
+        expect_throws<std::invalid_argument>(
             [] { parse_text("format_version = 1\nmystery = 1\n"); },
             "unknown key");
         bool ranged = false;
@@ -85,8 +82,23 @@ int main() {
             ranged = contains(e.what(), "invalid bot");
         }
         check(ranged, "mistake rate range");
-        expect_throw([] { load_bot_file("tmp_missing_bot_xyz.txt"); },
+        expect_throws<std::invalid_argument>([] { load_bot_file("tmp_missing_bot_xyz.txt"); },
                      "missing file");
+
+        // Save/restore round-trips (the GUI designer writes these).
+        {
+            BotFile original = heuristic_file();
+            original.name = "Saver";
+            original.aggression = 0.75;
+            std::ostringstream out;
+            save_bot_file(original, out);
+            std::istringstream in(out.str());
+            const BotFile back = parse_bot(in);
+            check(back.name == "Saver" && back.aggression == 0.75 &&
+                      back.style == BotStyle::Heuristic &&
+                      back.mistake_rate == 0.0,
+                  "bot round-trip");
+        }
     }
 
     // Aces preflop want to raise; trash facing a big bet folds.
@@ -96,7 +108,7 @@ int main() {
         Table table(config);
         auto bot = make_bot(heuristic_file());
         // Seat 0 (SB) gets As Ad; seat 1 gets bricks.
-        table.start_hand_from_deck(shoe({"7c", "As", "2d", "Ad", "Ks", "Qh",
+        table.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
                                          "Jh", "9c", "3d"}));
         check(table.acting() == 0, "SB acts");
         const Action open = bot->decide(make_view(table, 0));
@@ -104,7 +116,7 @@ int main() {
 
         // Same bot, second hand: seat 0 holds 7c 2d and faces a flop bet.
         Table table2(config);
-        table2.start_hand_from_deck(shoe({"Ks", "7c", "Kd", "2d", "Ah", "Qh",
+        table2.start_hand_from_deck(cards({"Ks", "7c", "Kd", "2d", "Ah", "Qh",
                                           "Jh", "9c", "3d"}));
         table2.act(0, {ActionType::Call, 0});
         table2.act(1, {ActionType::Check, 0});
@@ -145,6 +157,33 @@ int main() {
         check(profit > 0, "heuristic beats random");
         // Deterministic: the same match twice, same result.
         check(vair(30) == profit, "bot match deterministic");
+    }
+
+    // Omaha bots decide postflop without crashing: exact-2 evaluation
+    // replaces best-any-five (which would throw on 9 cards).
+    {
+        GameConfig config;
+        config.num_players = 2;
+        config.hole_cards = 4;
+        config.board_cards = 5;
+        config.showdown = HandConstruction::OmahaTwoAndThree;
+        Table table(config);
+        auto bot = make_bot(heuristic_file());
+        // seat1: 7c 2d 3h 4s; seat0: As Ah Qd Jh (aces raise preflop).
+        // Board: Ks 5d 9c 2h 6d.
+        table.start_hand_from_deck(cards({"7c", "As", "2d", "Ah", "3h", "Qd",
+                                         "4s", "Jh", "Ks", "5d", "9c", "2h",
+                                         "6d"}));
+        check(table.hole_cards(0).size() == 4, "omaha deal");
+        const Action open = bot->decide(make_view(table, 0));
+        check(open.type == ActionType::Raise, "omaha aces raise preflop");
+        table.act(0, {ActionType::Call, 0});
+        table.act(1, {ActionType::Check, 0});
+        table.deal_next_street();
+        const int flop_actor = table.acting();
+        const Action flop = bot->decide(make_view(table, flop_actor));
+        check_legal(table, flop_actor, flop);
+        table.act(flop_actor, flop);
     }
 
     std::cout << "test_bot ok\n";

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "cardengine/bot.h"
+#include "helpers.h"
 
 namespace {
 
@@ -12,13 +13,7 @@ using cardengine::ActionType;
 using cardengine::HandSummary;
 using cardengine::SeatSummary;
 using cardengine::SeatView;
-
-void check(bool condition, const char* message) {
-    if (!condition) {
-        std::cerr << "FAIL: " << message << "\n";
-        std::exit(1);
-    }
-}
+using testutil::check;
 
 cardengine::BotFile parse_text(const std::string& text) {
     std::istringstream in(text);

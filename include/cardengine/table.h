@@ -22,7 +22,7 @@ struct ActionOptions {
 
 // UI-agnostic table engine: the "dealer". Holds authoritative state,
 // validates every action, and reports facts. It never reads input or prints:
-// seating a human or a bot in a seat is the protocol layer's decision (M4+),
+// seating a human or a bot in a seat is the protocol layer's decision,
 // the engine treats all seats identically.
 //
 // Standard no-limit rules: min open is the big blind, min re-raise is the
