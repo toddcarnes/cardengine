@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
     }
 
     Championship cup(file.config);
-    csv << "stage,table,seed,hands,winner_seat,winner_bot,lineup\n";
+    csv << "stage,table,seed,hands,winner_seat,winner_bot,lineup,placements\n";
     std::map<std::string, int> wins;
     unsigned long long hands_total = 0;
     unsigned long long seed = args.seed;
@@ -220,9 +220,15 @@ int main(int argc, char** argv) {
                 if (s > 0) lineup += ";";
                 lineup += bot_names[static_cast<std::size_t>(file_for(s))];
             }
+            // Finishing order (champion first) for multiplayer ratings.
+            std::string placements;
+            for (const int seat : finishing_order(event)) {
+                if (!placements.empty()) placements += ";";
+                placements += std::to_string(seat);
+            }
             csv << stage << "," << table << "," << table_seed << "," << hands
                 << "," << winner << "," << csv_field(winner_bot) << ","
-                << csv_field(lineup) << "\n";
+                << csv_field(lineup) << "," << placements << "\n";
             ++wins[winner_bot];
         }
     }

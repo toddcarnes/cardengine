@@ -88,6 +88,11 @@ private:
     std::vector<int> prizes_;
 };
 
+// Seats in finishing order, champion first. Throws std::logic_error unless
+// the tournament is complete. The stress CSV's `placements` column is this
+// order; the ratings tool reads it for pairwise Elo.
+std::vector<int> finishing_order(const Tournament& event);
+
 // Shareable tournament file. A `game` key composes a game file (path
 // relative to the tournament file); any game keys alongside override it:
 //

@@ -1,5 +1,6 @@
 #include "cardengine/tournament.h"
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -193,6 +194,23 @@ std::vector<Tournament::Standing> Tournament::standings() const {
         out.push_back(standing);
     }
     return out;
+}
+
+std::vector<int> finishing_order(const Tournament& event) {
+    if (!event.complete()) {
+        throw std::logic_error("tournament is not complete");
+    }
+    std::vector<Tournament::Standing> table = event.standings();
+    std::sort(table.begin(), table.end(), [](const Tournament::Standing& a,
+                                             const Tournament::Standing& b) {
+        return a.finish_place < b.finish_place;
+    });
+    std::vector<int> order;
+    order.reserve(table.size());
+    for (const Tournament::Standing& standing : table) {
+        order.push_back(standing.seat);
+    }
+    return order;
 }
 
 TournamentFile parse_tournament(std::istream& in, const std::string& base_dir) {

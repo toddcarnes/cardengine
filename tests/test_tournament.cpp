@@ -115,6 +115,14 @@ int main() {
                 fresh.winner();
             },
             "winner before complete");
+        expect_throws<std::exception>(
+            [&] {
+                TournamentConfig config;
+                config.game.num_players = 2;
+                Tournament fresh(config);
+                finishing_order(fresh);
+            },
+            "finishing order before complete");
     }
 
     // Busts take places and prizes; the champion takes the remainder.
@@ -158,6 +166,8 @@ int main() {
               "second takes 30%");
         check(standings[0].finish_place == 1 && standings[0].prize == 1500,
               "champion takes the remainder");
+        check(finishing_order(tournament) == std::vector<int>{0, 1, 2},
+              "finishing order is champion first");
         expect_throws<std::exception>([&] { tournament.begin_hand(9); }, "no hands when over");
     }
 
