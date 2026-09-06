@@ -143,6 +143,56 @@ int main() {
               "rock still gets respect");
     }
 
+    // Aggression reads: the same marginal hand is a bluff-catch against a
+    // raising maniac but stays folded against a passive caller. adapt_rate
+    // scales the swing (0 ignores the read entirely).
+    {
+        auto read_file = [](double adapt) {
+            std::ostringstream text;
+            text << "format_version = 1\nname = R\nstyle = adaptive\n"
+                    "mistake_rate = 0.0\naggression = 0.5\n"
+                    "looseness = 0.0\nadapt_rate = "
+                 << adapt << "\nseed = 2\n";
+            return parse_text(text.str());
+        };
+        // Weak pair (s ~ 0.35) facing 200 into 200 with no raise left:
+        // pot odds demand 0.5, hand plus empty looseness gives ~0.35.
+        // Maniac reads (3 raises/hand) flip it to a catch; passive reads
+        // (no raises, low looseness signal) leave the fold standing.
+        SeatView view = base_view();
+        view.hole = {card("7h"), card("2d")};
+        view.board = {card("7s"), card("Kd"), card("Qc")};
+        view.pot = 200;
+        view.to_call = 200;
+        view.call_amount = 200;
+        view.current_bet = 200;
+        view.can_raise = false;
+
+        auto catcher = make_bot(read_file(2.0));
+        for (int i = 0; i < 10; ++i) {
+            catcher->observe(0, maniac_summary());  // 3 raises/hand.
+        }
+        check(catcher->decide(view).type == ActionType::Call,
+              "maniac bet is a bluff-catch");
+
+        auto respect = make_bot(read_file(2.0));
+        HandSummary passive = maniac_summary();
+        passive.seats[1].committed = 100;  // Rock: no voluntary money.
+        passive.seats[1].raises = 0;
+        for (int i = 0; i < 10; ++i) {
+            respect->observe(0, passive);
+        }
+        check(respect->decide(view).type == ActionType::Fold,
+              "passive bet gets no discount");
+
+        auto blind = make_bot(read_file(0.0));
+        for (int i = 0; i < 10; ++i) {
+            blind->observe(0, maniac_summary());
+        }
+        check(blind->decide(view).type == ActionType::Fold,
+              "adapt zero ignores the read");
+    }
+
     // Summaries read straight off a finished hand's events.
     {
         GameConfig config;

@@ -42,6 +42,9 @@ void validate_bot(const BotFile& file) {
     if (file.position_weight < 0.0 || file.position_weight > 2.0) {
         throw std::invalid_argument("position_weight must be 0..2");
     }
+    if (file.adapt_rate < 0.0 || file.adapt_rate > 2.0) {
+        throw std::invalid_argument("adapt_rate must be 0..2");
+    }
 }
 
 BotFile parse_bot(std::istream& in) {
@@ -106,6 +109,8 @@ BotFile parse_bot(std::istream& in) {
             bot.defense = parse_double(value, lineno);
         } else if (key == "position_weight") {
             bot.position_weight = parse_double(value, lineno);
+        } else if (key == "adapt_rate") {
+            bot.adapt_rate = parse_double(value, lineno);
         } else if (key == "seed") {
             try {
                 std::size_t used = 0;
@@ -172,6 +177,7 @@ void save_bot_file(const BotFile& bot, std::ostream& out) {
     out << "bluff_rate = " << bot.bluff_rate << "\n";
     out << "defense = " << bot.defense << "\n";
     out << "position_weight = " << bot.position_weight << "\n";
+    out << "adapt_rate = " << bot.adapt_rate << "\n";
     out << "seed = " << bot.seed << "\n";
 }
 
@@ -525,12 +531,38 @@ private:
 };
 
 // Heuristic core plus a table image: tracks each opponent's looseness
-// (voluntary money per hand) across observed hands and shifts its own
-// continuing range — looser against maniacs, tighter against rocks.
+// (voluntary money per hand) and aggression (raises per hand) across
+// observed hands. Shifts its own continuing range — looser against maniacs,
+// tighter against rocks — and calls down aggressive bluffers lighter while
+// giving tight raisers extra respect.
 class AdaptiveBot : public HeuristicBot {
 public:
     explicit AdaptiveBot(const BotFile& file)
         : HeuristicBot(file), base_looseness_(file.looseness) {}
+
+    Action decide(const SeatView& view) override {
+        Action action = HeuristicBot::decide(view);
+        if (action.type != ActionType::Fold || view.to_call <= 0) {
+            return action;
+        }
+        // Aggression read: the bettor's raise rate reconsiders a fold.
+        // Against a maniac the same hand is a bluff-catch; against a rock
+        // the fold stands. adapt_rate scales the swing (0 = ignore reads).
+        const double aggression = table_aggression();
+        const double swing = file_.adapt_rate * (aggression - 0.35) * 0.30;
+        if (swing <= 0.0) return action;
+        const double s = strength(view, file_.position_weight);
+        const double pot_odds =
+            static_cast<double>(view.to_call) /
+            static_cast<double>(view.pot + view.to_call);
+        const double bar = view.can_raise ? pot_odds * 2.0 : pot_odds;
+        // The bluff discount: maniac bets are weaker than the pot claims,
+        // so a near-miss fold becomes a catch.
+        if (s + file_.looseness * 0.25 + swing * 2.0 >= bar) {
+            return {ActionType::Call, 0};
+        }
+        return action;
+    }
 
     void observe(int own_seat, const HandSummary& summary) override {
         for (std::size_t i = 0; i < summary.seats.size(); ++i) {
@@ -541,6 +573,7 @@ public:
             ++opp.hands;
             // Voluntary money past one big blind means playing loose.
             if (seat.committed > summary.big_blind) ++opp.loose;
+            opp.raises += seat.raises;
         }
         // Prior-weighted average: 3 imaginary neutral hands steady small
         // samples, real evidence dominates with volume.
@@ -553,7 +586,7 @@ public:
         }
         double average = 0.4;
         if (weight > 0.0) average = total / weight;
-        double tuned = base_looseness_ + (average - 0.4);
+        double tuned = base_looseness_ + file_.adapt_rate * (average - 0.4);
         if (tuned < 0.0) tuned = 0.0;
         if (tuned > 1.0) tuned = 1.0;
         file_.looseness = tuned;
@@ -563,7 +596,21 @@ private:
     struct Opponent {
         int hands = 0;
         int loose = 0;
+        int raises = 0;
     };
+
+    // Table's raise rate per hand, prior-weighted toward a neutral 0.35
+    // (about one raise every three hands each). Maniacs push it past 1.
+    double table_aggression() const {
+        double raises = 0.0;
+        double hands = 0.0;
+        for (const auto& [seat, opp] : opponents_) {
+            (void)seat;
+            raises += static_cast<double>(opp.raises);
+            hands += static_cast<double>(opp.hands);
+        }
+        return (raises + 0.35 * 3.0) / (hands + 3.0);
+    }
 
     double base_looseness_;
     std::map<int, Opponent> opponents_;
