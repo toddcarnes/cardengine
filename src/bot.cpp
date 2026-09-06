@@ -48,6 +48,9 @@ void validate_bot(const BotFile& file) {
     if (file.barrels < 0.0 || file.barrels > 2.0) {
         throw std::invalid_argument("barrels must be 0..2");
     }
+    if (file.planning < 0 || file.planning > 2) {
+        throw std::invalid_argument("planning must be 0..2");
+    }
 }
 
 BotFile parse_bot(std::istream& in) {
@@ -116,6 +119,8 @@ BotFile parse_bot(std::istream& in) {
             bot.adapt_rate = parse_double(value, lineno);
         } else if (key == "barrels") {
             bot.barrels = parse_double(value, lineno);
+        } else if (key == "planning") {
+            bot.planning = parse_int(value, lineno);
         } else if (key == "seed") {
             try {
                 std::size_t used = 0;
@@ -184,6 +189,7 @@ void save_bot_file(const BotFile& bot, std::ostream& out) {
     out << "position_weight = " << bot.position_weight << "\n";
     out << "adapt_rate = " << bot.adapt_rate << "\n";
     out << "barrels = " << bot.barrels << "\n";
+    out << "planning = " << bot.planning << "\n";
     out << "seed = " << bot.seed << "\n";
 }
 
@@ -482,7 +488,8 @@ protected:
         prior_aggressor_ = false;
     }
 
-    // The baseline decision without story tracking.
+    // The baseline decision without story tracking. Planning overrides
+    // this, not decide, so lookahead shares one story update.
     Action decide_inner(const SeatView& view,
                         std::uniform_real_distribution<double>& unit) {
         const double s = strength(view, file_.position_weight);
@@ -496,6 +503,8 @@ protected:
             unit(rng_) < file_.barrels * 0.5) {
             return {ActionType::Raise, size_bet(view)};
         }
+        // Planning: one-street lookahead reconsiders the baseline below.
+        // (planning = 0 skips straight to it.)
         // Survival (ICM-lite): short stacks demand a risk premium on
         // elimination-risk calls — tournament chips lost are worth more
         // than chips gained, so marginal continues become folds. Zero when
@@ -511,24 +520,55 @@ protected:
             if (view.can_check) return {ActionType::Check, 0};
             return {ActionType::Call, 0};  // Zero-cost call, same as check.
         }
-        if (s >= 0.62 + premium && view.can_raise) {
+        double equity = s;
+        if (file_.planning > 0) {
+            equity = planned_equity(view, s);
+        }
+        if (equity >= 0.62 + premium && view.can_raise) {
             return {ActionType::Raise, size_bet(view)};
         }
         const double pot_odds =
             static_cast<double>(view.to_call) /
             static_cast<double>(view.pot + view.to_call);
         if (view.can_raise &&
-            s + file_.looseness * 0.25 >= pot_odds * 2.0 + premium) {
+            equity + file_.looseness * 0.25 >= pot_odds * 2.0 + premium) {
             return {ActionType::Call, 0};
         }
         if (!view.can_raise &&
-            s + file_.looseness * 0.25 >= pot_odds + premium) {
+            equity + file_.looseness * 0.25 >= pot_odds + premium) {
             return {ActionType::Call, 0};
         }
         return {ActionType::Fold, 0};
     }
 
 private:
+    // One-street lookahead: current strength blended with the hand's
+    // draw trajectory. Draw-heavy hands gain (outs realize next street);
+    // made hands with no redraws decay slightly (the board can only get
+    // scarier). planning = 1 blends half, 2 blends three-quarters.
+    // Pure arithmetic over the existing evaluators: no search tree, no
+    // opponent model — microseconds, not milliseconds.
+    double planned_equity(const SeatView& view, double now) const {
+        const double draw = draw_equity(view);
+        const double made = made_strength(view);
+        double next = now;
+        if (draw > made && !view.board.empty() &&
+            view.board.size() < 5) {
+            // Drawing: expected next-street strength if one card hits.
+            next = made + draw * 0.5;
+        } else if (made >= 0.5 && draw <= 0.05 && !view.board.empty() &&
+                   view.board.size() < 5) {
+            // Vulnerable made hand, no redraws: discount for scary cards.
+            next = made - 0.06;
+        }
+        const double blend =
+            file_.planning >= 2 ? 0.75 : 0.5;
+        double equity = now + (next - now) * blend;
+        if (equity < 0.0) equity = 0.0;
+        if (equity > 1.0) equity = 1.0;
+        return equity;
+    }
+
     // Fraction of the stack at risk, scaled by shortness: deep stacks risk
     // little per call, short stacks risk everything. Premium peaks when a
     // call costs a large share of a below-starting stack. The 2x weight on

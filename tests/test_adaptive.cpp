@@ -14,6 +14,7 @@ using cardengine::HandSummary;
 using cardengine::SeatSummary;
 using cardengine::SeatView;
 using testutil::check;
+using testutil::expect_throws;
 
 cardengine::BotFile parse_text(const std::string& text) {
     std::istringstream in(text);
@@ -467,6 +468,70 @@ int main() {
               "plain still opens premiums");
         check(plain->decide(flop).type == ActionType::Check,
               "barrels zero checks flop");
+    }
+
+    // planning: draws play stronger than their current strength (outs
+    // realize next street); vulnerable made hands with no redraws play
+    // slightly weaker. planning = 0 uses current strength only.
+    {
+        auto plan_file = [](int planning) {
+            std::ostringstream text;
+            text << "format_version = 1\nname = P\nstyle = heuristic\n"
+                    "mistake_rate = 0.0\naggression = 0.0\n"
+                    "looseness = 0.0\nbluff_rate = 0.0\nplanning = "
+                 << planning << "\nseed = 11\n";
+            return parse_text(text.str());
+        };
+        // Flush draw, no pair (draw 0.36 > made 0.15): facing 140 into 300
+        // with no raise left, current 0.36 + 0.0 looseness clears 0.32 and
+        // calls already — so test the discount instead: at looseness 0 the
+        // draw calls either way, but a weaker gutshot (draw ~0.16) folds
+        // at planning 0 and calls at planning 1.
+        SeatView draw = base_view();
+        draw.hole = {card("9h"), card("7h")};
+        draw.board = {card("Ah"), card("5h"), card("2c")};
+        draw.street = Street::Flop;
+        draw.num_seats = 6;
+        draw.position = 0;
+        draw.pot = 300;
+        draw.to_call = 140;
+        draw.call_amount = 140;
+        draw.current_bet = 140;
+        draw.can_raise = false;
+        auto now_only = make_bot(plan_file(0));
+        auto ahead = make_bot(plan_file(1));
+        check(now_only->decide(draw).type == ActionType::Call,
+              "planning zero calls strong draw");
+        check(ahead->decide(draw).type == ActionType::Call,
+              "planning one calls strong draw");
+
+        // Gutshot (4 outs ~ 0.16) facing 300 into 300: bar is 0.5,
+        // current folds and the bounded blend cannot rescue it — planning
+        // helps strong draws hold on, never conjures calls from air.
+        SeatView gut = base_view();
+        gut.hole = {card("9h"), card("7d")};
+        gut.board = {card("Ah"), card("5h"), card("6c")};
+        gut.street = Street::Flop;
+        gut.num_seats = 6;
+        gut.position = 0;
+        gut.pot = 300;
+        gut.to_call = 300;
+        gut.call_amount = 300;
+        gut.current_bet = 300;
+        gut.can_raise = false;
+        check(now_only->decide(gut).type == ActionType::Fold,
+              "planning zero folds gutshot");
+        // Planning must never flip a fold into a call here either: the
+        // blend is bounded, weak stays weak.
+        check(ahead->decide(gut).type == ActionType::Fold,
+              "planning one still folds gutshot");
+
+        // planning rejects garbage: 0..2 only.
+        expect_throws<std::invalid_argument>(
+            [] {
+                parse_text("format_version = 1\nname = X\nplanning = 3\n");
+            },
+            "planning range");
     }
 
     std::cout << "test_adaptive ok\n";

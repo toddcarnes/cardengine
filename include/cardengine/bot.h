@@ -32,6 +32,7 @@ enum class BotStyle { Random, Heuristic, Adaptive, Gto };
 //   position_weight = 1.0    # 0..2: positional adjustment scale
 //   adapt_rate = 1.0         # 0..2: opponent-reading strength (adaptive)
 //   barrels = 0.0            # 0..2: continued aggression after betting
+//   planning = 0             # 0..2: one-street lookahead depth (heuristic)
 //   seed = 7                 # mistake/random RNG seed (deterministic)
 struct BotFile {
     int format_version = 1;
@@ -47,6 +48,7 @@ struct BotFile {
     double position_weight = 1.0;
     double adapt_rate = 1.0;
     double barrels = 0.0;
+    int planning = 0;
     std::uint64_t seed = 0;
 };
 
