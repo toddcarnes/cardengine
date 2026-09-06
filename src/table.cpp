@@ -359,13 +359,17 @@ std::vector<Payout> Table::settle() {
     for (const Payout& p : payouts) {
         seats_[static_cast<std::size_t>(p.seat)].stack += p.amount;
     }
+    HandSettledEvent settled;
+    settled.showdown = showdown_;
+    settled.payouts = payouts;
+    for (const Seat& s : seats_) settled.committed.push_back(s.committed);
     // The pot has been awarded; commitments no longer exist.
     for (Seat& s : seats_) {
         s.bet = 0;
         s.committed = 0;
     }
     last_payouts_ = payouts;
-    events_.push_back(HandSettledEvent{showdown_, last_payouts_});
+    events_.push_back(settled);
     street_ = Street::Complete;
     acting_ = -1;
     // Advance the button to the next seated player with chips.

@@ -84,6 +84,11 @@ std::string format_event(const Event& event) {
             out << e.payouts[i].seat << ":" << e.payouts[i].amount;
         }
     }
+    out << " committed ";
+    for (std::size_t i = 0; i < e.committed.size(); ++i) {
+        if (i > 0) out << ",";
+        out << e.committed[i];
+    }
     return out.str();
 }
 

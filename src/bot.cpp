@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <map>
 #include <random>
 #include <stdexcept>
 
@@ -70,10 +71,14 @@ BotFile parse_bot(std::istream& in) {
                 bot.style = BotStyle::Random;
             } else if (s == "heuristic") {
                 bot.style = BotStyle::Heuristic;
+            } else if (s == "adaptive") {
+                bot.style = BotStyle::Adaptive;
+            } else if (s == "gto") {
+                bot.style = BotStyle::Gto;
             } else {
                 throw std::invalid_argument(
                     "line " + std::to_string(lineno) +
-                    ": style must be random or heuristic");
+                    ": style must be random, heuristic, adaptive, or gto");
             }
         } else if (key == "mistake_rate") {
             bot.mistake_rate = parse_double(value, lineno);
@@ -136,6 +141,9 @@ SeatView make_view(const Table& table, int seat) {
     view.can_raise = opts.can_raise;
     view.min_raise_to = opts.min_raise_to;
     view.max_raise_to = opts.max_raise_to;
+    view.num_seats = table.num_seats();
+    view.position = (seat - table.button() + table.num_seats()) %
+                    table.num_seats();
     return view;
 }
 
@@ -182,8 +190,9 @@ double card_points(Rank r) {
     }
 }
 
-// Rough 0..1 hand strength: Chen-style points preflop, category-based after.
-double strength(const SeatView& view) {
+// Rough 0..1 made-hand strength: Chen-style points preflop,
+// category-based after.
+double made_strength(const SeatView& view) {
     if (view.board.empty()) {
         std::vector<Rank> ranks;
         for (const Card& c : view.hole) ranks.push_back(c.rank);
@@ -227,6 +236,62 @@ double strength(const SeatView& view) {
     return total;
 }
 
+// Drawing equity: 9 outs per four-flush, 8 per open-ender, times ~4% per
+// street to come. Conservative on purpose; combined with made strength.
+double draw_equity(const SeatView& view) {
+    if (view.board.empty() || view.board.size() >= 5) return 0.0;
+    int suited[4] = {};
+    auto count_suit = [&](const Card& c) {
+        ++suited[static_cast<int>(c.suit)];
+    };
+    for (const Card& c : view.hole) count_suit(c);
+    for (const Card& c : view.board) count_suit(c);
+    int outs = 0;
+    for (int count : suited) {
+        if (count == 4) outs += 9;
+    }
+    bool present[15] = {};
+    auto mark_rank = [&](Rank r) {
+        present[static_cast<int>(r)] = true;
+        if (r == Rank::Ace) present[1] = true;
+    };
+    for (const Card& c : view.hole) mark_rank(c.rank);
+    for (const Card& c : view.board) mark_rank(c.rank);
+    for (int start = 1; start <= 10; ++start) {
+        int window = 0;
+        for (int r = start; r < start + 5; ++r) {
+            if (present[r]) ++window;
+        }
+        if (window == 4) {
+            outs += 8;
+            break;
+        }
+    }
+    if (outs == 0) return 0.0;
+    const double per_card = view.board.size() <= 3 ? 0.04 : 0.02;
+    double equity = static_cast<double>(outs) * per_card;
+    if (equity > 0.55) equity = 0.55;
+    return equity;
+}
+
+double strength(const SeatView& view) {
+    double total = made_strength(view);
+    const double draw = draw_equity(view);
+    if (draw > total) total = draw;
+    // Position: late seats realize more equity and steal more often;
+    // early seats pay for acting blind. Small on purpose.
+    if (view.num_seats > 0) {
+        if (view.position == 0 || view.position == view.num_seats - 1) {
+            total += 0.05;
+        } else if (view.position == 1 || view.position == 2) {
+            total -= 0.05;
+        }
+    }
+    if (total < 0.0) total = 0.0;
+    if (total > 1.0) total = 1.0;
+    return total;
+}
+
 class HeuristicBot : public Bot {
 public:
     explicit HeuristicBot(const BotFile& file)
@@ -262,6 +327,10 @@ public:
 
     const std::string& name() const override { return file_.name; }
 
+protected:
+    // AdaptiveBot retunes looseness as it profiles the table.
+    BotFile file_;
+
 private:
     int size_bet(const SeatView& view) const {
         const double frac = 0.5 + 0.5 * file_.aggression;
@@ -273,17 +342,159 @@ private:
         return target;
     }
 
+    std::mt19937_64 rng_;
+    RandomBot random_;
+};
+
+// Heuristic core plus a table image: tracks each opponent's looseness
+// (voluntary money per hand) across observed hands and shifts its own
+// continuing range — looser against maniacs, tighter against rocks.
+class AdaptiveBot : public HeuristicBot {
+public:
+    explicit AdaptiveBot(const BotFile& file)
+        : HeuristicBot(file), base_looseness_(file.looseness) {}
+
+    void observe(int own_seat, const HandSummary& summary) override {
+        for (std::size_t i = 0; i < summary.seats.size(); ++i) {
+            if (static_cast<int>(i) == own_seat) continue;
+            const SeatSummary& seat = summary.seats[i];
+            if (!seat.played) continue;
+            Opponent& opp = opponents_[static_cast<int>(i)];
+            ++opp.hands;
+            // Voluntary money past one big blind means playing loose.
+            if (seat.committed > summary.big_blind) ++opp.loose;
+        }
+        // Prior-weighted average: 3 imaginary neutral hands steady small
+        // samples, real evidence dominates with volume.
+        double total = 0.0;
+        double weight = 0.0;
+        for (const auto& [seat, opp] : opponents_) {
+            (void)seat;
+            total += static_cast<double>(opp.loose) + 0.4 * 3.0;
+            weight += static_cast<double>(opp.hands) + 3.0;
+        }
+        double average = 0.4;
+        if (weight > 0.0) average = total / weight;
+        double tuned = base_looseness_ + (average - 0.4);
+        if (tuned < 0.0) tuned = 0.0;
+        if (tuned > 1.0) tuned = 1.0;
+        file_.looseness = tuned;
+    }
+
+private:
+    struct Opponent {
+        int hands = 0;
+        int loose = 0;
+    };
+
+    double base_looseness_;
+    std::map<int, Opponent> opponents_;
+};
+
+// Balanced-lite: fixed pot-fraction sizing, minimum-defense-frequency
+// calls, value-heavy raises plus occasional bluffs at the same size.
+class GtoBot : public Bot {
+public:
+    explicit GtoBot(const BotFile& file)
+        : file_(file), name_(file.name), rng_(file.seed), random_(file) {}
+
+    Action decide(const SeatView& view) override {
+        std::uniform_real_distribution<double> unit(0.0, 1.0);
+        if (unit(rng_) < file_.mistake_rate) {
+            return random_.decide(view);
+        }
+        const double s = strength(view);
+        if (view.to_call == 0) {
+            if (view.can_raise && (s > 0.62 ||
+                                   (s < 0.30 && unit(rng_) < 0.35))) {
+                return {ActionType::Raise, size_bet(view)};
+            }
+            if (view.can_check) return {ActionType::Check, 0};
+            return {ActionType::Call, 0};
+        }
+        if (s > 0.75 && view.can_raise) return {ActionType::Raise, size_bet(view)};
+        // Minimum defense frequency: call often enough that bluffs break even.
+        const double mdf = static_cast<double>(view.pot) /
+                           static_cast<double>(view.pot + view.to_call);
+        if (unit(rng_) < mdf) return {ActionType::Call, 0};
+        return {ActionType::Fold, 0};
+    }
+
+    const std::string& name() const override { return name_; }
+
+private:
+    int size_bet(const SeatView& view) const {
+        const int target =
+            view.current_bet +
+            static_cast<int>(static_cast<double>(view.pot) * 0.6);
+        if (target < view.min_raise_to) return view.min_raise_to;
+        if (target > view.max_raise_to) return view.max_raise_to;
+        return target;
+    }
+
     BotFile file_;
+    std::string name_;
     std::mt19937_64 rng_;
     RandomBot random_;
 };
 
 }  // namespace
 
+HandSummary summarize_hand(const std::vector<Event>& events, std::size_t begin,
+                           std::size_t end) {
+    HandSummary summary;
+    if (begin > events.size()) begin = events.size();
+    if (end > events.size()) end = events.size();
+    for (std::size_t k = begin; k < end; ++k) {
+        const Event& event = events[k];
+        if (const auto* started = std::get_if<HandStartedEvent>(&event)) {
+            summary.big_blind = started->config.big_blind;
+            summary.seats.assign(started->hole.size(), SeatSummary{});
+            for (std::size_t i = 0; i < started->hole.size(); ++i) {
+                summary.seats[i].played = !started->hole[i].empty();
+                summary.seats[i].folded = false;
+            }
+        } else if (const auto* action = std::get_if<ActionTakenEvent>(&event)) {
+            if (action->seat < 0 ||
+                static_cast<std::size_t>(action->seat) >= summary.seats.size()) {
+                throw std::invalid_argument("action from unknown seat");
+            }
+            SeatSummary& seat = summary.seats[static_cast<std::size_t>(action->seat)];
+            if (action->action.type == ActionType::Fold) {
+                seat.folded = true;
+            } else {
+                seat.folded = false;
+                if (action->action.type == ActionType::Raise) ++seat.raises;
+            }
+        } else if (const auto* settled = std::get_if<HandSettledEvent>(&event)) {
+            if (settled->committed.size() != summary.seats.size()) {
+                throw std::invalid_argument("settle does not match its hand");
+            }
+            for (std::size_t i = 0; i < summary.seats.size(); ++i) {
+                summary.seats[i].committed = settled->committed[i];
+            }
+            for (const Payout& payout : settled->payouts) {
+                summary.seats[static_cast<std::size_t>(payout.seat)].won +=
+                    payout.amount;
+            }
+        }
+    }
+    if (summary.seats.empty()) {
+        throw std::invalid_argument("no hand in range");
+    }
+    return summary;
+}
+
 std::unique_ptr<Bot> make_bot(const BotFile& file) {
     validate_bot(file);
     if (file.style == BotStyle::Random) {
         return std::make_unique<RandomBot>(file);
+    }
+    if (file.style == BotStyle::Adaptive) {
+        return std::make_unique<AdaptiveBot>(file);
+    }
+    if (file.style == BotStyle::Gto) {
+        return std::make_unique<GtoBot>(file);
     }
     return std::make_unique<HeuristicBot>(file);
 }

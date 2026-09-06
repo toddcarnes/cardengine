@@ -80,15 +80,18 @@ a friend's hand-edited file can error, never corrupt a game.
 ## Bot files
 
 Tunable personalities, same conventions as game files (`bots/` holds
-examples). Parameters, not code: `style = heuristic|random`, plus 0..1
+examples). Parameters, not code: `style = heuristic|random|adaptive|gto`, plus 0..1
 sliders `mistake_rate` (decisions replaced by a random legal action),
 `aggression` (sizing and thin value), `looseness` (how weak a hand
 continues), and integer `seed` for determinism. New *strategies* still need
-C++ behind the `Bot` interface; new *personalities* are just files.
+C++ behind the `Bot` interface; new *personalities* are just files
+(`tag`/`lag`/`nit` presets included).
 
 Bots live in the session for now (same machine, local trust — they see only
-their own hole cards by construction via `SeatView`). Out-of-process bots
-over the protocol wait on per-seat state views (see trust note above).
+their own hole cards by construction via `SeatView`). In-process bots study
+each finished hand through `observe` (public action frequencies only).
+Out-of-process runners (`cardengine_bot`, `examples/match.py`) decide from
+filtered `state <seat>` views plus `options` (see "Out-of-process bots").
 
 ## Event log
 
@@ -100,14 +103,15 @@ read this instead of scraping state:
 begin_hand button 0 seed 7 stacks 10000,10000 hole As,Ad|7c,2d
 action 0 raise 200 pot 300
 street flop Ks Qh Jh
-settle showdown yes payouts 0:300
+settle showdown yes payouts 0:300 committed 200,100
 ```
 
 - `begin_hand`: pre-hand stacks, the seed (`-` for from-deck testing deals),
   and dealt hole cards per seat (`|`-separated, positionally).
 - `action`: seat, action, and pot after the action.
 - `street`: only the newly dealt cards.
-- `settle`: payouts as `seat:amount` pairs. Never contains hole cards —
+- `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
+  (pot accounting for analysis and learning bots). Never contains hole cards —
   folders' cards appear in `begin_hand` and nowhere else.
 
 Same trust model as `state`: omniscient, for local eyes only.

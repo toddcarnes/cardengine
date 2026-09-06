@@ -43,6 +43,8 @@ private:
     // Automated seats. Bots live in the session (same machine, local trust)
     // until per-seat protocol views allow out-of-process bots.
     std::map<int, std::unique_ptr<Bot>> bots_;
+    // Event-log index where the current hand began (for post-hand observe).
+    std::size_t hand_events_begin_ = 0;
 };
 
 int run_protocol(std::istream& in, std::ostream& out);

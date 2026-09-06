@@ -87,6 +87,7 @@ std::string Session::execute(const std::string& raw_line) {
             config_ = game.config;
             table_ = Table(config_);
             bots_.clear();
+            hand_events_begin_ = 0;
             return "ok";
         }
         if (command == "start") {
@@ -99,7 +100,10 @@ std::string Session::execute(const std::string& raw_line) {
                 return "error bad seed '" + rest + "'";
             }
             if (used != rest.size()) return "error bad seed '" + rest + "'";
+            // Baseline first: a rejected start must not move it.
+            const std::size_t baseline = table_.events().size();
             table_.start_hand(static_cast<std::uint64_t>(seed));
+            hand_events_begin_ = baseline;
             return "ok";
         }
         if (command == "state") {
@@ -175,6 +179,12 @@ std::string Session::execute(const std::string& raw_line) {
                 out << "payout " << p.seat << " " << p.amount << "\n";
             }
             out << "ok";
+            // Seated bots study the finished hand before the next deal.
+            const HandSummary summary = summarize_hand(
+                table_.events(), hand_events_begin_, table_.events().size());
+            for (auto& [seat, bot] : bots_) {
+                bot->observe(seat, summary);
+            }
             return out.str();
         }
         if (command == "addbot") {

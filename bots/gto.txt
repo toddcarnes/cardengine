@@ -1,0 +1,9 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "GTO"
+description = "Balanced-lite: minimum-defense calls, pot-fraction sizing, mixed bluffs"
+style = gto
+mistake_rate = 0.0
+aggression = 0.5
+looseness = 0.3
+seed = 34

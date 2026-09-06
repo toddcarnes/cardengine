@@ -86,7 +86,8 @@ int main() {
         check(contains(first_line, "begin_hand button 0 seed -"), "text head");
         check(contains(first_line, "stacks 10000,10000,10000"), "text stacks");
         const std::string last_line = format_event(events[3]);
-        check(last_line == "settle showdown no payouts 2:150", "text settle");
+        check(last_line == "settle showdown no payouts 2:150 committed 0,50,100",
+              "text settle");
 
         // No-leak rule: the folders' hole cards appear in begin_hand and
         // nowhere else in the hand's log.
@@ -128,7 +129,7 @@ int main() {
         const auto* settled = as_event<HandSettledEvent>(events[12]);
         check(settled != nullptr && settled->showdown, "showdown flag");
         check(format_event(events[12]) ==
-                  "settle showdown yes payouts 0:200",
+                  "settle showdown yes payouts 0:200 committed 100,100",
               "settle text");
     }
 
@@ -178,7 +179,8 @@ int main() {
         check(contains(log, "settle showdown no") == false, "not settled yet");
         session.execute("settle");
         const std::string log2 = session.execute("log");
-        check(contains(log2, "payouts 2:150\nend"), "log has framed settle");
+        check(contains(log2, "committed 0,50,100,0,0,0\nend"),
+              "log has framed settle");
     }
 
     std::cout << "test_events ok\n";

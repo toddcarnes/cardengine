@@ -42,6 +42,7 @@ struct StreetDealtEvent {
 struct HandSettledEvent {
     bool showdown = false;
     std::vector<Payout> payouts;
+    std::vector<int> committed;  // Per seat, pre-award (pot accounting).
 };
 
 using Event = std::variant<HandStartedEvent, ActionTakenEvent,
