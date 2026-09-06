@@ -223,6 +223,58 @@ HandValue omaha_current(const std::vector<Card>& hole,
                         const std::vector<Card>& board);
 double made_strength(const SeatView& view) {
     if (view.board.empty()) {
+        // Omaha deals four: pairs (6 combos, not 1) and rundowns/connectivity
+        // dominate; raw high cards leak value without coordination.
+        if (view.showdown == HandConstruction::OmahaTwoAndThree) {
+            std::vector<Rank> ranks;
+            for (const Card& c : view.hole) ranks.push_back(c.rank);
+            std::sort(ranks.begin(), ranks.end());
+            double value = 0.30;
+            int pairs = 0;
+            for (std::size_t i = 1; i < ranks.size(); ++i) {
+                if (ranks[i] == ranks[i - 1]) ++pairs;
+            }
+            if (pairs > 0) {
+                // Two pair in four cards is usually bottom-two junk, not a
+                // premium: only aces-up+ or trips+ get the premium score.
+                const bool premium =
+                    ranks[3] == ranks[2] &&
+                    (ranks[3] == Rank::Ace ||
+                     (ranks[1] == ranks[0] &&
+                      static_cast<int>(ranks[3]) >= 11));
+                if (premium) {
+                    value = 0.60 + static_cast<double>(
+                                       static_cast<int>(ranks.back()) - 2) *
+                                       0.02;
+                } else {
+                    value = 0.30 + static_cast<double>(
+                                       static_cast<int>(ranks.back()) - 2) *
+                                       0.01;
+                }
+            } else {
+                value = card_points(ranks[3]) + card_points(ranks[2]) * 0.4;
+                // Coordination: suits together, ranks connected. Bare high
+                // cards with neither are PLO trash (everyone makes hands).
+                // The penalty has to clear the open-raise bar (~0.45), not
+                // just dent the number: -0.3 still calls 2x pot odds.
+                int suited_max = 0;
+                int suits[4] = {};
+                for (const Card& c : view.hole) {
+                    ++suits[static_cast<int>(c.suit)];
+                    if (suits[static_cast<int>(c.suit)] > suited_max) {
+                        suited_max = suits[static_cast<int>(c.suit)];
+                    }
+                }
+                if (suited_max >= 2) value += 0.04;
+                const int span = static_cast<int>(ranks[3]) -
+                                 static_cast<int>(ranks[0]);
+                const bool connected = span <= 5;
+                if (connected) value += 0.06;
+                if (suited_max < 2 && !connected) value = 0.0;
+                if (value > 0.75) value = 0.75;
+            }
+            return value;
+        }
         std::vector<Rank> ranks;
         for (const Card& c : view.hole) ranks.push_back(c.rank);
         std::sort(ranks.begin(), ranks.end());

@@ -192,6 +192,53 @@ int main() {
         check(rate > 0.3 && rate < 0.7, "mdf defense rate");
     }
 
+    // Omaha preflop: pairs and coordinated hands raise, bare high cards
+    // with no coordination fold to pressure.
+    {
+        auto bot = make_bot(heuristic_file());
+        SeatView omaha = base_view();
+        omaha.showdown = HandConstruction::OmahaTwoAndThree;
+        omaha.num_seats = 6;
+        // Aces with connectors: a premium raising hand.
+        omaha.hole = {card("As"), card("Ah"), card("Ks"), card("Qd")};
+        omaha.pot = 150;
+        omaha.to_call = 0;
+        omaha.call_amount = 0;
+        omaha.can_check = true;
+        omaha.can_raise = true;
+        omaha.min_raise_to = 200;
+        omaha.max_raise_to = 8000;
+        check(bot->decide(omaha).type == ActionType::Raise,
+              "omaha aces raise");
+        // Four bare high cards, rainbow, unconnected: folds to a big bet.
+        SeatView junk = base_view();
+        junk.showdown = HandConstruction::OmahaTwoAndThree;
+        junk.num_seats = 6;
+        junk.hole = {card("Ah"), card("Kd"), card("Qc"), card("7s")};
+        junk.pot = 370;
+        junk.to_call = 500;
+        junk.call_amount = 500;
+        junk.current_bet = 500;
+        junk.min_raise_to = 600;
+        junk.max_raise_to = 8000;
+        check(bot->decide(junk).type == ActionType::Fold,
+              "omaha junk folds to pressure");
+        // Two small pair in four cards is bottom-two junk, not a premium:
+        // folds to pressure where aces-up would continue.
+        SeatView two_pair = base_view();
+        two_pair.showdown = HandConstruction::OmahaTwoAndThree;
+        two_pair.num_seats = 6;
+        two_pair.hole = {card("7h"), card("7d"), card("3c"), card("3s")};
+        two_pair.pot = 370;
+        two_pair.to_call = 500;
+        two_pair.call_amount = 500;
+        two_pair.current_bet = 500;
+        two_pair.min_raise_to = 600;
+        two_pair.max_raise_to = 8000;
+        check(bot->decide(two_pair).type == ActionType::Fold,
+              "omaha bottom two folds to pressure");
+    }
+
     std::cout << "test_adaptive ok\n";
     return 0;
 }
