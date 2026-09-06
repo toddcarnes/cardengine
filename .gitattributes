@@ -1,2 +1,15 @@
-# Normalize line endings: LF in the repo, native on checkout.
-* text=auto
+# Line endings: LF in the repo, native on checkout. Explicit per-type
+# rules so PowerShell-copied files (UTF-16, bare LF) can't silently
+# reintroduce encoding drift — diffs stay content-only.
+* text=auto eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.py text eol=crlf
+*.txt text eol=crlf
+*.md text eol=crlf
+*.json text eol=crlf
+*.yml text eol=crlf
+# Binary: never touch.
+*.png binary
+*.jpg binary
+*.ico binary
