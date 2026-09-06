@@ -27,6 +27,9 @@ enum class BotStyle { Random, Heuristic, Adaptive, Gto };
 //   aggression = 0.6         # 0..1: bet sizing and thin-value frequency
 //   looseness = 0.3          # 0..1: how weak a hand still continues
 //   survival = 0.0           # 0..1: risk premium when short (ICM-lite)
+//   bluff_rate = 0.35        # 0..1: weak-hand betting frequency (GTO bluffs)
+//   defense = 1.0            # 0..2: MDF call-frequency scale (GTO defense)
+//   position_weight = 1.0    # 0..2: positional adjustment scale
 //   seed = 7                 # mistake/random RNG seed (deterministic)
 struct BotFile {
     int format_version = 1;
@@ -37,6 +40,9 @@ struct BotFile {
     double aggression = 0.5;
     double looseness = 0.3;
     double survival = 0.0;
+    double bluff_rate = 0.35;
+    double defense = 1.0;
+    double position_weight = 1.0;
     std::uint64_t seed = 0;
 };
 

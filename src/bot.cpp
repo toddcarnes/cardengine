@@ -33,6 +33,15 @@ void validate_bot(const BotFile& file) {
     if (file.survival < 0.0 || file.survival > 1.0) {
         throw std::invalid_argument("survival must be 0..1");
     }
+    if (file.bluff_rate < 0.0 || file.bluff_rate > 1.0) {
+        throw std::invalid_argument("bluff_rate must be 0..1");
+    }
+    if (file.defense < 0.0 || file.defense > 2.0) {
+        throw std::invalid_argument("defense must be 0..2");
+    }
+    if (file.position_weight < 0.0 || file.position_weight > 2.0) {
+        throw std::invalid_argument("position_weight must be 0..2");
+    }
 }
 
 BotFile parse_bot(std::istream& in) {
@@ -91,6 +100,12 @@ BotFile parse_bot(std::istream& in) {
             bot.looseness = parse_double(value, lineno);
         } else if (key == "survival") {
             bot.survival = parse_double(value, lineno);
+        } else if (key == "bluff_rate") {
+            bot.bluff_rate = parse_double(value, lineno);
+        } else if (key == "defense") {
+            bot.defense = parse_double(value, lineno);
+        } else if (key == "position_weight") {
+            bot.position_weight = parse_double(value, lineno);
         } else if (key == "seed") {
             try {
                 std::size_t used = 0;
@@ -154,6 +169,9 @@ void save_bot_file(const BotFile& bot, std::ostream& out) {
     out << "aggression = " << bot.aggression << "\n";
     out << "looseness = " << bot.looseness << "\n";
     out << "survival = " << bot.survival << "\n";
+    out << "bluff_rate = " << bot.bluff_rate << "\n";
+    out << "defense = " << bot.defense << "\n";
+    out << "position_weight = " << bot.position_weight << "\n";
     out << "seed = " << bot.seed << "\n";
 }
 
@@ -404,17 +422,18 @@ double draw_equity(const SeatView& view) {
     return equity;
 }
 
-double strength(const SeatView& view) {
+double strength(const SeatView& view, double position_weight) {
     double total = made_strength(view);
     const double draw = draw_equity(view);
     if (draw > total) total = draw;
     // Position: late seats realize more equity and steal more often;
-    // early seats pay for acting blind. Small on purpose.
-    if (view.num_seats > 0) {
+    // early seats pay for acting blind. Scaled by position_weight
+    // (0 = ignore position, 1 = classic nudge, 2 = double).
+    if (view.num_seats > 0 && position_weight > 0.0) {
         if (view.position == 0 || view.position == view.num_seats - 1) {
-            total += 0.05;
+            total += 0.05 * position_weight;
         } else if (view.position == 1 || view.position == 2) {
-            total -= 0.05;
+            total -= 0.05 * position_weight;
         }
     }
     if (total < 0.0) total = 0.0;
@@ -433,15 +452,17 @@ public:
         if (unit(rng_) < file_.mistake_rate) {
             return random_.decide(view);
         }
-        const double s = strength(view);
+        const double s = strength(view, file_.position_weight);
         // Survival (ICM-lite): short stacks demand a risk premium on
         // elimination-risk calls — tournament chips lost are worth more
         // than chips gained, so marginal continues become folds. Zero when
         // deep or when survival = 0 (cash-game default).
         const double premium = risk_premium(view);
         if (view.to_call == 0) {
+            // Bluffs: weak hands bet at bluff_rate so value bets get paid.
             if (view.can_raise &&
-                s > 0.60 - file_.aggression * 0.15 + premium * 0.5) {
+                (s > 0.60 - file_.aggression * 0.15 + premium * 0.5 ||
+                 (s < 0.30 && unit(rng_) < file_.bluff_rate))) {
                 return {ActionType::Raise, size_bet(view)};
             }
             if (view.can_check) return {ActionType::Check, 0};
@@ -560,20 +581,23 @@ public:
         if (unit(rng_) < file_.mistake_rate) {
             return random_.decide(view);
         }
-        const double s = strength(view);
+        const double s = strength(view, file_.position_weight);
         if (view.to_call == 0) {
             if (view.can_raise && (s > 0.62 ||
-                                   (s < 0.30 && unit(rng_) < 0.35))) {
+                                   (s < 0.30 && unit(rng_) < file_.bluff_rate))) {
                 return {ActionType::Raise, size_bet(view)};
             }
             if (view.can_check) return {ActionType::Check, 0};
             return {ActionType::Call, 0};
         }
         if (s > 0.75 && view.can_raise) return {ActionType::Raise, size_bet(view)};
-        // Minimum defense frequency: call often enough that bluffs break even.
+        // Minimum defense frequency, scaled by defense: call often enough
+        // that bluffs break even at 1.0; under-defend below, over-defend
+        // above. (An equity floor lost ~50 Elo here: this field bets
+        // value-heavy, so MDF already over-defends.)
         const double mdf = static_cast<double>(view.pot) /
                            static_cast<double>(view.pot + view.to_call);
-        if (unit(rng_) < mdf) return {ActionType::Call, 0};
+        if (unit(rng_) < mdf * file_.defense) return {ActionType::Call, 0};
         return {ActionType::Fold, 0};
     }
 

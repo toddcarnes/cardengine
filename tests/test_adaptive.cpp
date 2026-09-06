@@ -38,6 +38,8 @@ cardengine::BotFile gto_file() {
                       "looseness = 0.3\nseed = 9\n");
 }
 
+cardengine::BotFile slider_file(const char* text) { return parse_text(text); }
+
 cardengine::Card card(const char* text) {
     return cardengine::parse_card(text);
 }
@@ -196,6 +198,46 @@ int main() {
         }
         const double rate = static_cast<double>(defended) / trials;
         check(rate > 0.3 && rate < 0.7, "mdf defense rate");
+
+        // defense = 0 never defends air; defense = 2 always defends.
+        auto never = make_bot(slider_file(
+            "format_version = 1\nname = N\nstyle = gto\ndefense = 0.0\n"
+            "seed = 9\n"));
+        auto always = make_bot(slider_file(
+            "format_version = 1\nname = A\nstyle = gto\ndefense = 2.0\n"
+            "seed = 9\n"));
+        for (int i = 0; i < 20; ++i) {
+            check(never->decide(air).type == ActionType::Fold,
+                  "defense zero folds air");
+            check(always->decide(air).type == ActionType::Call,
+                  "defense two calls air");
+        }
+
+        // bluff_rate = 0 never bluffs weak open hands; = 1 always does.
+        SeatView weak_open = base_view();
+        weak_open.hole = {card("7c"), card("2d")};
+        weak_open.board = {};
+        weak_open.street = Street::Preflop;
+        weak_open.pot = 150;
+        weak_open.to_call = 0;
+        weak_open.can_check = false;
+        weak_open.can_raise = true;
+        weak_open.call_amount = 100;
+        weak_open.current_bet = 100;
+        weak_open.min_raise_to = 200;
+        weak_open.max_raise_to = 8000;
+        auto honest = make_bot(slider_file(
+            "format_version = 1\nname = H\nstyle = gto\nbluff_rate = 0.0\n"
+            "seed = 9\n"));
+        auto bluffy = make_bot(slider_file(
+            "format_version = 1\nname = B\nstyle = gto\nbluff_rate = 1.0\n"
+            "seed = 9\n"));
+        for (int i = 0; i < 20; ++i) {
+            check(honest->decide(weak_open).type == ActionType::Call,
+                  "bluff zero checks through");
+            check(bluffy->decide(weak_open).type == ActionType::Raise,
+                  "bluff one bets weak");
+        }
     }
 
     // Omaha preflop: pairs and coordinated hands raise, bare high cards
@@ -243,6 +285,42 @@ int main() {
         two_pair.max_raise_to = 8000;
         check(bot->decide(two_pair).type == ActionType::Fold,
               "omaha bottom two folds to pressure");
+    }
+
+    // position_weight: 0 ignores position (same decision both seats),
+    // 2 doubles the nudge (late raises wider, early folds harder).
+    {
+        auto flat = make_bot(slider_file(
+            "format_version = 1\nname = F\nstyle = heuristic\n"
+            "mistake_rate = 0.0\nposition_weight = 0.0\nseed = 11\n"));
+        auto sharp = make_bot(slider_file(
+            "format_version = 1\nname = P\nstyle = heuristic\n"
+            "mistake_rate = 0.0\nposition_weight = 2.0\nseed = 11\n"));
+        SeatView early = base_view();
+        early.hole = {card("Ah"), card("7d")};
+        early.board = {};
+        early.street = Street::Preflop;
+        early.num_seats = 6;
+        early.position = 1;  // Small blind: worst nudge.
+        early.pot = 150;
+        early.to_call = 0;
+        early.can_check = true;
+        early.can_raise = true;
+        early.call_amount = 100;
+        early.current_bet = 100;
+        early.min_raise_to = 200;
+        early.max_raise_to = 8000;
+        SeatView late = early;
+        late.position = 0;  // Button: best nudge.
+        // Weight 0: identical strength, identical decision.
+        check(flat->decide(early).type == flat->decide(late).type,
+              "position zero plays seats alike");
+        // Weight 2: the nudge separates a borderline raiser.
+        const Action early_act = sharp->decide(early);
+        const Action late_act = sharp->decide(late);
+        check(!(early_act.type == ActionType::Raise &&
+                late_act.type != ActionType::Raise),
+              "position two never raises early-only");
     }
 
     // Survival: a short stack folds a marginal continue a deep stack
