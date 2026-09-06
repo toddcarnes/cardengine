@@ -1,0 +1,79 @@
+{
+  "players": {
+    "Adapter": {
+      "rating": 1200.01,
+      "tables": 52029
+    },
+    "Fit-or-Fold Fred": {
+      "rating": 1201.37,
+      "tables": 52515
+    },
+    "GTO": {
+      "rating": 1197.25,
+      "tables": 52222
+    },
+    "LAG": {
+      "rating": 1200.05,
+      "tables": 52016
+    },
+    "Loose Lucy": {
+      "rating": 1199.8,
+      "tables": 52249
+    },
+    "Nit": {
+      "rating": 1201.47,
+      "tables": 52004
+    },
+    "Randy": {
+      "rating": 1192.16,
+      "tables": 52096
+    },
+    "Station Sal": {
+      "rating": 1199.29,
+      "tables": 52420
+    },
+    "Survivor": {
+      "rating": 1202.23,
+      "tables": 52082
+    },
+    "TAG": {
+      "rating": 1201.95,
+      "tables": 52187
+    },
+    "Tight Ted": {
+      "rating": 1201.55,
+      "tables": 52170
+    },
+    "Vanguard": {
+      "rating": 1202.89,
+      "tables": 52212
+    }
+  },
+  "updated": "2026-09-06T22:23:51+00:00",
+  "variants": [
+    {
+      "duels": 606450,
+      "name": "nlhe-6max",
+      "tables": 40430,
+      "weight": 1.6489405556929672e-06
+    },
+    {
+      "duels": 606450,
+      "name": "plo-6max",
+      "tables": 40430,
+      "weight": 1.6489405556929672e-06
+    },
+    {
+      "duels": 25005,
+      "name": "limit-6max",
+      "tables": 1667,
+      "weight": 3.9992001599680064e-05
+    },
+    {
+      "duels": 65520,
+      "name": "hu",
+      "tables": 65520,
+      "weight": 1.5262515262515263e-05
+    }
+  ]
+}
