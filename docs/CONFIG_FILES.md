@@ -113,6 +113,13 @@ mandatory. (A genuinely new way of playing still requires programming; new
 | `mistake_rate` | `0.0` | 0–1. How often a decision is thrown away and replaced by a random legal move. Small values (like 0.05) make strong bots feel human and beatable; `1.0` plays randomly. |
 | `aggression` | `0.5` | 0–1. How big it bets (higher means a bigger fraction of the pot on top of the current bet) and how good a hand needs to be before it bets for value. |
 | `looseness` | `0.3` | 0–1. How bad a hand it will still continue with when facing a bet. The adaptive style adjusts this during play; the starting value is its first guess. |
+| `survival` | `0.0` | 0–1. Tournament risk premium: when short-stacked, marginal calls that risk busting become folds. `0` plays cash-game pot odds at any stack; `1` (see the `survivor` preset) prices its tournament life. Deep stacks are unaffected either way. |
+| `bluff_rate` | `0.35` | 0–1. How often a weak hand bets anyway when nobody has bet yet, so value bets get paid off. `0` never bluffs; `1` always fires. |
+| `defense` | `1.0` | 0–2. Scales how often the `gto` style calls to keep bluffs unprofitable (`1` = textbook minimum defense, `0` = fold everything but the nuts, `2` = never fold). |
+| `position_weight` | `1.0` | 0–2. How much acting order matters: `0` plays every seat alike, `1` is the classic nudge (tighter in early seats, looser on the button), `2` doubles it. |
+| `adapt_rate` | `1.0` | 0–2. `adaptive` style only: how hard it leans on its reads. `0` plays its starting `looseness` forever; `1` shifts its calling range with the table average and catches suspected bluffs lighter; `2` doubles both swings. |
+| `barrels` | `0.0` | 0–2. How often the bot keeps betting after it was the last aggressor — second barrels on the flop, delayed bets on later streets — with hands too weak to bet fresh. `0` (the default) only bets hands that qualify on their own; `2` fires the story almost every time. Needs a real hand behind it: pure air still gives up. |
+| `planning` | `0` | 0–2. One-street lookahead: `0` judges the hand as it stands; `1` blends in where the hand is heading (draws play stronger, vulnerable made hands slightly weaker); `2` leans harder into the projection. Cheap arithmetic, not a search tree — costs microseconds. |
 | `seed` | `0` | Starting number for its randomness. Same file plus same game means the same decisions on every computer — useful for testing and demonstrations. |
 
 Notes:
