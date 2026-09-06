@@ -42,4 +42,12 @@ GameFile load_game_file(const std::string& path);
 
 void save_game_file(const GameFile& game, std::ostream& out);
 
+// Shared with tournament files: applies one lowered `key` + trimmed `value`
+// to a GameConfig, or throws a line-numbered error (including "unknown key").
+void apply_game_key(GameConfig& config, const std::string& key,
+                    const std::string& value, int lineno);
+
+// Shared writer for the ten game-rule lines (used by both file kinds).
+void write_game_config(const GameConfig& config, std::ostream& out);
+
 }  // namespace cardengine

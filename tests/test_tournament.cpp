@@ -1,0 +1,312 @@
+// Tournament director: levels, busts, prizes, rebuys, files, protocol.
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include "cardengine/protocol.h"
+#include "cardengine/tournament.h"
+
+namespace {
+
+using cardengine::BlindLevel;
+using cardengine::Table;
+using cardengine::Tournament;
+using cardengine::TournamentConfig;
+
+void check(bool condition, const char* message) {
+    if (!condition) {
+        std::cerr << "FAIL: " << message << "\n";
+        std::exit(1);
+    }
+}
+
+bool contains(const std::string& haystack, const std::string& needle) {
+    return haystack.find(needle) != std::string::npos;
+}
+
+template <typename F>
+void expect_throw(F&& f, const char* message) {
+    try {
+        f();
+    } catch (const std::exception&) {
+        return;
+    }
+    std::cerr << "FAIL (expected throw): " << message << "\n";
+    std::exit(1);
+}
+
+void play_out(Table& table) {
+    using cardengine::ActionType;
+    while (!table.hand_complete()) {
+        if (table.acting() != -1) {
+            const int seat = table.acting();
+            if (table.options(seat).can_check) {
+                table.act(seat, {ActionType::Check, 0});
+            } else {
+                table.act(seat, {ActionType::Call, 0});
+            }
+        } else {
+            table.deal_next_street();
+        }
+    }
+    table.settle();
+}
+
+std::vector<cardengine::Card> shoe(std::initializer_list<const char*> texts) {
+    std::vector<cardengine::Card> out;
+    for (const char* t : texts) out.push_back(cardengine::parse_card(t));
+    return out;
+}
+
+TournamentConfig two_player() {
+    TournamentConfig config;
+    config.game.num_players = 2;
+    config.levels = {BlindLevel{50, 100, 0, 2}, BlindLevel{100, 200, 50, 2}};
+    return config;
+}
+
+}  // namespace
+
+int main() {
+    using namespace cardengine;
+
+    // Config validation.
+    {
+        TournamentConfig bad;
+        bad.game.num_players = 2;
+        bad.levels.clear();
+        expect_throw([&] { validate_tournament(bad); }, "empty levels");
+        bad = TournamentConfig{};
+        bad.game.num_players = 2;
+        bad.levels = {BlindLevel{50, 100, 0, 0}};
+        expect_throw([&] { validate_tournament(bad); }, "zero-length level");
+        bad.levels = {BlindLevel{100, 50, 0, 5}};
+        expect_throw([&] { validate_tournament(bad); }, "inverted blinds");
+        bad.levels = {BlindLevel{50, 100, 0, 5}};
+        bad.prizes = {60, 50};
+        expect_throw([&] { validate_tournament(bad); }, "prizes over 100");
+        bad.prizes = {50};
+        bad.buy_in = -1;
+        expect_throw([&] { validate_tournament(bad); }, "negative buy-in");
+        expect_throw(
+            [] {
+                TournamentConfig c;
+                c.game.num_players = 11;
+                Tournament t(c);
+            },
+            "bad game inside tournament");
+    }
+
+    // Levels escalate blinds/antes on schedule.
+    {
+        Tournament tournament(two_player());
+        tournament.begin_hand(1);
+        check(tournament.table().committed(0) == 50, "level 0 SB");
+        check(tournament.table().committed(1) == 100, "level 0 BB");
+        play_out(tournament.table());
+        tournament.finish_hand();
+        check(tournament.level_index() == 0 && tournament.hands_into_level() == 1,
+              "one hand into level 0");
+        tournament.begin_hand(2);
+        play_out(tournament.table());
+        tournament.finish_hand();
+        check(tournament.level_index() == 1 && tournament.hands_into_level() == 0,
+              "advanced to level 1");
+        tournament.begin_hand(3);
+        check(tournament.table().committed(0) == 150, "level 1 SB plus ante");
+        check(tournament.table().committed(1) == 250, "level 1 BB plus ante");
+        play_out(tournament.table());
+        tournament.finish_hand();
+        tournament.advance_level();  // Already last: sticks.
+        check(tournament.level_index() == 1, "level capped");
+    }
+
+    // Busts take places and prizes; the champion takes the remainder.
+    {
+        TournamentConfig config;
+        config.game.num_players = 3;
+        config.prizes = {50, 30, 20};
+        config.buy_in = 1000;
+        Tournament tournament(config);
+        check(tournament.prize_pool() == 3000, "pool is 3 buy-ins");
+        tournament.table().set_stack(2, 150);
+        // seat1: 3c 4d; seat2: 7c 2d; seat0: As Ad. Board bricks everyone else.
+        tournament.begin_hand_from_deck(shoe({"3c", "7c", "As", "4d", "2d",
+                                              "Ad", "Ks", "Qh", "Jh", "9c",
+                                              "3d"}));
+        tournament.table().act(0, {ActionType::Raise, 10000});
+        tournament.table().act(1, {ActionType::Fold, 0});
+        tournament.table().act(2, {ActionType::Call, 0});  // All in short.
+        play_out(tournament.table());
+        tournament.finish_hand();
+        auto standings = tournament.standings();
+        check(standings[2].eliminated && standings[2].finish_place == 3 &&
+                  standings[2].prize == 600,
+              "third takes 20%");
+        check(!tournament.complete(), "two remain");
+
+        tournament.table().set_stack(1, 150);
+        // Heads-up now (button to seat 1): seat1 <- 7c 2d, seat0 <- As Ad.
+        // Seat 1 shoves short, seat 0 calls, aces hold.
+        tournament.begin_hand_from_deck(shoe({"As", "7c", "Ad", "2d", "Ks",
+                                              "Qh", "Jh", "9c", "3d"}));
+        tournament.table().act(1, {ActionType::Raise, 150});
+        tournament.table().act(0, {ActionType::Call, 0});
+        play_out(tournament.table());
+        tournament.finish_hand();
+        check(tournament.complete(), "one remains");
+        check(tournament.winner() == 0, "seat 0 wins");
+        standings = tournament.standings();
+        check(standings[1].finish_place == 2 && standings[1].prize == 900,
+              "second takes 30%");
+        check(standings[0].finish_place == 1 && standings[0].prize == 1500,
+              "champion takes the remainder");
+        expect_throw([&] { tournament.begin_hand(9); }, "no hands when over");
+    }
+
+    // Rebuys restore stacks (and the pool), vacate finishes, never mid-hand.
+    {
+        TournamentConfig config;
+        config.game.num_players = 3;
+        config.buy_in = 1000;
+        Tournament tournament(config);
+        check(tournament.prize_pool() == 3000, "pool is 3 buy-ins");
+        // Bust seat 2 first (same rig as the prize test).
+        tournament.table().set_stack(2, 150);
+        tournament.begin_hand_from_deck(shoe({"3c", "7c", "As", "4d", "2d",
+                                              "Ad", "Ks", "Qh", "Jh", "9c",
+                                              "3d"}));
+        tournament.table().act(0, {ActionType::Raise, 10000});
+        tournament.table().act(1, {ActionType::Fold, 0});
+        tournament.table().act(2, {ActionType::Call, 0});
+        play_out(tournament.table());
+        tournament.finish_hand();
+        check(tournament.standings()[2].eliminated, "seat 2 busts");
+        check(!tournament.complete(), "two remain");
+        tournament.rebuy(2);
+        check(tournament.table().stack(2) == 10000, "stack restored");
+        check(tournament.prize_pool() == 4000, "pool grew");
+        auto standings = tournament.standings();
+        check(!standings[2].eliminated && standings[2].finish_place == 0 &&
+                  standings[2].prize == 0,
+              "finish vacated");
+        // Continuity: the next hand runs with all three seats.
+        tournament.begin_hand(2);
+        check(tournament.table().in_hand(0) &&
+                  tournament.table().in_hand(1) &&
+                  tournament.table().in_hand(2),
+              "rebought seat plays on");
+        expect_throw([&] { tournament.rebuy(0); }, "no rebuys mid-hand");
+    }
+
+    // Table blind controls validate and refuse mid-hand changes.
+    {
+        GameConfig game;
+        game.num_players = 2;
+        Table table(game);
+        table.set_blinds(100, 200);
+        table.set_ante(25);
+        expect_throw([&] { table.set_blinds(200, 100); }, "inverted blinds");
+        expect_throw([&] { table.set_ante(-5); }, "negative ante");
+        table.start_hand(1);
+        expect_throw([&] { table.set_blinds(100, 200); }, "mid-hand blinds");
+        expect_throw([&] { table.set_ante(25); }, "mid-hand ante");
+    }
+
+    // Tournament files: game refs, overrides, levels, prizes, errors.
+    {
+        const char* game_path = "tmp_tourney_base_game.txt";
+        {
+            std::ofstream file(game_path);
+            file << "format_version = 1\nname = Base\nnum_players = 2\n";
+        }
+        const char* path = "tmp_tourney.txt";
+        {
+            std::ofstream file(path);
+            file << "format_version = 1\nname = \"Friday Freezeout\"\n"
+                    "game = tmp_tourney_base_game.txt\n"
+                    "starting_stack = 5000\n"
+                    "buy_in = 5000\n"
+                    "prizes = 60, 40\n"
+                    "level = 50, 100, 0, 5\n"
+                    "level = 100, 200, 25, 5\n";
+        }
+        TournamentFile parsed = load_tournament_file(path);
+        check(parsed.name == "Friday Freezeout", "tournament name");
+        check(parsed.config.game.num_players == 2, "base game seats");
+        check(parsed.config.game.starting_stack == 5000, "override applies");
+        check(parsed.config.buy_in == 5000, "buy-in");
+        check(parsed.config.prizes == std::vector<int>({60, 40}), "prizes");
+        check(parsed.config.levels.size() == 2, "two levels");
+        check(parsed.config.levels[1].ante == 25, "second level ante");
+
+        std::ostringstream saved;
+        save_tournament_file(parsed, saved);
+        std::istringstream in(saved.str());
+        TournamentFile back = parse_tournament(in);
+        check(back.config.levels.size() == 2 &&
+                  back.config.prizes == std::vector<int>({60, 40}) &&
+                  back.config.buy_in == 5000 &&
+                  back.config.game.starting_stack == 5000,
+              "tournament round-trip");
+
+        expect_throw(
+            [] {
+                std::istringstream bad("format_version = 1\nlevel = 1, 2\n");
+                parse_tournament(bad);
+            },
+            "short level");
+        expect_throw(
+            [] {
+                std::istringstream bad("format_version = 1\nmystery = 1\n");
+                parse_tournament(bad);
+            },
+            "unknown tournament key");
+        expect_throw([] { load_tournament_file("tmp_missing_xyz.txt"); },
+                     "missing tournament file");
+        std::remove(game_path);
+        std::remove(path);
+    }
+
+    // Protocol: tload, tstatus, and auto-finish at settle.
+    {
+        const char* path = "tmp_proto_tourney.txt";
+        {
+            std::ofstream file(path);
+            file << "format_version = 1\nname = P\nnum_players = 2\n"
+                    "starting_stack = 10000\nbuy_in = 100\nprizes = 100\n"
+                    "level = 50, 100, 0, 99\n";
+        }
+        Session session;
+        check(contains(session.execute("tstatus"), "error"), "no tourney yet");
+        check(session.execute(std::string("tload ") + path) == "ok", "tload");
+        const std::string status = session.execute("tstatus");
+        check(contains(status, "tournament level 0/1"), "level line");
+        check(contains(status, "blinds 50/100"), "blinds line");
+        check(contains(status, "pool 200"), "pool line");
+        check(session.execute("start 3") == "ok", "tourney start");
+        check(session.execute("act fold") == "ok", "SB folds");
+        const std::string done = session.execute("settle");
+        check(contains(done, "payout 1 150"), "BB wins");
+        const std::string after = session.execute("tstatus");
+        check(contains(after, "hands 1/99"), "hand booked");
+        // Cash load leaves tournament mode entirely.
+        {
+            std::ofstream game("tmp_proto_cash.txt");
+            game << "format_version = 1\nnum_players = 2\n";
+            game.close();
+            check(session.execute("load tmp_proto_cash.txt") == "ok",
+                  "cash load");
+            check(contains(session.execute("tstatus"), "error"),
+                  "tournament mode cleared");
+            std::remove("tmp_proto_cash.txt");
+        }
+        std::remove(path);
+    }
+
+    std::cout << "test_tournament ok\n";
+    return 0;
+}

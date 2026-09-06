@@ -27,6 +27,24 @@ void Table::set_stack(int seat, int chips) {
     seats_[static_cast<std::size_t>(seat)].stack = chips;
 }
 
+void Table::set_blinds(int small, int big) {
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("cannot change blinds mid-hand");
+    }
+    if (small < 1 || big < 1) throw std::invalid_argument("blinds must be positive");
+    if (small > big) throw std::invalid_argument("small blind exceeds big blind");
+    config_.small_blind = small;
+    config_.big_blind = big;
+}
+
+void Table::set_ante(int ante) {
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("cannot change ante mid-hand");
+    }
+    if (ante < 0) throw std::invalid_argument("ante cannot be negative");
+    config_.ante = ante;
+}
+
 void Table::set_button(int seat) {
     check_seat(seat);
     button_ = seat;

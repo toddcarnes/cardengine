@@ -24,6 +24,7 @@ add_library(cardengine STATIC
     src/bot.cpp
     src/bot_runner.cpp
     src/event.cpp
+    src/tournament.cpp
 )
 target_include_directories(cardengine PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

@@ -9,6 +9,7 @@
 #include "cardengine/bot.h"
 #include "cardengine/config.h"
 #include "cardengine/table.h"
+#include "cardengine/tournament.h"
 
 namespace cardengine {
 
@@ -37,9 +38,14 @@ private:
     // view_seat < 0 is the full local-trust dump; otherwise that seat's
     // hole cards are shown and every other seat is hidden.
     std::string do_state(int view_seat) const;
+    // Cash table, or the tournament's table when a tournament is loaded.
+    Table& active_table();
+    const Table& active_table() const;
 
     GameConfig config_;
     Table table_;
+    // Tournament mode replaces the cash table (null = cash game).
+    std::unique_ptr<Tournament> tournament_;
     // Automated seats. Bots live in the session (same machine, local trust)
     // until per-seat protocol views allow out-of-process bots.
     std::map<int, std::unique_ptr<Bot>> bots_;

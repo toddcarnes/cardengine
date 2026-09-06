@@ -92,6 +92,9 @@ def main():
     parser.add_argument("--engine", default=str(DEFAULT_ENGINE))
     parser.add_argument("--bot-exe", default=str(DEFAULT_BOT))
     parser.add_argument("--game", default=None)
+    parser.add_argument("--tournament", default=None,
+                        help="tournament file (tload instead of load; "
+                             "stops when one player remains)")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--hands", type=int, default=1)
     parser.add_argument("--auto", action="store_true",
@@ -107,7 +110,10 @@ def main():
 
     engine = Engine(args.engine)
     try:
-        if args.game:
+        if args.tournament:
+            if engine.send(f"tload {args.tournament}") != ["ok"]:
+                return 1
+        elif args.game:
             if engine.send(f"load {args.game}") != ["ok"]:
                 return 1
         procs = {s: Runner(exe, s, f) for s, (exe, f) in runners.items()}
@@ -115,8 +121,16 @@ def main():
             ok = True
             for hand in range(args.hands):
                 print(f"--- hand {hand + 1} (seed {args.seed + hand}) ---")
-                ok = play_hand(engine, procs, args.seed + hand,
-                               args.auto) and ok
+                if play_hand(engine, procs, args.seed + hand, args.auto):
+                    continue
+                if args.tournament:
+                    status = engine.send("tstatus")
+                    for line in status:
+                        print(f"  {line}")
+                    alive = sum(1 for line in status if " alive " in line)
+                    if alive <= 1:
+                        break  # Champion crowned: clean end.
+                ok = False
         finally:
             for runner in procs.values():
                 runner.close()

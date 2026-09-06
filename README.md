@@ -41,6 +41,8 @@ python examples/cli.py --auto --hands 3 --seed 42
 python examples/cli.py --auto --bots bots/tight.txt,bots/random.txt --hands 2
 # Out-of-process bots, one OS process per seat, views filtered by the engine.
 python examples/match.py --auto --bots 1:bots/tight.txt --bots 2:bots/random.txt --hands 2
+# Tournament (busts, places, prizes; stops at the champion).
+python examples/match.py --auto --bots 1:bots/tight.txt --tournament tournaments/freezeout-6max.txt --hands 30
 ```
 
 ## Layout
@@ -48,6 +50,7 @@ python examples/match.py --auto --bots 1:bots/tight.txt --bots 2:bots/random.txt
 - `include/cardengine/` — public engine headers (`card.h`, `deck.h`, `hand.h`, `config.h`, `types.h`, `table.h`, `event.h`, `game_file.h`, `protocol.h`, `bot.h`, `bot_runner.h`; `cardengine.h` umbrella)
 - `src/` — `cardengine` static library + `cardengine` entrypoint (target `cardengine_app`, `OUTPUT_NAME cardengine`; speaks `docs/PROTOCOL.md` on stdin/stdout) + `cardengine_bot` seat runner
 - `games/` — shareable game-variant files (`key = value`, see `docs/PROTOCOL.md`)
+- `tournaments/` — shareable tournament files (levels, prizes, buy-ins; compose game files)
 - `bots/` — shareable bot-personality files (same format family)
 - `examples/cli.py` — hotseat reference client; proves any language can drive the engine over pipes
 - `examples/match.py` — match host: engine + one bot process per seat (the listen-server shape)

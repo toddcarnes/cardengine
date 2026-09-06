@@ -67,6 +67,16 @@ std::string street_name(Street street) {
 
 Session::Session() : table_(config_) {}
 
+Table& Session::active_table() {
+    if (tournament_) return tournament_->table();
+    return table_;
+}
+
+const Table& Session::active_table() const {
+    if (tournament_) return tournament_->table();
+    return table_;
+}
+
 std::string Session::execute(const std::string& raw_line) {
     std::string line = trim(raw_line);
     if (!line.empty() && line.back() == '\r') {
@@ -77,8 +87,8 @@ std::string Session::execute(const std::string& raw_line) {
     try {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
-            return "ok commands: help load start state options act deal "
-                   "settle log addbot bots step quit";
+            return "ok commands: help load tload tstatus start state options "
+                   "act deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
         if (command == "load") {
@@ -86,9 +96,46 @@ std::string Session::execute(const std::string& raw_line) {
             const GameFile game = load_game_file(rest);
             config_ = game.config;
             table_ = Table(config_);
+            tournament_.reset();
             bots_.clear();
             hand_events_begin_ = 0;
             return "ok";
+        }
+        if (command == "tload") {
+            if (rest.empty()) return "error usage: tload <tournament-file>";
+            TournamentFile file = load_tournament_file(rest);
+            config_ = file.config.game;
+            tournament_ = std::make_unique<Tournament>(file.config);
+            bots_.clear();
+            hand_events_begin_ = 0;
+            return "ok";
+        }
+        if (command == "tstatus") {
+            if (!tournament_) return "error no tournament loaded";
+            const Tournament& tournament = *tournament_;
+            const BlindLevel level = tournament.level();
+            const int levels = static_cast<int>(
+                tournament.config().levels.size());
+            std::ostringstream out;
+            out << "tournament level " << tournament.level_index() << "/"
+                << levels << " hands " << tournament.hands_into_level() << "/"
+                << level.hands << " blinds " << level.small_blind << "/"
+                << level.big_blind << " ante " << level.ante << " pool "
+                << tournament.prize_pool() << "\n";
+            for (const Tournament::Standing& standing :
+                 tournament.standings()) {
+                out << "standing " << standing.seat << " stack "
+                    << standing.stack << " "
+                    << (standing.eliminated ? "out" : "alive") << " place ";
+                if (standing.finish_place == 0) {
+                    out << "-";
+                } else {
+                    out << standing.finish_place;
+                }
+                out << " prize " << standing.prize << "\n";
+            }
+            out << "ok";
+            return out.str();
         }
         if (command == "start") {
             if (rest.empty()) return "error usage: start <seed>";
@@ -101,8 +148,12 @@ std::string Session::execute(const std::string& raw_line) {
             }
             if (used != rest.size()) return "error bad seed '" + rest + "'";
             // Baseline first: a rejected start must not move it.
-            const std::size_t baseline = table_.events().size();
-            table_.start_hand(static_cast<std::uint64_t>(seed));
+            const std::size_t baseline = active_table().events().size();
+            if (tournament_) {
+                tournament_->begin_hand(static_cast<std::uint64_t>(seed));
+            } else {
+                active_table().start_hand(static_cast<std::uint64_t>(seed));
+            }
             hand_events_begin_ = baseline;
             return "ok";
         }
@@ -116,23 +167,23 @@ std::string Session::execute(const std::string& raw_line) {
                 return "error bad seat '" + rest + "'";
             }
             if (used != rest.size() || seat < 0 ||
-                seat >= table_.num_seats()) {
+                seat >= active_table().num_seats()) {
                 return "error bad seat '" + rest + "'";
             }
             return do_state(seat);
         }
         if (command == "log") {
             std::ostringstream out;
-            for (const Event& e : table_.events()) {
+            for (const Event& e : active_table().events()) {
                 out << format_event(e) << "\n";
             }
             out << "end";
             return out.str();
         }
         if (command == "options") {
-            const int seat = table_.acting();
+            const int seat = active_table().acting();
             if (seat == -1) return "error no action pending";
-            const ActionOptions o = table_.options(seat);
+            const ActionOptions o = active_table().options(seat);
             std::ostringstream out;
             out << "options seat " << seat << " check "
                 << (o.can_check ? "yes" : "no") << " call " << o.call_amount
@@ -143,7 +194,7 @@ std::string Session::execute(const std::string& raw_line) {
             return out.str();
         }
         if (command == "act") {
-            const int seat = table_.acting();
+            const int seat = active_table().acting();
             if (seat == -1) return "error no action pending";
             if (bots_.count(seat) != 0) {
                 return "error seat " + std::to_string(seat) + " is automated";
@@ -153,27 +204,27 @@ std::string Session::execute(const std::string& raw_line) {
                 return "error usage: act fold|check|call|raise [amount]";
             }
             if (args[0] == "fold") {
-                table_.act(seat, {ActionType::Fold, 0});
+                active_table().act(seat, {ActionType::Fold, 0});
             } else if (args[0] == "check") {
-                table_.act(seat, {ActionType::Check, 0});
+                active_table().act(seat, {ActionType::Check, 0});
             } else if (args[0] == "call") {
-                table_.act(seat, {ActionType::Call, 0});
+                active_table().act(seat, {ActionType::Call, 0});
             } else if (args[0] == "raise") {
                 if (args.size() < 2) return "error usage: act raise <amount>";
-                table_.act(seat, {ActionType::Raise, parse_amount(args[1])});
+                active_table().act(seat, {ActionType::Raise, parse_amount(args[1])});
             } else {
                 return "error unknown action '" + args[0] + "'";
             }
             return "ok";
         }
         if (command == "deal") {
-            table_.deal_next_street();
+            active_table().deal_next_street();
             return "ok";
         }
         if (command == "settle") {
-            const std::vector<Payout> payouts = table_.settle();
+            const std::vector<Payout> payouts = active_table().settle();
             std::ostringstream out;
-            out << "showdown " << (table_.went_to_showdown() ? "yes" : "no")
+            out << "showdown " << (active_table().went_to_showdown() ? "yes" : "no")
                 << "\n";
             for (const Payout& p : payouts) {
                 out << "payout " << p.seat << " " << p.amount << "\n";
@@ -181,9 +232,13 @@ std::string Session::execute(const std::string& raw_line) {
             out << "ok";
             // Seated bots study the finished hand before the next deal.
             const HandSummary summary = summarize_hand(
-                table_.events(), hand_events_begin_, table_.events().size());
+                active_table().events(), hand_events_begin_, active_table().events().size());
             for (auto& [seat, bot] : bots_) {
                 bot->observe(seat, summary);
+            }
+            // Tournaments book eliminations, prizes, and levels at settle.
+            if (tournament_) {
+                tournament_->finish_hand();
             }
             return out.str();
         }
@@ -200,7 +255,7 @@ std::string Session::execute(const std::string& raw_line) {
                 return "error bad seat '" + seat_text + "'";
             }
             if (used != seat_text.size() || seat < 0 ||
-                seat >= table_.num_seats()) {
+                seat >= active_table().num_seats()) {
                 return "error bad seat '" + seat_text + "'";
             }
             bots_[seat] = make_bot(load_bot_file(path));
@@ -220,14 +275,14 @@ std::string Session::execute(const std::string& raw_line) {
             return out.str();
         }
         if (command == "step") {
-            const int seat = table_.acting();
+            const int seat = active_table().acting();
             if (seat == -1) return "error no action pending";
             const auto it = bots_.find(seat);
             if (it == bots_.end()) {
                 return "error seat " + std::to_string(seat) + " is manual";
             }
             const Action action = it->second->decide(make_view(table_, seat));
-            table_.act(seat, action);
+            active_table().act(seat, action);
             std::ostringstream out;
             out << "ok " << seat << " ";
             switch (action.type) {
@@ -246,30 +301,30 @@ std::string Session::execute(const std::string& raw_line) {
 
 std::string Session::do_state(int view_seat) const {
     std::ostringstream out;
-    out << "street " << street_name(table_.street()) << "\n";
-    out << "button " << table_.button() << "\n";
-    out << "acting " << table_.acting() << "\n";
-    out << "pot " << table_.pot_total() << "\n";
-    out << "current " << table_.current_bet() << "\n";
+    out << "street " << street_name(active_table().street()) << "\n";
+    out << "button " << active_table().button() << "\n";
+    out << "acting " << active_table().acting() << "\n";
+    out << "pot " << active_table().pot_total() << "\n";
+    out << "current " << active_table().current_bet() << "\n";
     out << "board";
-    if (table_.board().empty()) {
+    if (active_table().board().empty()) {
         out << " -";
     } else {
-        for (const Card& c : table_.board()) out << " " << to_string(c);
+        for (const Card& c : active_table().board()) out << " " << to_string(c);
     }
     out << "\n";
-    for (int i = 0; i < table_.num_seats(); ++i) {
-        out << "seat " << i << " stack " << table_.stack(i) << " bet "
-            << table_.bet(i) << " committed " << table_.committed(i) << " "
-            << (table_.in_hand(i) ? "in" : "out") << " "
-            << (table_.has_folded(i) ? "folded" : "live") << " hole";
+    for (int i = 0; i < active_table().num_seats(); ++i) {
+        out << "seat " << i << " stack " << active_table().stack(i) << " bet "
+            << active_table().bet(i) << " committed " << active_table().committed(i) << " "
+            << (active_table().in_hand(i) ? "in" : "out") << " "
+            << (active_table().has_folded(i) ? "folded" : "live") << " hole";
         // Filtered views hide every other seat's cards; bare `state` is the
         // local-trust full dump. Folded and out seats always show `--`.
         const bool show =
-            table_.in_hand(i) && !table_.has_folded(i) &&
+            active_table().in_hand(i) && !active_table().has_folded(i) &&
             (view_seat < 0 || view_seat == i);
         if (show) {
-            for (const Card& c : table_.hole_cards(i)) {
+            for (const Card& c : active_table().hole_cards(i)) {
                 out << " " << to_string(c);
             }
         } else {

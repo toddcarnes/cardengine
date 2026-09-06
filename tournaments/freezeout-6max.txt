@@ -1,0 +1,13 @@
+# CardEngine tournament file (format 1)
+format_version = 1
+name = "Friday Freezeout"
+description = "6-max no-limit Hold'em freezeout, 10k stacks, 10-hand levels"
+game = ../games/holdem-6max.txt
+num_players = 6
+starting_stack = 10000
+buy_in = 10000
+prizes = 50, 30, 20
+level = 50, 100, 0, 10
+level = 75, 150, 25, 10
+level = 100, 200, 50, 10
+level = 200, 400, 100, 999

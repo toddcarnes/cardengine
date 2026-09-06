@@ -42,14 +42,15 @@ class Engine:
     def send(self, command):
         """Send one command, return the reply lines (without `end`).
 
-        Framing follows docs/PROTOCOL.md: only `state` replies with a block
-        (terminated by `end`); `settle` ends with `ok`; everything else is
-        exactly one line.
+        Framing follows docs/PROTOCOL.md: `state` and `log` reply with
+        blocks terminated by `end`; `settle` and `tstatus` reply with
+        prelude lines and a final `ok`; everything else is one line.
         """
         self.proc.stdin.write(command + "\n")
         self.proc.stdin.flush()
         lines = []
-        block = command.split()[0] in ("state", "log")
+        first = command.split()[0]
+        block = first in ("state", "log")
         while True:
             line = self.proc.stdout.readline()
             if not line:
@@ -60,10 +61,12 @@ class Engine:
                     return lines
                 lines.append(line)
                 continue
-            if line.startswith("showdown") or line.startswith("payout"):
-                lines.append(line)  # settle prelude; `ok` still to come
-                continue
             lines.append(line)
+            if line in ("ok", "bye") or line.startswith("error"):
+                return lines
+            if line.split()[0] in ("showdown", "payout", "tournament",
+                                   "standing"):
+                continue
             return lines
 
     def close(self):

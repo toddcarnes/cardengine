@@ -45,49 +45,8 @@ GameFile parse_game(std::istream& in) {
             game.name = unquote(value);
         } else if (key == "description") {
             game.description = unquote(value);
-        } else if (key == "num_players") {
-            game.config.num_players = parse_int(value, lineno);
-        } else if (key == "starting_stack") {
-            game.config.starting_stack = parse_int(value, lineno);
-        } else if (key == "small_blind") {
-            game.config.small_blind = parse_int(value, lineno);
-        } else if (key == "big_blind") {
-            game.config.big_blind = parse_int(value, lineno);
-        } else if (key == "ante") {
-            game.config.ante = parse_int(value, lineno);
-        } else if (key == "hole_cards") {
-            game.config.hole_cards = parse_int(value, lineno);
-        } else if (key == "board_cards") {
-            game.config.board_cards = parse_int(value, lineno);
-        } else if (key == "betting") {
-            const std::string b = lower(value);
-            if (b == "nolimit") {
-                game.config.betting = BettingStructure::NoLimit;
-            } else if (b == "limit") {
-                game.config.betting = BettingStructure::Limit;
-            } else if (b == "potlimit") {
-                game.config.betting = BettingStructure::PotLimit;
-            } else {
-                throw std::invalid_argument(
-                    "line " + std::to_string(lineno) +
-                    ": betting must be nolimit, limit, or potlimit");
-            }
-        } else if (key == "showdown") {
-            const std::string s = lower(value);
-            if (s == "holdem") {
-                game.config.showdown = HandConstruction::BestFiveOfAll;
-            } else if (s == "omaha") {
-                game.config.showdown = HandConstruction::OmahaTwoAndThree;
-            } else {
-                throw std::invalid_argument(
-                    "line " + std::to_string(lineno) +
-                    ": showdown must be holdem or omaha");
-            }
-        } else if (key == "max_raises") {
-            game.config.max_raises_per_round = parse_int(value, lineno);
         } else {
-            throw std::invalid_argument("line " + std::to_string(lineno) +
-                                        ": unknown key '" + key + "'");
+            apply_game_key(game.config, key, value, lineno);
         }
     }
     if (!saw_version) {
@@ -99,6 +58,86 @@ GameFile parse_game(std::istream& in) {
         throw std::invalid_argument(std::string("invalid config: ") + e.what());
     }
     return game;
+}
+
+void apply_game_key(GameConfig& config, const std::string& key,
+                    const std::string& value, int lineno) {
+    if (key == "num_players") {
+        config.num_players = parse_int(value, lineno);
+    } else if (key == "starting_stack") {
+        config.starting_stack = parse_int(value, lineno);
+    } else if (key == "small_blind") {
+        config.small_blind = parse_int(value, lineno);
+    } else if (key == "big_blind") {
+        config.big_blind = parse_int(value, lineno);
+    } else if (key == "ante") {
+        config.ante = parse_int(value, lineno);
+    } else if (key == "hole_cards") {
+        config.hole_cards = parse_int(value, lineno);
+    } else if (key == "board_cards") {
+        config.board_cards = parse_int(value, lineno);
+    } else if (key == "betting") {
+        const std::string b = lower(value);
+        if (b == "nolimit") {
+            config.betting = BettingStructure::NoLimit;
+        } else if (b == "limit") {
+            config.betting = BettingStructure::Limit;
+        } else if (b == "potlimit") {
+            config.betting = BettingStructure::PotLimit;
+        } else {
+            throw std::invalid_argument(
+                "line " + std::to_string(lineno) +
+                ": betting must be nolimit, limit, or potlimit");
+        }
+    } else if (key == "showdown") {
+        const std::string s = lower(value);
+        if (s == "holdem") {
+            config.showdown = HandConstruction::BestFiveOfAll;
+        } else if (s == "omaha") {
+            config.showdown = HandConstruction::OmahaTwoAndThree;
+        } else {
+            throw std::invalid_argument(
+                "line " + std::to_string(lineno) +
+                ": showdown must be holdem or omaha");
+        }
+    } else if (key == "max_raises") {
+        config.max_raises_per_round = parse_int(value, lineno);
+    } else {
+        throw std::invalid_argument("line " + std::to_string(lineno) +
+                                    ": unknown key '" + key + "'");
+    }
+}
+
+void write_game_config(const GameConfig& config, std::ostream& out) {
+    out << "num_players = " << config.num_players << "\n";
+    out << "starting_stack = " << config.starting_stack << "\n";
+    out << "small_blind = " << config.small_blind << "\n";
+    out << "big_blind = " << config.big_blind << "\n";
+    out << "ante = " << config.ante << "\n";
+    out << "hole_cards = " << config.hole_cards << "\n";
+    out << "board_cards = " << config.board_cards << "\n";
+    out << "betting = ";
+    switch (config.betting) {
+        case BettingStructure::NoLimit:
+            out << "nolimit\n";
+            break;
+        case BettingStructure::Limit:
+            out << "limit\n";
+            break;
+        case BettingStructure::PotLimit:
+            out << "potlimit\n";
+            break;
+    }
+    out << "showdown = ";
+    switch (config.showdown) {
+        case HandConstruction::BestFiveOfAll:
+            out << "holdem\n";
+            break;
+        case HandConstruction::OmahaTwoAndThree:
+            out << "omaha\n";
+            break;
+    }
+    out << "max_raises = " << config.max_raises_per_round << "\n";
 }
 
 GameFile load_game_file(const std::string& path) {
@@ -118,35 +157,7 @@ void save_game_file(const GameFile& game, std::ostream& out) {
     out << "format_version = " << game.format_version << "\n";
     out << "name = \"" << game.name << "\"\n";
     out << "description = \"" << game.description << "\"\n";
-    out << "num_players = " << game.config.num_players << "\n";
-    out << "starting_stack = " << game.config.starting_stack << "\n";
-    out << "small_blind = " << game.config.small_blind << "\n";
-    out << "big_blind = " << game.config.big_blind << "\n";
-    out << "ante = " << game.config.ante << "\n";
-    out << "hole_cards = " << game.config.hole_cards << "\n";
-    out << "board_cards = " << game.config.board_cards << "\n";
-    out << "betting = ";
-    switch (game.config.betting) {
-        case BettingStructure::NoLimit:
-            out << "nolimit\n";
-            break;
-        case BettingStructure::Limit:
-            out << "limit\n";
-            break;
-        case BettingStructure::PotLimit:
-            out << "potlimit\n";
-            break;
-    }
-    out << "showdown = ";
-    switch (game.config.showdown) {
-        case HandConstruction::BestFiveOfAll:
-            out << "holdem\n";
-            break;
-        case HandConstruction::OmahaTwoAndThree:
-            out << "omaha\n";
-            break;
-    }
-    out << "max_raises = " << game.config.max_raises_per_round << "\n";
+    write_game_config(game.config, out);
 }
 
 }  // namespace cardengine

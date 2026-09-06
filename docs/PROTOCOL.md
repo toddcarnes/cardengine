@@ -20,6 +20,8 @@ bindings) for the reference client.
 |---|---|---|
 | `help` | `ok commands: ...` | |
 | `load <game-file>` | `ok` | Re-tables with fresh stacks. Path may contain spaces. |
+| `tload <tournament-file>` | `ok` | Tournament mode (below); clears bots. |
+| `tstatus` | `tournament ...`, `standing ...` × n, `ok` | Levels, pool, places. |
 | `start <seed>` | `ok` | Starts a hand; stacks and button carry over between hands. |
 | `state` | block, then `end` | Full table dump — local trust only (below). |
 | `state <seat>` | block, then `end` | That seat's view: own hole cards shown, all other seats `--`. |
@@ -116,8 +118,38 @@ settle showdown yes payouts 0:300 committed 200,100
 
 Same trust model as `state`: omniscient, for local eyes only.
 
-## Example session (real transcript)
+## Tournaments
+
+`tload` switches the session to tournament mode: `start` deals at the
+current level's blinds, `settle` also books eliminations/places/prizes and
+level progress, `tstatus` reports it. `load` switches back to cash.
+
 ```
+tournament level 0/4 hands 5/10 blinds 50/100 ante 0 pool 60000
+standing 0 stack 0 out place 2 prize 0
+standing 1 stack 600 alive place 1 prize 600
+ok
+```
+
+Tournament files (`tournaments/`) share the game-file conventions. A `game`
+key composes a game file (path relative to the tournament file); any game
+keys alongside override it. The rest is schedule and money:
+
+```
+format_version = 1
+name = "Friday Freezeout"
+game = ../games/holdem-6max.txt
+buy_in = 10000
+prizes = 50, 30, 20
+level = 50, 100, 0, 10      # small, big, ante, hands (repeatable)
+```
+
+Places follow bust order (simultaneous busts in seat order); unwon prize
+remainder goes to the champion. Manual level advances for GUI clocks are a
+library call today (`Tournament::advance_level`); the matching protocol
+command arrives when a GUI needs it. Rebuys likewise (`Tournament::rebuy`).
+
+## Example session (real transcript)```
 > help
 ok commands: help load start state options act deal settle quit
 > start 7

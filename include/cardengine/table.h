@@ -39,6 +39,9 @@ public:
     int stack(int seat) const;
     // Setup/operator control (tests, tournaments, rebuys). Not part of play.
     void set_stack(int seat, int chips);
+    // Tournament level changes between hands (never mid-hand).
+    void set_blinds(int small, int big);
+    void set_ante(int ante);
     int button() const { return button_; }
     void set_button(int seat);
     Street street() const { return street_; }
