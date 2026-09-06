@@ -1,0 +1,9 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Fit-or-Fold Fred"
+description = "Honest beginner: strong hands only, no bluffs, folds to pressure"
+style = heuristic
+mistake_rate = 0.02
+aggression = 0.25
+looseness = 0.05
+seed = 42

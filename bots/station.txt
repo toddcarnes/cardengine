@@ -1,0 +1,9 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Station Sal"
+description = "Calling station: almost never folds, almost never raises"
+style = heuristic
+mistake_rate = 0.02
+aggression = 0.1
+looseness = 1.0
+seed = 41
