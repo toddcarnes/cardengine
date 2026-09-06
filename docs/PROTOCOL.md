@@ -62,6 +62,13 @@ seats show `hole --`.
 > on the same computer) and wrong for play over the internet. `state <seat>`
 > is the filtered form remote players get; until then, never expose the bare
 > stream to anyone you would not show your cards to.
+>
+> **Trust note (seeds):** whoever supplies `start <seed>` chooses the deck —
+> the shuffle is public and deterministic, so seed knowledge is card
+> knowledge. Only the trusted host may pick seeds, from OS entropy, never
+> from a player, and no player may see a hand's seed (including the `log`
+> line that records it) before that hand is over. The logged seed is the
+> audit trail: after the hand anyone can replay the shuffle and verify it.
 
 ## Separate bot programs
 

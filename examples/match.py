@@ -19,7 +19,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from cli import DEFAULT_BOT, DEFAULT_ENGINE, Engine, parse_options  # noqa: E402
+from cli import DEFAULT_BOT, DEFAULT_ENGINE, Engine, hand_seed  # noqa: E402
+from cli import parse_options  # noqa: E402
 from cli import parse_state  # noqa: E402
 
 
@@ -93,7 +94,9 @@ def main():
     parser.add_argument("--tournament", default=None,
                         help="tournament file (tload instead of load; "
                              "stops when one player remains)")
-    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=None,
+                        help="first hand's seed (reproducible runs only; "
+                             "default: OS entropy per hand)")
     parser.add_argument("--hands", type=int, default=1)
     parser.add_argument("--auto", action="store_true",
                         help="check-or-call policy for non-botted seats")
@@ -118,8 +121,9 @@ def main():
         try:
             ok = True
             for hand in range(args.hands):
-                print(f"--- hand {hand + 1} (seed {args.seed + hand}) ---")
-                if play_hand(engine, procs, args.seed + hand, args.auto):
+                seed = hand_seed(args.seed, hand)
+                print(f"--- hand {hand + 1} (seed {seed}) ---")
+                if play_hand(engine, procs, seed, args.auto):
                     continue
                 if args.tournament:
                     status = engine.send("tstatus")

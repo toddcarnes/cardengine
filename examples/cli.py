@@ -18,6 +18,7 @@ Usage:
 """
 
 import argparse
+import secrets
 import subprocess
 import sys
 from pathlib import Path
@@ -174,6 +175,15 @@ def choose_human(seat, hole, opts):
         print("huh?")
 
 
+def hand_seed(base, hand):
+    """Hand seed: OS entropy by default; reproducible base+hand when the
+    operator passes --seed explicitly. The engine's shuffle is public and
+    deterministic, so production seeds must never come from a player."""
+    if base is None:
+        return secrets.randbits(64)
+    return base + hand
+
+
 def play_hand(engine, seed, auto, botted):
     reply = engine.send(f"start {seed}")
     if reply != ["ok"]:
@@ -213,7 +223,9 @@ def main():
     parser = argparse.ArgumentParser(description="CardEngine shared-screen client")
     parser.add_argument("--engine", default=str(DEFAULT_ENGINE))
     parser.add_argument("--game", default=None)
-    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=None,
+                        help="first hand's seed (reproducible runs only; "
+                             "default: OS entropy per hand)")
     parser.add_argument("--hands", type=int, default=1)
     parser.add_argument("--auto", action="store_true")
     parser.add_argument("--bots", default="",
@@ -238,8 +250,9 @@ def main():
             botted.add(seat)
         ok = True
         for hand in range(args.hands):
-            print(f"--- hand {hand + 1} (seed {args.seed + hand}) ---")
-            ok = play_hand(engine, args.seed + hand, args.auto, botted) and ok
+            seed = hand_seed(args.seed, hand)
+            print(f"--- hand {hand + 1} (seed {seed}) ---")
+            ok = play_hand(engine, seed, args.auto, botted) and ok
     finally:
         engine.close()
     return 0 if ok else 1
