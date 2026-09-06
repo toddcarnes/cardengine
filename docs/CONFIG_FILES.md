@@ -63,7 +63,7 @@ everything else falls back to standard no-limit Hold'em.
 | Key | Default | Rules |
 |---|---|---|
 | `format_version` | **required** | Must be `1`. If the format ever changes, this number changes too, so old files are rejected clearly instead of misread. |
-| `name` | `""` | Display name shown in game lists. |
+| `name` | `""` | Display name shown in game lists. Optional to the engine, but write one anyway: a client listing your file shows this name, and falls back to the filename when it is empty. |
 | `description` | `""` | One-line summary shown in game lists. |
 | `num_players` | `6` | Seats at the table, 2–10. With 2 seats the button posts the small blind and bets first before the flop (the standard two-player rules). |
 | `starting_stack` | `10000` | Chips each seat starts with. Must be positive and at least cover the big blind. |
@@ -107,7 +107,7 @@ mandatory. (A genuinely new way of playing still requires programming; new
 | Key | Default | Effect |
 |---|---|---|
 | `format_version` | **required** | Must be `1`. |
-| `name` | `""` | Shown in logs and on screen. |
+| `name` | `""` | Shown in logs and on screen — this is the "Fred" in "Fred folds". Optional to the engine, but write one anyway: clients fall back to the filename when it is empty. |
 | `description` | `""` | One-line summary. |
 | `style` | `heuristic` | How the bot thinks. `random`: picks any legal move at random — the punching bag every real bot must beat. `heuristic`: plays from experience-style rules — it values starting hands (pairs and high cards score best), values made hands after the flop, counts its outs when drawing, and plays a little tighter in early seats and looser on the button. `adaptive`: the same rules, plus it watches every opponent across hands — against players who play lots of hands it calls lighter, against players who fold everything it waits for big hands. `gto` (short for *game theory optimal*): tries to play balanced, hard-to-exploit poker — strong hands and occasional bluffs are bet exactly the same way so opponents cannot tell them apart, and it calls just often enough that bluffing against it does not pay. |
 | `mistake_rate` | `0.0` | 0–1. How often a decision is thrown away and replaced by a random legal move. Small values (like 0.05) make strong bots feel human and beatable; `1.0` plays randomly. |

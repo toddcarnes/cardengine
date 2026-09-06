@@ -104,7 +104,22 @@ Bots live in the session for now (same machine, local trust — they see only
 their own hole cards by construction via `SeatView`). In-process bots study
 each finished hand through `observe` (public action frequencies only).
 Out-of-process runners (`cardengine_bot`, `examples/match.py`) decide from
-filtered `state <seat>` views plus `options` (see "Out-of-process bots").
+filtered `state <seat>` views plus `options` (see "Separate bot programs").
+
+## Who names whom
+
+The engine only ever identifies seats by number (`seat 1 folds`,
+`payout 2 150`). Names are the host program's job: whoever seats a player
+knows what to call them. The convention is:
+
+- A human seat shows the screen name typed at the table.
+- A botted seat shows the bot file's `name` (`"Fred"` beats `"bot 1"`).
+- A game or bot file with an empty `name` is shown under its filename
+  without the extension (`tight`, not `tight.txt`).
+
+So "Fred folds, Sally raises 100" is assembled by the client from the seat
+roster it already owns — no engine changes needed, and nothing travels over
+the wire that was not already there.
 
 ## Event log
 
