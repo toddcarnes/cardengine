@@ -5,11 +5,14 @@
 //
 // Exit codes: 0 bracket complete, 1 usage/file error, 2 hand cap reached,
 // 3 estimate gate (re-run with --yes).
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
+#include <random>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -144,26 +147,36 @@ int main(int argc, char** argv) {
     }
 
     Championship cup(file.config);
-    csv << "stage,table,seed,hands,winner_seat,winner_bot\n";
+    csv << "stage,table,seed,hands,winner_seat,winner_bot,lineup\n";
     std::map<std::string, int> wins;
     unsigned long long hands_total = 0;
     unsigned long long seed = args.seed;
     int table_index = 0;
-    int seat_offset = 0;  // Global seats before this table (rotation).
     const int bot_count = static_cast<int>(bot_names.size());
     for (int stage = 0; stage < cup.num_stages(); ++stage) {
         for (int table = 0; table < cup.num_tables(stage); ++table) {
             Tournament& event = cup.tournament(stage, table);
             const int seats = event.table().num_seats();
+            // Seating shuffle: straight rotation resonates when table size
+            // shares a divisor with the bot count (e.g. 2 seats, 8 files
+            // locks seat parity to bot parity). A per-table shuffle of the
+            // files is fair for every shape and still deterministic.
+            const unsigned long long table_seed = seed + table_index++;
+            std::vector<int> order(static_cast<std::size_t>(bot_count));
+            std::iota(order.begin(), order.end(), 0);
+            std::mt19937_64 seating(table_seed ^ 0x9E3779B97F4A7C15ULL);
+            std::shuffle(order.begin(), order.end(), seating);
+            auto file_for = [&](int s) {
+                return order[static_cast<std::size_t>(
+                    s % static_cast<int>(order.size()))];
+            };
             // Fresh bot per seat: adaptive personalities learn within each
             // table without leaking reads across unrelated tables.
             std::vector<std::unique_ptr<Bot>> table_bots;
             for (int s = 0; s < seats; ++s) {
-                table_bots.push_back(
-                    make_bot(bot_files[static_cast<std::size_t>(
-                        (seat_offset + s) % bot_count)]));
+                table_bots.push_back(make_bot(bot_files[static_cast<std::size_t>(
+                    file_for(s))]));
             }
-            const unsigned long long table_seed = seed + table_index++;
             int hands = 0;
             while (!event.complete()) {
                 if (hands_total >= args.max_hands) {
@@ -201,12 +214,16 @@ int main(int argc, char** argv) {
             }
             const int winner = event.winner();
             const std::string& winner_bot =
-                bot_names[static_cast<std::size_t>((seat_offset + winner) %
-                                                   bot_count)];
+                bot_names[static_cast<std::size_t>(file_for(winner))];
+            std::string lineup;
+            for (int s = 0; s < seats; ++s) {
+                if (s > 0) lineup += ";";
+                lineup += bot_names[static_cast<std::size_t>(file_for(s))];
+            }
             csv << stage << "," << table << "," << table_seed << "," << hands
-                << "," << winner << "," << csv_field(winner_bot) << "\n";
+                << "," << winner << "," << csv_field(winner_bot) << ","
+                << csv_field(lineup) << "\n";
             ++wins[winner_bot];
-            seat_offset += seats;
         }
     }
 

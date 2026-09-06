@@ -1,0 +1,13 @@
+# CardEngine championship file (format 1)
+#
+# The Big Bash: a depth-2 all-holdem bracket for stress testing.
+# 36 opening tables of 6 (216 entrants) -> 6 semifinal tables -> final.
+# Large on purpose: run with cardengine_stress --yes (see README).
+format_version = 1
+name = "Big Bash"
+description = "Depth-2 6-max stress bracket: 36 openers, 6 semis, final"
+game = ../games/holdem-6max.txt
+depth = 2
+buy_in = 10000
+prizes = 50, 30, 20
+champion_prize = 100000
