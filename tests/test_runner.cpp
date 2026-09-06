@@ -18,9 +18,11 @@ bool starts_with(const std::string& text, const std::string& prefix) {
 }
 
 cardengine::BotFile heuristic_file() {
+    // bluff_rate = 0: the free-card check below must not become a bluff
+    // (default 0.35 would raise trash here on some RNG draws).
     std::istringstream in("format_version = 1\nname = H\nstyle = heuristic\n"
                           "mistake_rate = 0.0\naggression = 0.5\n"
-                          "looseness = 0.3\nseed = 3\n");
+                          "looseness = 0.3\nbluff_rate = 0.0\nseed = 3\n");
     return cardengine::parse_bot(in);
 }
 
