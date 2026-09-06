@@ -1,0 +1,26 @@
+# Tests use only the C++ standard library (no external test framework),
+# per the project's minimize-dependencies policy. Each test is a small
+# executable returning nonzero on failure; CTest registers them by name.
+
+function(cardengine_add_test name source)
+    add_executable(${name} ${source})
+    target_link_libraries(${name} PRIVATE cardengine)
+    if(MSVC)
+        target_compile_options(${name} PRIVATE /W4)
+    else()
+        target_compile_options(${name} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME ${name} COMMAND ${name})
+endfunction()
+
+cardengine_add_test(test_version test_version.cpp)
+cardengine_add_test(test_card test_card.cpp)
+cardengine_add_test(test_deck test_deck.cpp)
+cardengine_add_test(test_hand test_hand.cpp)
+cardengine_add_test(test_table test_table.cpp)
+cardengine_add_test(test_config test_config.cpp)
+cardengine_add_test(test_variants test_variants.cpp)
+cardengine_add_test(test_gamefile test_gamefile.cpp)
+cardengine_add_test(test_protocol test_protocol.cpp)
+cardengine_add_test(test_bot test_bot.cpp)
+cardengine_add_test(test_events test_events.cpp)

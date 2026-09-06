@@ -1,0 +1,9 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Tight Ted"
+description = "Heuristic regular: few mistakes, modest aggression, tight calls"
+style = heuristic
+mistake_rate = 0.02
+aggression = 0.4
+looseness = 0.15
+seed = 7

@@ -1,0 +1,9 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Loose Lucy"
+description = "Heuristic maniac: chases wide, bets big, gifts chips sometimes"
+style = heuristic
+mistake_rate = 0.08
+aggression = 0.8
+looseness = 0.55
+seed = 21

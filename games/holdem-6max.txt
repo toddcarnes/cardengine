@@ -1,0 +1,12 @@
+# CardEngine game file (format 1)
+format_version = 1
+name = "No-Limit Hold'em 6-max"
+description = "Standard cash game: 6 seats, 10000 chips, 50/100 blinds"
+num_players = 6
+starting_stack = 10000
+small_blind = 50
+big_blind = 100
+ante = 0
+hole_cards = 2
+board_cards = 5
+betting = nolimit

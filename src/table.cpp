@@ -1,0 +1,488 @@
+#include "cardengine/table.h"
+
+#include <algorithm>
+#include <stdexcept>
+
+#include "cardengine/deck.h"
+#include "cardengine/hand.h"
+
+namespace cardengine {
+
+Table::Table(const GameConfig& config) : config_(config) {
+    validate(config_);
+    seats_.resize(static_cast<std::size_t>(config_.num_players));
+    for (Seat& s : seats_) s.stack = config_.starting_stack;
+}
+
+int Table::num_seats() const { return config_.num_players; }
+
+int Table::stack(int seat) const {
+    check_seat(seat);
+    return seats_[seat].stack;
+}
+
+void Table::set_stack(int seat, int chips) {
+    check_seat(seat);
+    if (chips < 0) throw std::invalid_argument("chips cannot be negative");
+    seats_[static_cast<std::size_t>(seat)].stack = chips;
+}
+
+void Table::set_button(int seat) {
+    check_seat(seat);
+    button_ = seat;
+}
+
+const std::vector<Card>& Table::hole_cards(int seat) const {
+    check_seat(seat);
+    const Seat& s = seats_[static_cast<std::size_t>(seat)];
+    if (!s.in_hand) throw std::logic_error("seat not in hand");
+    return s.hole;
+}
+
+bool Table::in_hand(int seat) const {
+    check_seat(seat);
+    return seats_[static_cast<std::size_t>(seat)].in_hand;
+}
+
+bool Table::has_folded(int seat) const {
+    check_seat(seat);
+    return seats_[static_cast<std::size_t>(seat)].folded;
+}
+
+bool Table::is_all_in(int seat) const {
+    check_seat(seat);
+    const Seat& s = seats_[static_cast<std::size_t>(seat)];
+    return s.in_hand && !s.folded && s.stack == 0;
+}
+
+int Table::bet(int seat) const {
+    check_seat(seat);
+    return seats_[static_cast<std::size_t>(seat)].bet;
+}
+
+int Table::committed(int seat) const {
+    check_seat(seat);
+    return seats_[static_cast<std::size_t>(seat)].committed;
+}
+
+int Table::to_call(int seat) const {
+    check_seat(seat);
+    const Seat& s = seats_[static_cast<std::size_t>(seat)];
+    return current_bet_ > s.bet ? current_bet_ - s.bet : 0;
+}
+
+int Table::pot_total() const {
+    int total = 0;
+    for (const Seat& s : seats_) total += s.committed;
+    return total;
+}
+
+ActionOptions Table::options(int seat) const {
+    ActionOptions out;
+    if (seat < 0 || seat >= num_seats()) return out;
+    const Seat& s = seats_[static_cast<std::size_t>(seat)];
+    if (street_ == Street::None || street_ == Street::Complete) return out;
+    if (!can_act(seat)) return out;
+    const int call = to_call(seat);
+    out.can_check = (call == 0);
+    out.call_amount = call < s.stack ? call : s.stack;
+    const bool reopened = !s.acted || s.seen_seq < round_seq_;
+    if (s.stack > 0 && s.bet + s.stack > current_bet_ && reopened) {
+        out.can_raise = true;
+        const int max_to = s.bet + s.stack;
+        const int min_full = current_bet_ + last_raise_size_;
+        // An all-in short of a full raise is still legal (it just doesn't
+        // reopen betting for others).
+        out.min_raise_to = max_to < min_full ? max_to : min_full;
+        out.max_raise_to = max_to;
+    }
+    return out;
+}
+
+void Table::start_hand(std::uint64_t seed) {
+    Deck deck;
+    deck.shuffle(seed);
+    std::vector<Card> shoe;
+    while (!deck.empty()) shoe.push_back(deck.deal());
+    start_hand_common();
+    shoe_ = std::move(shoe);
+    // Deal hole_cards rounds starting left of the button.
+    int s = button_;
+    for (int round = 0; round < config_.hole_cards; ++round) {
+        for (int k = 0; k < num_seats(); ++k) {
+            s = next_in_hand(s + 1);
+            Seat& seat = seats_[static_cast<std::size_t>(s)];
+            seat.hole.push_back(shoe_.front());
+            shoe_.erase(shoe_.begin());
+        }
+    }
+    record_hand_started(seed, true);
+}
+
+void Table::start_hand_from_deck(std::vector<Card> top_first) {
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("hand already running");
+    }
+    const int funded = static_cast<int>(std::count_if(
+        seats_.begin(), seats_.end(), [](const Seat& s) { return s.stack > 0; }));
+    if (funded < 2) throw std::logic_error("need at least 2 players");
+    const std::size_t need = static_cast<std::size_t>(funded * config_.hole_cards +
+                                                      config_.board_cards);
+    if (top_first.size() < need) {
+        throw std::invalid_argument("deck too small for this hand");
+    }
+    start_hand_common();
+    shoe_ = std::move(top_first);
+    int s = button_;
+    for (int round = 0; round < config_.hole_cards; ++round) {
+        for (int k = 0; k < num_seats(); ++k) {
+            s = next_in_hand(s + 1);
+            Seat& seat = seats_[static_cast<std::size_t>(s)];
+            seat.hole.push_back(shoe_.front());
+            shoe_.erase(shoe_.begin());
+        }
+    }
+    record_hand_started(0, false);
+}
+
+void Table::act(int seat, const Action& action) {
+    check_seat(seat);
+    if (street_ == Street::None || street_ == Street::Complete) {
+        throw std::logic_error("no hand running");
+    }
+    if (seat != acting_) throw std::logic_error("not this seat's turn");
+    Seat& s = seats_[static_cast<std::size_t>(seat)];
+
+    switch (action.type) {
+        case ActionType::Fold:
+            s.folded = true;
+            s.acted = true;
+            s.seen_seq = round_seq_;
+            break;
+        case ActionType::Check:
+            if (to_call(seat) != 0) {
+                throw std::invalid_argument("cannot check facing a bet");
+            }
+            s.acted = true;
+            s.seen_seq = round_seq_;
+            break;
+        case ActionType::Call: {
+            const int call = to_call(seat);
+            const int pay = call < s.stack ? call : s.stack;
+            s.stack -= pay;
+            s.bet += pay;
+            s.committed += pay;
+            s.acted = true;
+            s.seen_seq = round_seq_;
+            break;
+        }
+        case ActionType::Raise: {
+            const ActionOptions opts = options(seat);
+            if (!opts.can_raise) {
+                throw std::invalid_argument("raise not available");
+            }
+            if (action.amount < opts.min_raise_to ||
+                action.amount > opts.max_raise_to) {
+                throw std::invalid_argument("raise amount out of range");
+            }
+            const int additional = action.amount - s.bet;
+            const int increment = action.amount - current_bet_;
+            s.stack -= additional;
+            s.bet = action.amount;
+            s.committed += additional;
+            s.acted = true;
+            if (increment >= last_raise_size_) {
+                // Full raise: reopens betting for everyone else.
+                last_raise_size_ = increment;
+                ++round_seq_;
+                s.seen_seq = round_seq_;
+            } else {
+                // Short all-in: current bet rises, action stays closed.
+                s.seen_seq = round_seq_;
+            }
+            current_bet_ = action.amount;
+            break;
+        }
+    }
+    advance_acting(seat + 1);
+    events_.push_back(ActionTakenEvent{seat, action, pot_total()});
+}
+
+void Table::deal_next_street() {
+    if (street_ != Street::Preflop && street_ != Street::Flop &&
+        street_ != Street::Turn) {
+        throw std::logic_error("no street left to deal");
+    }
+    if (acting_ != -1) throw std::logic_error("betting round not complete");
+    if (hand_complete()) throw std::logic_error("hand already decided");
+    // Board cards are dealt 3-1-1 across flop/turn/river, scaled to however
+    // many the config asks for (fewer cards, or none, just deal fewer).
+    const int remaining =
+        config_.board_cards - static_cast<int>(board_.size());
+    int deal_now = 0;
+    if (street_ == Street::Preflop) {
+        street_ = Street::Flop;
+        deal_now = remaining < 3 ? remaining : 3;
+    } else {
+        street_ = (street_ == Street::Flop) ? Street::Turn : Street::River;
+        deal_now = remaining < 1 ? remaining : 1;
+    }
+    StreetDealtEvent dealt;
+    dealt.street = street_;
+    for (int i = 0; i < deal_now; ++i) {
+        dealt.cards.push_back(shoe_.front());
+        board_.push_back(shoe_.front());
+        shoe_.erase(shoe_.begin());
+    }
+    events_.push_back(dealt);
+    begin_round();
+}
+
+bool Table::hand_complete() const {
+    if (street_ == Street::None || street_ == Street::Complete) return false;
+    int remaining = 0;
+    for (const Seat& s : seats_) {
+        if (s.in_hand && !s.folded) ++remaining;
+    }
+    if (remaining <= 1) return true;
+    return street_ == Street::River && acting_ == -1;
+}
+
+std::vector<Payout> Table::settle() {
+    if (!hand_complete()) throw std::logic_error("hand not complete");
+
+    std::vector<int> alive;
+    for (int i = 0; i < num_seats(); ++i) {
+        const Seat& s = seats_[static_cast<std::size_t>(i)];
+        if (s.in_hand && !s.folded) alive.push_back(i);
+    }
+
+    std::vector<Payout> payouts;
+    if (alive.size() == 1) {
+        showdown_ = false;
+        payouts.push_back({alive[0], pot_total()});
+    } else {
+        showdown_ = true;
+        // Contribution levels, low to high; each band forms one pot.
+        std::vector<int> levels;
+        for (int i = 0; i < num_seats(); ++i) {
+            const Seat& s = seats_[static_cast<std::size_t>(i)];
+            if (s.in_hand && s.committed > 0) levels.push_back(s.committed);
+        }
+        std::sort(levels.begin(), levels.end());
+        levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
+
+        std::vector<Card> seven = board_;
+        int prev = 0;
+        for (int level : levels) {
+            int contributors = 0;
+            std::vector<int> eligible;
+            for (int i = 0; i < num_seats(); ++i) {
+                const Seat& s = seats_[static_cast<std::size_t>(i)];
+                if (s.in_hand && s.committed >= level) {
+                    ++contributors;
+                    if (!s.folded) eligible.push_back(i);
+                }
+            }
+            const int amount = (level - prev) * contributors;
+            prev = level;
+            if (amount == 0 || eligible.empty()) continue;
+
+            HandValue best;
+            bool have_best = false;
+            for (int i : eligible) {
+                seven.resize(board_.size());
+                const Seat& s = seats_[static_cast<std::size_t>(i)];
+                seven.insert(seven.end(), s.hole.begin(), s.hole.end());
+                const HandValue value = evaluate_best(seven);
+                if (!have_best || best < value) {
+                    best = value;
+                    have_best = true;
+                }
+            }
+            std::vector<int> winners;
+            for (int i : eligible) {
+                seven.resize(board_.size());
+                const Seat& s = seats_[static_cast<std::size_t>(i)];
+                seven.insert(seven.end(), s.hole.begin(), s.hole.end());
+                if (evaluate_best(seven) == best) winners.push_back(i);
+            }
+            // Odd chips go clockwise from the button.
+            std::sort(winners.begin(), winners.end(), [&](int a, int b) {
+                const int da = (a - button_ + num_seats()) % num_seats();
+                const int db = (b - button_ + num_seats()) % num_seats();
+                return da < db;
+            });
+            const int share = amount / static_cast<int>(winners.size());
+            const int remainder =
+                amount % static_cast<int>(winners.size());
+            for (std::size_t w = 0; w < winners.size(); ++w) {
+                int award = share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+                auto it = std::find_if(payouts.begin(), payouts.end(),
+                                       [&](const Payout& p) {
+                                           return p.seat == winners[w];
+                                       });
+                if (it == payouts.end()) {
+                    payouts.push_back({winners[w], award});
+                } else {
+                    it->amount += award;
+                }
+            }
+        }
+    }
+
+    for (const Payout& p : payouts) {
+        seats_[static_cast<std::size_t>(p.seat)].stack += p.amount;
+    }
+    // The pot has been awarded; commitments no longer exist.
+    for (Seat& s : seats_) {
+        s.bet = 0;
+        s.committed = 0;
+    }
+    last_payouts_ = payouts;
+    events_.push_back(HandSettledEvent{showdown_, last_payouts_});
+    street_ = Street::Complete;
+    acting_ = -1;
+    // Advance the button to the next seated player with chips.
+    for (int k = 1; k <= num_seats(); ++k) {
+        const int s = (button_ + k) % num_seats();
+        if (seats_[static_cast<std::size_t>(s)].stack > 0) {
+            button_ = s;
+            break;
+        }
+    }
+    return payouts;
+}
+
+void Table::record_hand_started(std::uint64_t seed, bool seeded) {
+    HandStartedEvent started;
+    started.config = config_;
+    started.button = button_;
+    started.seed = seed;
+    started.seeded = seeded;
+    for (const Seat& s : seats_) {
+        // Nothing is created or destroyed mid-hand, so pre-hand stacks are
+        // exactly what's left plus what's committed.
+        started.stacks.push_back(s.stack + s.committed);
+        started.hole.push_back(s.hole);
+    }
+    events_.push_back(started);
+}
+
+void Table::check_seat(int seat) const {
+    if (seat < 0 || seat >= num_seats()) {
+        throw std::invalid_argument("seat out of range");
+    }
+}
+
+int Table::next_in_hand(int from) const {
+    for (int k = 0; k < num_seats(); ++k) {
+        const int s = (from + k) % num_seats();
+        if (seats_[static_cast<std::size_t>(s)].in_hand) return s;
+    }
+    throw std::logic_error("no participating seat");
+}
+
+bool Table::can_act(int seat) const {
+    const Seat& s = seats_[static_cast<std::size_t>(seat)];
+    return s.in_hand && !s.folded && s.stack > 0;
+}
+
+bool Table::needs_action(int seat) const {
+    if (!can_act(seat)) return false;
+    const Seat& s = seats_[static_cast<std::size_t>(seat)];
+    return !s.acted || to_call(seat) > 0;
+}
+
+void Table::advance_acting(int from) {
+    acting_ = -1;
+    int remaining = 0;
+    for (const Seat& s : seats_) {
+        if (s.in_hand && !s.folded) ++remaining;
+    }
+    if (remaining <= 1) return;  // Last player wins immediately.
+    for (int k = 0; k < num_seats(); ++k) {
+        const int s = (from + k) % num_seats();
+        if (needs_action(s)) {
+            acting_ = s;
+            return;
+        }
+    }
+}
+
+void Table::post_blind(int seat, int amount) {
+    Seat& s = seats_[static_cast<std::size_t>(seat)];
+    const int pay = amount < s.stack ? amount : s.stack;
+    s.stack -= pay;
+    s.bet += pay;
+    s.committed += pay;
+}
+
+void Table::begin_round() {
+    for (Seat& s : seats_) {
+        if (!s.in_hand) continue;
+        s.bet = 0;
+        s.acted = false;
+        s.seen_seq = round_seq_;
+    }
+    current_bet_ = 0;
+    last_raise_size_ = config_.big_blind;
+    advance_acting(button_ + 1);
+}
+
+void Table::start_hand_common() {
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("hand already running");
+    }
+    for (Seat& s : seats_) {
+        s.bet = 0;
+        s.committed = 0;
+        s.in_hand = s.stack > 0;
+        s.folded = false;
+        s.acted = false;
+        s.seen_seq = 0;
+        s.hole.clear();
+    }
+    const int participants = static_cast<int>(
+        std::count_if(seats_.begin(), seats_.end(),
+                      [](const Seat& s) { return s.in_hand; }));
+    if (participants < 2) throw std::logic_error("need at least 2 players");
+    if (!seats_[static_cast<std::size_t>(button_)].in_hand) {
+        button_ = next_in_hand(button_ + 1);
+    }
+    showdown_ = false;
+    last_payouts_.clear();
+    board_.clear();
+
+    // Antes are dead money: everyone pays before the blinds go in.
+    // Short stacks ante what they have and play on from there.
+    for (int i = 0; i < num_seats(); ++i) {
+        Seat& s = seats_[static_cast<std::size_t>(i)];
+        if (!s.in_hand || config_.ante == 0) continue;
+        const int pay = config_.ante < s.stack ? config_.ante : s.stack;
+        s.stack -= pay;
+        s.committed += pay;
+    }
+
+    // Blinds. Heads-up the button is the small blind; otherwise SB/BB are
+    // the first two participants left of the button.
+    int sb = button_;
+    int bb = button_;
+    if (participants == 2) {
+        sb = button_;
+        bb = next_in_hand(button_ + 1);
+    } else {
+        sb = next_in_hand(button_ + 1);
+        bb = next_in_hand(sb + 1);
+    }
+    post_blind(sb, config_.small_blind);
+    post_blind(bb, config_.big_blind);
+
+    street_ = Street::Preflop;
+    current_bet_ = config_.big_blind;
+    last_raise_size_ = config_.big_blind;
+    round_seq_ = 0;
+    advance_acting(bb + 1);
+}
+
+}  // namespace cardengine

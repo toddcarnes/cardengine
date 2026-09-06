@@ -1,0 +1,12 @@
+# CardEngine game file (format 1)
+format_version = 1
+name = "No-Limit Hold'em heads-up"
+description = "Standard cash game: 2 seats, button posts the small blind"
+num_players = 2
+starting_stack = 10000
+small_blind = 50
+big_blind = 100
+ante = 0
+hole_cards = 2
+board_cards = 5
+betting = nolimit

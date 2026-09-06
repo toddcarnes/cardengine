@@ -1,0 +1,64 @@
+# Out-of-source build dirs
+build/
+cmake-build-*/
+out/
+
+# CMake generated files (in case of accidental in-source configure)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+Testing/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_CPack_Packages/
+
+# Compiled objects / libs / binaries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.pdb
+*.ilk
+*.exp
+*.dSYM/
+
+# Visual Studio / MSBuild
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+
+# Ninja / other generators
+.ninja_deps
+.ninja_log
+
+# Python (examples/cli.py reference client)
+__pycache__/
+*.py[cod]
+
+# Test scratch files (removed on success; a crash mid-run can leave them)
+tmp_*.txt
+
+# Local scratch space for throwaway scripts, logs, probes. Never committed.
+.scratch/
+
+# Editors and OS junk (open source, cross-platform contributors)
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*~

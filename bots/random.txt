@@ -1,0 +1,9 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Randy"
+description = "Baseline: uniform random legal actions. Every real bot must beat Randy."
+style = random
+mistake_rate = 0.0
+aggression = 0.5
+looseness = 0.5
+seed = 1
