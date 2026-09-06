@@ -1,0 +1,14 @@
+# CardEngine bot file (format 1)
+format_version = 1
+name = "Apex"
+description = "Theoretical best: Vanguard core, aggression 0.85, always bluffs, survival plus planning"
+style = heuristic
+mistake_rate = 0.0
+aggression = 0.85
+looseness = 0.2
+bluff_rate = 1.0
+defense = 1.0
+position_weight = 0.0
+survival = 1.0
+planning = 2
+seed = 71

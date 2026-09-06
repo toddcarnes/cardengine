@@ -60,10 +60,11 @@ def write_candidate(path, name, style, looseness, aggression, mistake,
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def run_bracket(engine, championship, bot_files, seed, out_csv):
+def run_bracket(engine, championship, bot_files, seed, out_csv,
+                max_hands=500000):
     cmd = [str(engine), "--championship", str(championship),
            "--bots", ",".join(str(f) for f in bot_files),
-           "--seed", str(seed), "--yes", "--max-hands", "500000",
+           "--seed", str(seed), "--yes", "--max-hands", str(max_hands),
            "--out", str(out_csv)]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
