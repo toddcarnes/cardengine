@@ -30,6 +30,8 @@ this project is called CardEngine.)
 | `trebuy <seat>` | `ok` | Tournament only, between hands: top up a live seat or bring back a busted one (adds a buy-in to the pool). Not for sitting-out seats. |
 | `tchop <seat:amount> ...` | `ok` | Tournament only, between hands: final-table deal. One pair per surviving seat, amounts summing to the remaining pool exactly; places go by stack (leader first), tournament ends. |
 | `sitout <seat>` / `resume <seat>` | `ok` | Flag a seat out (disconnect/away) or bring it back. Applies from the next hand; the running hand is unaffected. |
+| `save <file>` | `ok` | Between hands: writes the whole session (stacks, button, sit-outs, tournament books, log) to a session file. |
+| `restore <file>` | `ok` | Between hands: reboots this session from a session file (clears bots — reseat them). |
 | `start <seed>` | `ok` | Starts a hand; stacks and button carry over between hands. |
 | `state` | block, then `end` | Full table dump — local trust only (below). |
 | `state <seat>` | block, then `end` | That seat's view: own hole cards shown, all other seats `--`. |
@@ -163,6 +165,19 @@ settle showdown yes payouts 0:300 committed 200,100
 Same caution as `state`: this log records everybody's private cards, so keep
 it on this computer.
 
+## Saving and restoring
+
+A crashed host loses the tournament — unless it saved. `save <file>`
+(between hands only) writes the whole session: game rules, stacks, button,
+sit-out flags, tournament books (levels, pool, busts, places), and the raw
+log lines. `restore <file>` reboots this session from that file: same stacks,
+same button, same books, same log, ready to `start` the next hand. Seated
+bots are deliberately not saved — `addbot` them again after a restore
+(their adaptive reads rebuild from the restored log as new hands are
+observed). Session files are plain `key = value` text like game files
+(full key reference in `docs/CONFIG_FILES.md`); a hand-edited file that
+fails validation errors with a line number and changes nothing.
+
 ## Tournaments
 
 `tload` switches the session to tournament mode: `start` deals at the
@@ -203,7 +218,7 @@ further `start` hands are refused.
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus tlevel trebuy tchop sitout resume start state options act deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act deal settle log addbot bots step quit
 > start 7
 ok
 > options

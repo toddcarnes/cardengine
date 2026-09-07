@@ -93,6 +93,22 @@ public:
     // Append-only history of every hand since construction or clear_events().
     const std::vector<Event>& events() const { return events_; }
     void clear_events() { events_.clear(); }
+    // Restores a log parsed from text (session files). Appends verbatim;
+    // the caller guarantees the lines belong to this table's configs.
+    void append_events(std::vector<Event> more);
+
+    struct Snapshot {
+        GameConfig config;
+        std::vector<int> stacks;
+        std::vector<bool> sitting_out;
+        int button = 0;
+    };
+    // Between-hands state: stacks, sit-out flags, button. Throws
+    // std::logic_error when a hand is running.
+    Snapshot snapshot() const;
+    // Inverse of snapshot: fresh table, same configs, carried stacks/flags.
+    // Throws std::invalid_argument on a mismatched or negative snapshot.
+    void restore(const Snapshot& saved);
 
 private:
     struct Seat {

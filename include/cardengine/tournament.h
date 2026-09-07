@@ -59,6 +59,26 @@ public:
     // Between hands only; clears an elimination (with its recorded prize).
     void rebuy(int seat);
 
+    struct Snapshot {
+        TournamentConfig config;
+        std::vector<int> stacks;
+        std::vector<bool> sitting_out;
+        int button = 0;
+        int level_index = 0;
+        int hands_into_level = 0;
+        int prize_pool = 0;
+        int prize_awarded = 0;
+        std::vector<bool> eliminated;
+        std::vector<int> places;
+        std::vector<int> prizes;
+    };
+    // Between-hands books: levels, pool, busts, places. Throws
+    // std::logic_error when a hand is open.
+    Snapshot snapshot() const;
+    // Inverse of snapshot. Throws std::invalid_argument on a mismatched
+    // snapshot, std::logic_error when a hand is open.
+    void restore(const Snapshot& saved);
+
     // Final-table deal: the remaining players agree to split the rest of
     // the pool (listed amounts must sum to exactly pool minus prizes
     // already awarded) and the tournament ends at once. Places go by stack,

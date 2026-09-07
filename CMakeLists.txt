@@ -25,6 +25,7 @@ add_library(cardengine STATIC
     src/bot_runner.cpp
     src/championship.cpp
     src/event.cpp
+    src/session_file.cpp
     src/tournament.cpp
 )
 target_include_directories(cardengine PUBLIC

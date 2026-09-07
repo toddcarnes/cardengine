@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Sessions: `save <file>` / `restore <file>` persist the whole game between
+  hands (rules, stacks, button, sit-outs, tournament books, raw log) as
+  versioned key=value session files; `Table`/`Tournament` snapshot/restore
+  plus log-line parsing (`parse_event`) underneath. Bots clear on restore.
+
 ## 0.3.0 — Wave 1: tournament operations over the wire
 
 - Tournaments: `tchop <seat:amount> ...` final-table deals — survivors split

@@ -164,6 +164,69 @@ void Tournament::rebuy(int seat) {
     }
 }
 
+Tournament::Snapshot Tournament::snapshot() const {
+    if (hand_open_ || (table_.street() != Street::None &&
+                       table_.street() != Street::Complete)) {
+        throw std::logic_error("cannot snapshot mid-hand");
+    }
+    Snapshot saved;
+    saved.config = config_;
+    const Table::Snapshot felt = table_.snapshot();
+    saved.stacks = felt.stacks;
+    saved.sitting_out = felt.sitting_out;
+    saved.button = felt.button;
+    saved.level_index = level_index_;
+    saved.hands_into_level = hands_into_level_;
+    saved.prize_pool = prize_pool_;
+    saved.prize_awarded = prize_awarded_;
+    saved.eliminated = eliminated_;
+    saved.places = places_;
+    saved.prizes = prizes_;
+    return saved;
+}
+
+void Tournament::restore(const Snapshot& saved) {
+    if (hand_open_ || (table_.street() != Street::None &&
+                       table_.street() != Street::Complete)) {
+        throw std::logic_error("cannot restore mid-hand");
+    }
+    validate_tournament(saved.config);
+    const int n = saved.config.game.num_players;
+    if (saved.stacks.size() != static_cast<std::size_t>(n) ||
+        saved.sitting_out.size() != static_cast<std::size_t>(n) ||
+        saved.eliminated.size() != static_cast<std::size_t>(n) ||
+        saved.places.size() != static_cast<std::size_t>(n) ||
+        saved.prizes.size() != static_cast<std::size_t>(n)) {
+        throw std::invalid_argument("snapshot does not match this tournament");
+    }
+    if (saved.level_index < 0 ||
+        saved.level_index >= static_cast<int>(saved.config.levels.size()) ||
+        saved.hands_into_level < 0 || saved.prize_pool < 0 ||
+        saved.prize_awarded < 0) {
+        throw std::invalid_argument("snapshot books out of range");
+    }
+    config_ = saved.config;
+    table_ = Table(config_.game);  // Re-seat before restoring felt state.
+    Table::Snapshot felt;
+    felt.config = config_.game;
+    felt.stacks = saved.stacks;
+    felt.sitting_out = saved.sitting_out;
+    felt.button = saved.button;
+    table_.restore(felt);
+    // Blinds track the level: restore what begin_hand would have set.
+    const BlindLevel current = level();
+    table_.set_blinds(current.small_blind, current.big_blind);
+    table_.set_ante(current.ante);
+    level_index_ = saved.level_index;
+    hands_into_level_ = saved.hands_into_level;
+    prize_pool_ = saved.prize_pool;
+    prize_awarded_ = saved.prize_awarded;
+    eliminated_ = saved.eliminated;
+    places_ = saved.places;
+    prizes_ = saved.prizes;
+    hand_open_ = false;
+}
+
 void Tournament::chop(const std::vector<Payout>& deal) {
     if (complete()) throw std::logic_error("tournament is over");
     if (hand_open_ || (table_.street() != Street::None &&

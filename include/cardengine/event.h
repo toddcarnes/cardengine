@@ -53,4 +53,10 @@ const char* event_name(const Event& event);
 // One line per event, for the `log` command (spec: docs/PROTOCOL.md).
 std::string format_event(const Event& event);
 
+// Inverse of format_event: parses one log line back into an event.
+// The game config rides along because begin_hand lines carry stacks and
+// hole cards but not the rules they were dealt under. Throws
+// std::invalid_argument on any malformed line or card text.
+Event parse_event(const std::string& line, const GameConfig& config);
+
 }  // namespace cardengine

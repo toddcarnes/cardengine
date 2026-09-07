@@ -172,9 +172,10 @@ Tournament rules the file implies:
   players (including you) are still standing, you finish Nth, and a matching
   `prizes` entry pays you on the spot.
 - If two players bust in the same hand, places go in seat order.
-- Buying back in (`rebuy`) and moving levels by the clock instead of by
-  hand count are features of the engine's library for now; the matching
-  on-screen commands arrive with the graphical interface.
+- Buying back in (`trebuy`), moving levels by the clock (`tlevel`), and
+  final-table deals (`tchop`) all have matching protocol commands; saving
+  and restoring the whole session (`save` / `restore`) is covered under
+  "Session files" below.
 
 ## Championship files (`championships/`)
 
@@ -194,3 +195,32 @@ pure bracket math plus scheduling — no new poker rules.
 
 Examples: `winter-classic.txt` (two 6-seat semifinal freezeouts into a
 heads-up final) and `novice-cup.txt` (the depth-2 shortcut).
+
+## Session files (`save` / `restore`)
+
+A session file is a snapshot of a running game, written by `save` and read
+back by `restore`. Same `key = value` conventions as every other file; only
+`format_version`, `mode`, `stacks`, `button`, and `events` are mandatory
+(the rest default or apply to tournaments only). The `events` count says how
+many raw log lines follow the keys — they replay verbatim into the restored
+log for audit and bot training.
+
+| Key | Default | Effect |
+|---|---|---|
+| `format_version` | **required** | Must be `1`. |
+| `mode` | **required** | `cash` or `tournament`. Tournament mode additionally requires `eliminated`, `places`, and `prizes_earned`. |
+| Any game-file key | (game/defaults) | Rules in force: `num_players`, `starting_stack`, blinds, `ante`, `betting`, `showdown`, etc. `stacks` must carry one entry per seat. |
+| `stacks` | **required** | Per-seat chips, in order: `10000,9500,...`. |
+| `sitting_out` | all `0` | Per-seat flags (`1` = sitting out): `0,1,0,...`. One entry per seat. |
+| `button` | **required** | Seat holding the dealer button. |
+| `buy_in` / `prizes` / `level` | (tournament) | Tournament schedule and money, same shapes as tournament files (`level` repeatable). |
+| `level_index` / `hands_into_level` | `0` | Where the blind clock stands. |
+| `prize_pool` / `prize_awarded` | `0` | Chips paid in vs prizes booked so far. |
+| `eliminated` | (tournament) | Per-seat bust flags (`1` = out). One entry per seat. |
+| `places` | (tournament) | Per-seat finishing places (`0` = still playing). One entry per seat. |
+| `prizes_earned` | (tournament) | Per-seat booked prizes. One entry per seat. |
+| `events` | **required** | How many raw log lines follow the keys. A mismatch (or a malformed log line) rejects the file with a line number and restores nothing. |
+
+Snapshots are always between hands: `save` and `restore` mid-hand are
+refused. `restore` clears seated bots — `addbot` them again (adaptive reads
+rebuild from the restored log as new hands are observed).

@@ -1,5 +1,6 @@
 // Event log: exact sequences, formatting, no-leak rule, accumulation.
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -12,6 +13,7 @@ namespace {
 using testutil::cards;
 using testutil::check;
 using testutil::contains;
+using testutil::expect_throws;
 
 void fold(cardengine::Table& t, int s) {
     t.act(s, {cardengine::ActionType::Fold, 0});
@@ -169,6 +171,116 @@ int main() {
         const std::string log2 = session.execute("log");
         check(contains(log2, "committed 0,50,100,0,0,0\nend"),
               "log has framed settle");
+    }
+
+    // Log lines parse back into the events they were formatted from.
+    {
+        GameConfig config;
+        config.num_players = 3;
+        Table table(config);
+        table.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d",
+                                         "8h", "9s", "Tc", "Jd", "Qh"}));
+        fold(table, 0);
+        fold(table, 1);
+        table.settle();
+        for (const Event& e : table.events()) {
+            const Event back = parse_event(format_event(e), config);
+            check(event_name(back) == event_name(e), "name round-trips");
+            check(format_event(back) == format_event(e), "text round-trips");
+        }
+        // Seeded deals and showdowns round-trip too (seed, hit cards).
+        GameConfig hu;
+        hu.num_players = 2;
+        Table show(hu);
+        show.start_hand(41);
+        while (!show.hand_complete()) {
+            if (show.acting() != -1) {
+                const int seat = show.acting();
+                if (show.options(seat).can_check) {
+                    chk(show, seat);
+                } else {
+                    call(show, seat);
+                }
+            } else {
+                show.deal_next_street();
+            }
+        }
+        show.settle();
+        for (const Event& e : show.events()) {
+            const Event back = parse_event(format_event(e), hu);
+            check(format_event(back) == format_event(e), "showdown round-trips");
+        }
+        const auto* seeded =
+            std::get_if<HandStartedEvent>(&show.events()[0]);
+        check(seeded != nullptr && seeded->seeded && seeded->seed == 41,
+              "seed survives the round-trip");
+        // Every malformed shape names its problem, never half-parses.
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("", c);
+            },
+            "empty line");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("fumble 1 2 3", c);
+            },
+            "unknown event");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("begin_hand button 0 seed 5 stacks 1,2 hole 2c,3d", c);
+            },
+            "stacks and hole disagree");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("begin_hand button 0 seed nope stacks 1 hole 2c", c);
+            },
+            "bad seed");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("begin_hand button 0 seed 5 stacks 1 hole zz", c);
+            },
+            "bad hole card");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("action 0", c);
+            },
+            "short action");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("action 0 raise pot 5", c);
+            },
+            "short raise");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("action 0 dance pot 5", c);
+            },
+            "bad action name");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("street turn zz", c);
+            },
+            "bad street card");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("settle showdown maybe payouts - committed 0", c);
+            },
+            "bad showdown flag");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("settle showdown no payouts 0-5 committed 0", c);
+            },
+            "bad payout shape");
     }
 
     std::cout << "test_events ok\n";

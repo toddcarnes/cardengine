@@ -444,6 +444,65 @@ void Table::record_hand_started(std::uint64_t seed, bool seeded) {
     events_.push_back(started);
 }
 
+void Table::append_events(std::vector<Event> more) {
+    for (Event& e : more) events_.push_back(std::move(e));
+}
+
+Table::Snapshot Table::snapshot() const {
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("cannot snapshot mid-hand");
+    }
+    Snapshot saved;
+    saved.config = config_;
+    for (const Seat& s : seats_) {
+        saved.stacks.push_back(s.stack);
+        saved.sitting_out.push_back(s.sitting_out);
+    }
+    saved.button = button_;
+    return saved;
+}
+
+void Table::restore(const Snapshot& saved) {
+    if (street_ != Street::None && street_ != Street::Complete) {
+        throw std::logic_error("cannot restore mid-hand");
+    }
+    if (saved.stacks.size() != seats_.size() ||
+        saved.sitting_out.size() != seats_.size()) {
+        throw std::invalid_argument("snapshot does not match this table");
+    }
+    for (int chips : saved.stacks) {
+        if (chips < 0) throw std::invalid_argument("snapshot stack negative");
+    }
+    if (saved.button < 0 || saved.button >= num_seats()) {
+        throw std::invalid_argument("snapshot button out of range");
+    }
+    config_ = saved.config;
+    validate(config_);
+    for (int i = 0; i < num_seats(); ++i) {
+        Seat& s = seats_[static_cast<std::size_t>(i)];
+        s.stack = saved.stacks[static_cast<std::size_t>(i)];
+        s.bet = 0;
+        s.committed = 0;
+        s.in_hand = false;
+        s.folded = false;
+        s.acted = false;
+        s.sitting_out = saved.sitting_out[static_cast<std::size_t>(i)];
+        s.seen_seq = 0;
+        s.hole.clear();
+    }
+    button_ = saved.button;
+    street_ = Street::None;
+    board_.clear();
+    shoe_.clear();
+    acting_ = -1;
+    current_bet_ = 0;
+    last_raise_size_ = 0;
+    round_seq_ = 0;
+    raises_this_round_ = 0;
+    showdown_ = false;
+    last_payouts_.clear();
+}
+
 void Table::check_seat(int seat) const {
     if (seat < 0 || seat >= num_seats()) {
         throw std::invalid_argument("seat out of range");

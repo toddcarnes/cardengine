@@ -9,6 +9,9 @@
 
 #include "cardengine/detail/kv.h"
 #include "cardengine/game_file.h"
+#include "cardengine/session_file.h"
+
+#include <fstream>
 
 namespace cardengine {
 
@@ -88,10 +91,99 @@ std::string Session::execute(const std::string& raw_line) {
     try {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
-            return "ok commands: help load tload tstatus tlevel trebuy tchop sitout resume start state options "
+            return "ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options "
                    "act deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
+        if (command == "save") {
+            if (rest.empty()) return "error usage: save <session-file>";
+            if (active_table().street() != Street::None &&
+                active_table().street() != Street::Complete) {
+                return "error cannot save mid-hand";
+            }
+            SessionFile file;
+            file.tournament = (tournament_ != nullptr);
+            if (tournament_) {
+                const Tournament::Snapshot books = tournament_->snapshot();
+                file.game = books.config.game;
+                file.levels = books.config.levels;
+                file.prizes = books.config.prizes;
+                file.buy_in = books.config.buy_in;
+                file.level_index = books.level_index;
+                file.hands_into_level = books.hands_into_level;
+                file.prize_pool = books.prize_pool;
+                file.prize_awarded = books.prize_awarded;
+                file.eliminated = books.eliminated;
+                file.places = books.places;
+                file.prizes_earned = books.prizes;
+                file.stacks = books.stacks;
+                file.sitting_out = books.sitting_out;
+                file.button = books.button;
+            } else {
+                const Table::Snapshot felt = table_.snapshot();
+                file.game = felt.config;
+                file.stacks = felt.stacks;
+                file.sitting_out = felt.sitting_out;
+                file.button = felt.button;
+            }
+            for (const Event& e : active_table().events()) {
+                file.events.push_back(e);
+            }
+            std::ofstream out(detail::unquote(rest));
+            if (!out) {
+                return "error cannot open '" + rest + "'";
+            }
+            save_session_file(file, out);
+            out.flush();
+            if (!out) {
+                return "error cannot write '" + rest + "'";
+            }
+            return "ok";
+        }
+        if (command == "restore") {
+            if (rest.empty()) return "error usage: restore <session-file>";
+            if (active_table().street() != Street::None &&
+                active_table().street() != Street::Complete) {
+                return "error cannot restore mid-hand";
+            }
+            const SessionFile file =
+                load_session_file(detail::unquote(rest));
+            config_ = file.game;
+            if (file.tournament) {
+                Tournament::Snapshot books;
+                books.config.game = file.game;
+                books.config.levels = file.levels;
+                books.config.prizes = file.prizes;
+                books.config.buy_in = file.buy_in;
+                books.level_index = file.level_index;
+                books.hands_into_level = file.hands_into_level;
+                books.prize_pool = file.prize_pool;
+                books.prize_awarded = file.prize_awarded;
+                books.eliminated = file.eliminated;
+                books.places = file.places;
+                books.prizes = file.prizes_earned;
+                books.stacks = file.stacks;
+                books.sitting_out = file.sitting_out;
+                books.button = file.button;
+                auto fresh = std::make_unique<Tournament>(books.config);
+                fresh->restore(books);
+                tournament_ = std::move(fresh);
+            } else {
+                Table::Snapshot felt;
+                felt.config = file.game;
+                felt.stacks = file.stacks;
+                felt.sitting_out = file.sitting_out;
+                felt.button = file.button;
+                table_ = Table(file.game);
+                table_.restore(felt);
+                tournament_.reset();
+            }
+            active_table().clear_events();
+            active_table().append_events(file.events);
+            bots_.clear();
+            hand_events_begin_ = active_table().events().size();
+            return "ok";
+        }
         if (command == "load") {
             if (rest.empty()) return "error usage: load <game-file>";
             const GameFile game = load_game_file(detail::unquote(rest));

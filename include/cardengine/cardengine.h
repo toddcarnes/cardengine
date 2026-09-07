@@ -11,6 +11,7 @@
 #include "cardengine/game_file.h"
 #include "cardengine/hand.h"
 #include "cardengine/protocol.h"
+#include "cardengine/session_file.h"
 #include "cardengine/table.h"
 #include "cardengine/tournament.h"
 
