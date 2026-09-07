@@ -5,6 +5,8 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+## 0.3.0 — Wave 1: tournament operations over the wire
+
 - Tournaments: `tchop <seat:amount> ...` final-table deals — survivors split
   the remaining pool exactly, places go by stack (leader first, earlier
   busts slide below in bust order), and the tournament closes.

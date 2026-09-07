@@ -5,7 +5,7 @@ Verified 2026-09-05: configure + build + `ctest` pass with CMake 4.3.4 / VS 2026
 
 ## Structure (real)
 
-- Root `CMakeLists.txt` — `project(cardengine VERSION 0.2.0 LANGUAGES CXX)`; C++23 required, `CMAKE_CXX_EXTENSIONS OFF`.
+- Root `CMakeLists.txt` — `project(cardengine VERSION 0.3.0 LANGUAGES CXX)`; C++23 required, `CMAKE_CXX_EXTENSIONS OFF`.
 - `include/cardengine/cardengine.h` + `src/cardengine.cpp` — `cardengine` static lib (engine lives here).
   Umbrella header; engine modules: `card.h` (`Rank` 2–14 / `Suit` / `Card`, `"Qh"` notation + `parse_card`),
   `deck.h` (`Deck`, deterministic `shuffle(seed)`), `hand.h` (`evaluate_five` / `evaluate_best`, `HandValue` with
