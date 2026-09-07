@@ -22,7 +22,7 @@ namespace cardengine {
 
 // Keep in sync with the project() VERSION in the root CMakeLists.txt.
 inline constexpr int kVersionMajor = 0;
-inline constexpr int kVersionMinor = 4;
+inline constexpr int kVersionMinor = 5;
 inline constexpr int kVersionPatch = 0;
 
 // Human-readable "major.minor.patch".

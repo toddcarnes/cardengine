@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(cardengine VERSION 0.4.0 LANGUAGES CXX)
+project(cardengine VERSION 0.5.0 LANGUAGES CXX)
 
 # Portable ISO C++ only: no compiler extensions, no platform-only APIs in core.
 set(CMAKE_CXX_STANDARD 23)

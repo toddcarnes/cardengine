@@ -5,6 +5,8 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+## 0.5.0 — Wave 3: variants
+
 - Variants: seven-card stud with real rules (`showdown = stud`,
   `games/stud-8max.txt`, 2–8 seats): third street deals 2 down + 1 up with
   the low door card's bring-in (action opens left of it), fourth through
