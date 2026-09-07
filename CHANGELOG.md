@@ -5,6 +5,8 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+## 0.4.0 — Wave 2: persistence and clocks
+
 - Clocks: timed blind levels (`level = sb, bb, ante, hands, minutes` — wall
   time banked per hand, fires at the next deal, never mid-hand;
   `elapsed/left` in `tstatus`, `level_elapsed` in saves), action clock
