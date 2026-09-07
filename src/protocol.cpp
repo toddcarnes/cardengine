@@ -88,7 +88,7 @@ std::string Session::execute(const std::string& raw_line) {
     try {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
-            return "ok commands: help load tload tstatus start state options "
+            return "ok commands: help load tload tstatus tlevel trebuy start state options "
                    "act deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
@@ -137,6 +137,29 @@ std::string Session::execute(const std::string& raw_line) {
             }
             out << "ok";
             return out.str();
+        }
+        if (command == "tlevel") {
+            if (!tournament_) return "error no tournament loaded";
+            if (!rest.empty()) return "error usage: tlevel";
+            tournament_->advance_level();
+            return "ok";
+        }
+        if (command == "trebuy") {
+            if (!tournament_) return "error no tournament loaded";
+            if (rest.empty()) return "error usage: trebuy <seat>";
+            std::size_t used = 0;
+            int seat = -1;
+            try {
+                seat = std::stoi(rest, &used);
+            } catch (const std::exception&) {
+                return "error bad seat '" + rest + "'";
+            }
+            if (used != rest.size() || seat < 0 ||
+                seat >= active_table().num_seats()) {
+                return "error bad seat '" + rest + "'";
+            }
+            tournament_->rebuy(seat);
+            return "ok";
         }
         if (command == "start") {
             if (rest.empty()) return "error usage: start <seed>";

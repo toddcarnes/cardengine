@@ -275,26 +275,44 @@ int main() {
         std::remove(path);
     }
 
-    // Protocol: tload, tstatus, and auto-finish at settle.
+    // Protocol: tload, tstatus, tlevel, trebuy, and auto-finish at settle.
     {
         const char* path = "tmp_proto_tourney.txt";
         {
             std::ofstream file(path);
             file << "format_version = 1\nname = P\nnum_players = 2\n"
                     "starting_stack = 10000\nbuy_in = 100\nprizes = 100\n"
-                    "level = 50, 100, 0, 99\n";
+                    "level = 50, 100, 0, 99\n"
+                    "level = 100, 200, 25, 99\n";
         }
         Session session;
         check(contains(session.execute("tstatus"), "error"), "no tourney yet");
+        check(contains(session.execute("tlevel"), "error"), "tlevel needs tourney");
+        check(contains(session.execute("trebuy 0"), "error"), "trebuy needs tourney");
         check(session.execute(std::string("tload ") + path) == "ok", "tload");
         const std::string status = session.execute("tstatus");
-        check(contains(status, "tournament level 0/1"), "level line");
+        check(contains(status, "tournament level 0/2"), "level line");
         check(contains(status, "blinds 50/100"), "blinds line");
         check(contains(status, "pool 200"), "pool line");
+        // Manual clock advance: sticks at the final level, applies next hand.
+        check(contains(session.execute("tlevel extra"), "error"), "tlevel takes no args");
+        check(session.execute("tlevel") == "ok", "tlevel advances");
+        check(contains(session.execute("tstatus"), "tournament level 1/2"),
+              "level advanced");
+        check(session.execute("tlevel") == "ok", "tlevel sticks at last");
+        check(contains(session.execute("tstatus"), "tournament level 1/2"),
+              "level capped over the wire");
+        // Rebuy wiring: usage, range, live-seat top-up, mid-hand refusal.
+        check(contains(session.execute("trebuy"), "usage"), "trebuy usage");
+        check(contains(session.execute("trebuy x"), "error"), "trebuy bad seat text");
+        check(contains(session.execute("trebuy 7"), "error"), "trebuy seat range");
+        check(session.execute("trebuy 0") == "ok", "trebuy tops up live seat");
+        check(contains(session.execute("tstatus"), "pool 300"), "pool grew over wire");
         check(session.execute("start 3") == "ok", "tourney start");
+        check(contains(session.execute("trebuy 0"), "error"), "no rebuys mid-hand");
         check(session.execute("act fold") == "ok", "SB folds");
         const std::string done = session.execute("settle");
-        check(contains(done, "payout 1 150"), "BB wins");
+        check(contains(done, "payout 1 350"), "BB wins at level 1 (100/200 + antes)");
         const std::string after = session.execute("tstatus");
         check(contains(after, "hands 1/99"), "hand booked");
         // Cash load leaves tournament mode entirely.
@@ -306,6 +324,10 @@ int main() {
                   "cash load");
             check(contains(session.execute("tstatus"), "error"),
                   "tournament mode cleared");
+            check(contains(session.execute("tlevel"), "error"),
+                  "tlevel cleared with mode");
+            check(contains(session.execute("trebuy 0"), "error"),
+                  "trebuy cleared with mode");
             std::remove("tmp_proto_cash.txt");
         }
         std::remove(path);

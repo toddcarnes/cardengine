@@ -5,6 +5,9 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Protocol: `tlevel` (manual tournament clock advance) and `trebuy <seat>`
+  (between-hands top-up / bust-out return) expose the existing
+  `Tournament::advance_level` / `rebuy` library calls over the wire.
 - Championships: fixed brackets of tournaments with winner advancement,
   `game`+`depth` shortcut generation, game-count estimates, and the
   `cardengine_stress` runner (rotating bots, CSV results with lineups and a

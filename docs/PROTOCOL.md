@@ -26,6 +26,8 @@ this project is called CardEngine.)
 | `load <game-file>` | `ok` | Re-tables with fresh stacks. Path may contain spaces. |
 | `tload <tournament-file>` | `ok` | Tournament mode (below); clears bots. |
 | `tstatus` | `tournament ...`, `standing ...` × n, `ok` | Levels, pool, places. |
+| `tlevel` | `ok` | Tournament only: manual clock advance (sticks at final level). |
+| `trebuy <seat>` | `ok` | Tournament only, between hands: top up a live seat or bring back a busted one (adds a buy-in to the pool). |
 | `start <seed>` | `ok` | Starts a hand; stacks and button carry over between hands. |
 | `state` | block, then `end` | Full table dump — local trust only (below). |
 | `state <seat>` | block, then `end` | That seat's view: own hole cards shown, all other seats `--`. |
@@ -180,14 +182,14 @@ level = 50, 100, 0, 10      # small, big, ante, hands (repeatable)
 ```
 
 Places follow bust order (simultaneous busts in seat order); unwon prize
-remainder goes to the champion. Manual level advances for GUI clocks are a
-library call today (`Tournament::advance_level`); the matching protocol
-command arrives when a GUI needs it. Rebuys likewise (`Tournament::rebuy`).
+remainder goes to the champion. Manual clock advances go over the wire
+(`tlevel`), as do rebuys (`trebuy <seat>`, between hands only — the library
+calls `Tournament::advance_level` / `Tournament::rebuy` underneath).
 
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus start state options act deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy start state options act deal settle log addbot bots step quit
 > start 7
 ok
 > options
