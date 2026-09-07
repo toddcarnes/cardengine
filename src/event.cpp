@@ -10,6 +10,7 @@ const char* event_name(const Event& event) {
     if (std::holds_alternative<HandStartedEvent>(event)) return "begin_hand";
     if (std::holds_alternative<ActionTakenEvent>(event)) return "action";
     if (std::holds_alternative<StreetDealtEvent>(event)) return "street";
+    if (std::holds_alternative<RunoutDealtEvent>(event)) return "runout";
     if (std::holds_alternative<TimeoutEvent>(event)) return "timeout";
     return "settle";
 }
@@ -77,6 +78,11 @@ std::string format_event(const Event& event) {
         for (const Card& c : e->cards) out << " " << to_string(c);
         return out.str();
     }
+    if (const auto* e = std::get_if<RunoutDealtEvent>(&event)) {
+        out << "runout " << e->board;
+        for (const Card& c : e->cards) out << " " << to_string(c);
+        return out.str();
+    }
     if (const auto* e = std::get_if<TimeoutEvent>(&event)) {
         out << "timeout " << e->seat << " pot " << e->pot_after;
         return out.str();
@@ -96,6 +102,7 @@ std::string format_event(const Event& event) {
         if (i > 0) out << ",";
         out << e.committed[i];
     }
+    if (e.boards != 1) out << " boards " << e.boards;
     return out.str();
 }
 
@@ -239,6 +246,21 @@ Event parse_event(const std::string& line, const GameConfig& config) {
         }
         return e;
     }
+    if (toks[0] == "runout") {
+        if (toks.size() < 3) throw std::invalid_argument("short runout event");
+        RunoutDealtEvent e;
+        e.board = parse_count(toks[1], "board");
+        if (e.board < 2) throw std::invalid_argument("bad board 'runout'");
+        for (std::size_t i = 2; i < toks.size(); ++i) {
+            try {
+                e.cards.push_back(parse_card(toks[i]));
+            } catch (const std::exception&) {
+                throw std::invalid_argument(std::string("bad card '") +
+                                            toks[i] + "'");
+            }
+        }
+        return e;
+    }
     if (toks[0] == "timeout") {
         if (toks.size() != 4 || toks[2] != "pot") {
             throw std::invalid_argument("timeout needs 'timeout <seat> pot <pot>'");
@@ -272,6 +294,16 @@ Event parse_event(const std::string& line, const GameConfig& config) {
         }
         for (const std::string& item : split_on(after(toks, "committed"), ',')) {
             e.committed.push_back(parse_count(item, "committed"));
+        }
+        // Optional trailing `boards N` (run-it-twice); absent means 1.
+        for (std::size_t i = 0; i + 1 < toks.size(); ++i) {
+            if (toks[i] == "boards") {
+                e.boards = parse_count(toks[i + 1], "boards");
+                if (e.boards < 1) {
+                    throw std::invalid_argument("bad boards count");
+                }
+                break;
+            }
         }
         return e;
     }

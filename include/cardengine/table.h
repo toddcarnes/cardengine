@@ -154,10 +154,33 @@ private:
     // Showdown value under the configured construction rule.
     HandValue showdown_value(const std::vector<Card>& hole,
                              const std::vector<Card>& board) const;
+    // Same, on an explicit board (multi-board runouts judge each board).
+    HandValue showdown_value_on(const std::vector<Card>& hole,
+                                const std::vector<Card>& board) const {
+        if (config_.showdown == HandConstruction::OmahaTwoAndThree) {
+            return evaluate_omaha(hole, board);
+        }
+        if (config_.showdown == HandConstruction::OmahaHiLo) {
+            return evaluate_omaha_hilo(hole, board).high;
+        }
+        std::vector<Card> all = board;
+        all.insert(all.end(), hole.begin(), hole.end());
+        return evaluate_best(all);
+    }
     // Hi-Lo side-pot split: half to the best high hand(s), half to the best
     // qualifying low hand(s) (high scoops when no low qualifies).
     void award_hilo_pot(std::vector<Payout>& payouts,
                         const std::vector<int>& eligible, int amount) const;
+    // Multi-board showdown: each contribution band splits across every
+    // board (board-major split first, then the per-board rule — hi-lo
+    // halves apply per board, not on the total).
+    void award_multi_board(std::vector<Payout>& payouts,
+                           const std::vector<int>& alive,
+                           const std::vector<std::vector<Card>>& boards) const;
+    // One board's share of one contribution band to its winners.
+    void award_board_share(std::vector<Payout>& payouts,
+                           const std::vector<int>& eligible,
+                           const std::vector<Card>& board, int amount) const;
 
     GameConfig config_;
     std::vector<Seat> seats_;

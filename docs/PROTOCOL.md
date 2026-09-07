@@ -196,7 +196,10 @@ settle showdown yes payouts 0:300 committed 200,100
 - `street`: only the newly dealt cards.
 - `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
   (pot accounting for analysis and learning bots). Never contains hole cards —
-  folders' cards appear in `begin_hand` and nowhere else.
+  folders' cards appear in `begin_hand` and nowhere else. Run-it-twice hands
+  append `boards N` (1 is classic and omitted); the spare boards appear as
+  `runout <board> <cards...>` lines (`runout 2 Kc Qd Jc 8s 3c`), board 1
+  being the felt.
 - `timeout`: a clock fold of a seat, with the pot after (`timeout 3 pot 420`).
   Bots read it as a fold by that seat.
 

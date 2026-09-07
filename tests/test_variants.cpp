@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "cardengine/config.h"
+#include "cardengine/event.h"
 #include "cardengine/table.h"
 #include "helpers.h"
 
@@ -332,6 +333,64 @@ int main() {
         check(t.stack(1) == 10000 - 100 + 75, "tied low quarters");
         check(t.stack(2) == 10000 - 100 + 75, "tied low quarters");
         check(t.went_to_showdown(), "quarter is a showdown");
+    }
+
+    // Run-it-twice: two boards split the pot; the same hand wins both.
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.runouts = 2;
+        Table t(c);
+        // seat1: 7c 2d; seat0: As Ad. Board 1 Ks Qh Jh 9c 3d, board 2
+        // Kc Qd Jc 8s 3c: aces-up both times (no straight possible).
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d", "Kc", "Qd", "Jc",
+                                     "8s", "3c"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.went_to_showdown(), "twice is a showdown");
+        check(t.stack(0) == 10100 && t.stack(1) == 9900,
+              "aces scoop both boards");
+        const Event& last = t.events().back();
+        const auto* settled = std::get_if<HandSettledEvent>(&last);
+        check(settled != nullptr && settled->boards == 2, "boards logged");
+        check(format_event(last) == "settle showdown yes payouts 0:200 "
+                                    "committed 100,100 boards 2",
+              "settle text names boards");
+        // The spare board is in the log as a runout line that round-trips.
+        bool saw_runout = false;
+        for (const Event& e : t.events()) {
+            if (std::holds_alternative<RunoutDealtEvent>(e)) {
+                saw_runout = true;
+                check(format_event(e) == "runout 2 Kc Qd Jc 8s 3c",
+                      "runout text");
+                const Event back = parse_event(format_event(e), c);
+                check(format_event(back) == format_event(e),
+                      "runout round-trips");
+            }
+        }
+        check(saw_runout, "runout logged");
+    }
+    {
+        // Split runouts: board 1 to aces, board 2 to the flush.
+        GameConfig c;
+        c.num_players = 2;
+        c.runouts = 2;
+        Table t(c);
+        // seat1: 7h 6h; seat0: As Ad.
+        // Board 1 Ks Qh Jh 9c 3d (aces hold); board 2 2h 3h 4h 5h 9d
+        // (seat1's 7h 6h flush wins). 100 each.
+        t.start_hand_from_deck(cards({"7h", "As", "6h", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d", "2h", "3h", "4h",
+                                     "5h", "9d"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 10000 && t.stack(1) == 10000,
+              "runouts split one-one");
     }
 
     std::cout << "test_variants ok\n";

@@ -39,10 +39,20 @@ struct StreetDealtEvent {
     std::vector<Card> cards;  // Only the newly dealt cards.
 };
 
+// An extra runout board for run-it-twice (and triple): board 2+ dealt
+// from the remaining shoe at settle time, deciding its share of every
+// pot. Board 1 is the felt board (the `street` lines); these are the
+// spares, in order.
+struct RunoutDealtEvent {
+    int board = 2;  // 2-based: the second board is board 2.
+    std::vector<Card> cards;
+};
+
 struct HandSettledEvent {
     bool showdown = false;
     std::vector<Payout> payouts;
     std::vector<int> committed;  // Per seat, pre-award (pot accounting).
+    int boards = 1;              // Runouts this showdown ran (1 = classic).
 };
 
 // A forced fold by the clock: seat timed out holding the action. Not a
@@ -55,7 +65,8 @@ struct TimeoutEvent {
 };
 
 using Event = std::variant<HandStartedEvent, ActionTakenEvent,
-                           StreetDealtEvent, HandSettledEvent, TimeoutEvent>;
+                           StreetDealtEvent, RunoutDealtEvent,
+                           HandSettledEvent, TimeoutEvent>;
 
 const char* event_name(const Event& event);
 

@@ -23,6 +23,7 @@ namespace cardengine {
 //   ante_from = seats        # seats | button (button posts the whole ante)
 //   straddle = 0             # 0 = off, else twice the big blind (UTG, live)
 //   kill = off               # on = double blinds after a 10xBB pot
+//   runouts = 1              # 1..3 boards run at showdown (run-it-twice)
 //   hole_cards = 2
 //   board_cards = 5
 //   betting = nolimit          # nolimit | limit | potlimit

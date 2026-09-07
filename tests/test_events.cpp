@@ -310,6 +310,33 @@ int main() {
                 parse_event("settle showdown no payouts 0-5 committed 0", c);
             },
             "bad payout shape");
+        // Runouts and board counts round-trip (absent boards means 1).
+        {
+            GameConfig c;
+            const Event runout =
+                parse_event("runout 2 Kc Qd Jc 8s 3c", c);
+            check(std::string(event_name(runout)) == "runout", "runout name");
+            check(format_event(runout) == "runout 2 Kc Qd Jc 8s 3c",
+                  "runout round-trips");
+            const Event classic = parse_event(
+                "settle showdown yes payouts 0:200 committed 100,100", c);
+            check(std::get<HandSettledEvent>(classic).boards == 1,
+                  "classic settle is one board");
+            const Event twice = parse_event(
+                "settle showdown yes payouts 0:200 committed 100,100 "
+                "boards 2",
+                c);
+            check(format_event(twice) ==
+                      "settle showdown yes payouts 0:200 committed 100,100 "
+                      "boards 2",
+                  "boards round-trips");
+        }
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("runout 1 Ac Kd Qh Js Ts", c);
+            },
+            "board 1 is the felt");
     }
 
     std::cout << "test_events ok\n";

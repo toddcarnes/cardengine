@@ -96,6 +96,8 @@ void apply_game_key(GameConfig& config, const std::string& key,
                 "line " + std::to_string(lineno) +
                 ": kill must be on or off");
         }
+    } else if (key == "runouts") {
+        config.runouts = parse_int(value, lineno);
     } else if (key == "hole_cards") {
         config.hole_cards = parse_int(value, lineno);
     } else if (key == "board_cards") {
@@ -145,6 +147,7 @@ void write_game_config(const GameConfig& config, std::ostream& out) {
         << "\n";
     out << "straddle = " << config.straddle << "\n";
     out << "kill = " << (config.kill ? "on" : "off") << "\n";
+    out << "runouts = " << config.runouts << "\n";
     out << "hole_cards = " << config.hole_cards << "\n";
     out << "board_cards = " << config.board_cards << "\n";
     out << "betting = ";

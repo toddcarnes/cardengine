@@ -36,6 +36,11 @@ struct GameConfig {
     bool kill = false;       // Double the blinds for the next hand after any
                              // pot over 10× the big blind (full kill: the
                              // trigger hand's winner posts the extra blind).
+    int runouts = 1;         // Boards run at showdown, 1..3. 1 is classic
+                             // poker; 2+ deals that many boards from the
+                             // remaining shoe and splits each pot across them
+                             // (run-it-twice: all-in cash-game practice that
+                             // cuts variance without changing equity).
     int hole_cards = 2;      // Cards dealt to each seat.
     int board_cards = 5;     // Community cards, dealt 3-1-1 across streets
                              // (scaled down when fewer are configured).

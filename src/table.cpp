@@ -345,9 +345,36 @@ std::vector<Payout> Table::settle() {
     }
 
     std::vector<Payout> payouts;
+    int boards_run = 1;
     if (alive.size() == 1) {
         showdown_ = false;
         payouts.push_back({alive[0], pot_total()});
+    } else if (config_.runouts > 1) {
+        // Run-it-twice (or triple): every side pot splits across N boards.
+        // Board 1 is the felt; boards 2+ come off the remaining shoe, in
+        // order, and cannot duplicate the felt or each other (they are real
+        // cards from the same deck). A short shoe falls back to one board
+        // rather than dealing half a runout.
+        showdown_ = true;
+        std::vector<std::vector<Card>> boards;
+        boards.push_back(board_);
+        const std::size_t need =
+            static_cast<std::size_t>(config_.board_cards) *
+            static_cast<std::size_t>(config_.runouts - 1);
+        if (shoe_.size() >= need) {
+            for (int b = 2; b <= config_.runouts; ++b) {
+                RunoutDealtEvent runout;
+                runout.board = b;
+                for (int k = 0; k < config_.board_cards; ++k) {
+                    runout.cards.push_back(shoe_.front());
+                    shoe_.erase(shoe_.begin());
+                }
+                boards.push_back(runout.cards);
+                events_.push_back(runout);
+            }
+        }
+        boards_run = static_cast<int>(boards.size());
+        award_multi_board(payouts, alive, boards);
     } else {
         showdown_ = true;
         // Contribution levels, low to high; each band forms one pot.
@@ -427,6 +454,7 @@ std::vector<Payout> Table::settle() {
     settled.showdown = showdown_;
     settled.payouts = payouts;
     for (const Seat& s : seats_) settled.committed.push_back(s.committed);
+    settled.boards = boards_run;
     // The pot has been awarded; commitments no longer exist.
     for (Seat& s : seats_) {
         s.bet = 0;
@@ -461,6 +489,154 @@ HandValue Table::showdown_value(const std::vector<Card>& hole,
     std::vector<Card> all = board;
     all.insert(all.end(), hole.begin(), hole.end());
     return evaluate_best(all);
+}
+
+// One board's share of one contribution band: hi-lo halves apply per
+// board, otherwise plain best-hand-takes-it, odd chips clockwise.
+void Table::award_board_share(std::vector<Payout>& payouts,
+                              const std::vector<int>& eligible,
+                              const std::vector<Card>& board,
+                              int amount) const {
+    if (config_.showdown == HandConstruction::OmahaHiLo) {
+        // Hi-Lo per board: half to best high, half to best low on THIS
+        // board (high scoops the share when no low qualifies on it).
+        std::vector<OmahaHiLoValue> values;
+        for (int i : eligible) {
+            const Seat& s = seats_[static_cast<std::size_t>(i)];
+            values.push_back(evaluate_omaha_hilo(s.hole, board));
+        }
+        HandValue best_high = values[0].high;
+        for (const OmahaHiLoValue& value : values) {
+            if (best_high < value.high) best_high = value.high;
+        }
+        std::vector<int> high_winners;
+        for (std::size_t k = 0; k < eligible.size(); ++k) {
+            if (values[k].high == best_high) high_winners.push_back(eligible[k]);
+        }
+        std::vector<int> low_winners;
+        bool low_set = false;
+        LowValue best_low;
+        for (std::size_t k = 0; k < eligible.size(); ++k) {
+            if (!values[k].low.qualifies) continue;
+            if (!low_set || values[k].low < best_low) {
+                best_low = values[k].low;
+                low_set = true;
+            }
+        }
+        if (low_set) {
+            for (std::size_t k = 0; k < eligible.size(); ++k) {
+                if (values[k].low.qualifies &&
+                    !(best_low < values[k].low) &&
+                    !(values[k].low < best_low)) {
+                    low_winners.push_back(eligible[k]);
+                }
+            }
+        }
+        auto clockwise = [&](int a, int b) {
+            const int da = (a - button_ + num_seats()) % num_seats();
+            const int db = (b - button_ + num_seats()) % num_seats();
+            return da < db;
+        };
+        auto pay_share = [&](const std::vector<int>& winners, int share) {
+            std::vector<int> ordered = winners;
+            std::sort(ordered.begin(), ordered.end(), clockwise);
+            const int each = share / static_cast<int>(ordered.size());
+            const int remainder = share % static_cast<int>(ordered.size());
+            for (std::size_t w = 0; w < ordered.size(); ++w) {
+                const int award =
+                    each + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+                auto it = std::find_if(payouts.begin(), payouts.end(),
+                                       [&](const Payout& p) {
+                                           return p.seat == ordered[w];
+                                       });
+                if (it == payouts.end()) {
+                    payouts.push_back({ordered[w], award});
+                } else {
+                    it->amount += award;
+                }
+            }
+        };
+        if (low_winners.empty()) {
+            pay_share(high_winners, amount);
+            return;
+        }
+        const int low_half = amount / 2;
+        pay_share(high_winners, amount - low_half);
+        pay_share(low_winners, low_half);
+        return;
+    }
+    std::vector<HandValue> values;
+    for (int i : eligible) {
+        const Seat& s = seats_[static_cast<std::size_t>(i)];
+        values.push_back(showdown_value_on(s.hole, board));
+    }
+    HandValue best = values[0];
+    for (const HandValue& value : values) {
+        if (best < value) best = value;
+    }
+    std::vector<int> winners;
+    for (std::size_t k = 0; k < eligible.size(); ++k) {
+        if (values[k] == best) winners.push_back(eligible[k]);
+    }
+    std::sort(winners.begin(), winners.end(), [&](int a, int b) {
+        const int da = (a - button_ + num_seats()) % num_seats();
+        const int db = (b - button_ + num_seats()) % num_seats();
+        return da < db;
+    });
+    const int share = amount / static_cast<int>(winners.size());
+    const int remainder = amount % static_cast<int>(winners.size());
+    for (std::size_t w = 0; w < winners.size(); ++w) {
+        const int award =
+            share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+        auto it = std::find_if(payouts.begin(), payouts.end(),
+                               [&](const Payout& p) {
+                                   return p.seat == winners[w];
+                               });
+        if (it == payouts.end()) {
+            payouts.push_back({winners[w], award});
+        } else {
+            it->amount += award;
+        }
+    }
+}
+
+// Every contribution band, split across boards first: each board decides
+// its equal share of the band. Odd chips stay board-major — the first
+// boards in order absorb the remainder one chip each.
+void Table::award_multi_board(
+    std::vector<Payout>& payouts, const std::vector<int>& alive,
+    const std::vector<std::vector<Card>>& boards) const {
+    std::vector<int> levels;
+    for (int i = 0; i < num_seats(); ++i) {
+        const Seat& s = seats_[static_cast<std::size_t>(i)];
+        if (s.in_hand && s.committed > 0) levels.push_back(s.committed);
+    }
+    std::sort(levels.begin(), levels.end());
+    levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
+
+    int prev = 0;
+    for (int level : levels) {
+        int contributors = 0;
+        std::vector<int> eligible;
+        for (int i = 0; i < num_seats(); ++i) {
+            const Seat& s = seats_[static_cast<std::size_t>(i)];
+            if (s.in_hand && s.committed >= level) {
+                ++contributors;
+                if (!s.folded) eligible.push_back(i);
+            }
+        }
+        const int amount = (level - prev) * contributors;
+        prev = level;
+        if (amount == 0 || eligible.empty()) continue;
+        const int n = static_cast<int>(boards.size());
+        const int each = amount / n;
+        const int extra = amount % n;
+        for (int b = 0; b < n; ++b) {
+            award_board_share(payouts, eligible, boards[static_cast<std::size_t>(b)],
+                              each + (b < extra ? 1 : 0));
+        }
+    }
+    (void)alive;  // Eligibility comes from the bands, as in settle().
 }
 
 // Splits one side pot's worth of chips between the best high hand(s) and

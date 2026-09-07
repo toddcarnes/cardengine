@@ -10,6 +10,9 @@ minor bumps add features, patches fix bugs.
   disconnect `sitout`/`resume`, per-hand `save`) plus `bot_proxy.py`
   bridging `cardengine_bot` programs onto seats. Same match.py shape with
   sockets instead of pipes; stdlib only.
+- Variants: run-it-twice (`runouts = 2..3`: each side pot splits across
+  boards dealt from the remaining shoe at settle; `runout` log lines,
+  `boards N` on the settle line; hi-lo halves apply per board).
 - Variants: forced-bet options — live UTG straddle (`straddle = 2×BB`: posts,
   sets the bet, acts last preflop with the raiser's option), button ante
   (`ante_from = button`: button posts the whole table's ante), full kill

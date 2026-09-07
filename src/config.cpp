@@ -29,6 +29,9 @@ void validate(const GameConfig& config) {
     if (config.straddle > 0 && config.straddle != 2 * config.big_blind) {
         throw std::invalid_argument("straddle must be twice the big blind");
     }
+    if (config.runouts < 1 || config.runouts > 3) {
+        throw std::invalid_argument("runouts must be 1..3");
+    }
     if (config.hole_cards < 1 || config.hole_cards > 7) {
         throw std::invalid_argument("hole_cards must be 1..7");
     }

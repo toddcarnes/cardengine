@@ -94,6 +94,16 @@ int main() {
     c.ante = 10;
     validate(c);
 
+    // Runouts: 1..3 boards, classic by default.
+    c = GameConfig{};
+    check(c.runouts == 1, "classic default");
+    c.runouts = 0;
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "zero runouts");
+    c.runouts = 4;
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "four runouts");
+    c.runouts = 3;
+    validate(c);
+
     c = GameConfig{};
     c.max_raises_per_round = 0;
     expect_throws<std::invalid_argument>([&] { validate(c); }, "max raises positive");

@@ -109,6 +109,9 @@ int main() {
               "button ante parses");
         check(forced.config.straddle == 200, "straddle parses");
         check(forced.config.kill, "kill parses");
+        const GameFile runouts = parse_text(
+            "format_version = 1\nrunouts = 2\n");
+        check(runouts.config.runouts == 2, "runouts parses");
     }
 
     // Struct validation failures surface as config errors, not silence.
