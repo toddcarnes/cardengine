@@ -39,7 +39,7 @@ ctest --test-dir build --output-on-failure -C Release
 
 - Single test: `ctest --test-dir build -R <TestNameRegex> --output-on-failure -C Release`
 - After a fix: rebuild + `ctest -R` above, then full suite before finishing.
-- Incremental builds during work (full rebuilds cost minutes); clean `build/` + rebuild before final verify and commit. If a binary ever behaves behind its sources, delete the stale exe (MSBuild has skipped relinking against a newer static lib).
+- Clean build before every build: delete `build/` completely and reconfigure + rebuild (owner-set 2026-09-08 — MSBuild silently links stale objects/libs, incremental builds are unreliable).
 - Out-of-source builds only; `build/` is git-ignored. `CMAKE_BUILD_TYPE` is unused with the VS generator (multi-config) — harmless warning.
 - Throwaway scripts, probes, and captured logs go in `.scratch/` (git-ignored). Never commit them, and never leave temp files elsewhere in the tree.
 - Commit policy (owner-set 2026-09-06): one commit per finished item — green only (rebuild + full `ctest` clean + docs + CHANGELOG entry). Never batch a whole wave into one diff, never commit red or intermediate edits. `git log` style is `<Area>: <description>` (e.g. `Protocol: tlevel and trebuy tournament commands`).
