@@ -1,385 +1,437 @@
 {
   "events": [
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-0.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-0.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-1.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-1.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-2.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-2.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-3.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-3.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-4.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-4.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-5.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-5.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-6.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-6.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim-7.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim-7.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-0.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-0.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-1.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-1.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-2.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-2.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-3.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-3.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-4.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-4.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-5.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-5.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-6.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-6.csv",
       "rows": 1555
     },
     {
-      "csv": "D:\\src\\TexasHoldem\\.scratch\\flim2-7.csv",
+      "csv": "D:\\src\\TexasHoldem\\.scratch\\r5-flim2-7.csv",
       "rows": 1555
     }
   ],
   "pairs": {
+    "Adapter\u0001Apex": [
+      1934,
+      2850
+    ],
     "Adapter\u0001Fit-or-Fold Fred": [
-      2761,
-      2824
+      2253,
+      2496
     ],
     "Adapter\u0001GTO": [
-      3247,
-      2449
+      2689,
+      2074
     ],
     "Adapter\u0001LAG": [
-      2948,
-      2641
+      2507,
+      2261
     ],
     "Adapter\u0001Loose Lucy": [
-      2875,
-      2758
-    ],
-    "Adapter\u0001Nit": [
-      2726,
-      2996
-    ],
-    "Adapter\u0001Randy": [
-      2444,
-      3273
-    ],
-    "Adapter\u0001Station Sal": [
-      3055,
-      2657
-    ],
-    "Adapter\u0001Survivor": [
-      2135,
-      3476
-    ],
-    "Adapter\u0001TAG": [
-      2742,
-      2909
-    ],
-    "Adapter\u0001Tight Ted": [
-      2731,
-      2882
-    ],
-    "Adapter\u0001Vanguard": [
-      2156,
-      3380
-    ],
-    "Fit-or-Fold Fred\u0001GTO": [
-      3239,
-      2399
-    ],
-    "Fit-or-Fold Fred\u0001LAG": [
-      3008,
-      2603
-    ],
-    "Fit-or-Fold Fred\u0001Loose Lucy": [
-      2945,
-      2669
-    ],
-    "Fit-or-Fold Fred\u0001Nit": [
-      2866,
-      2863
-    ],
-    "Fit-or-Fold Fred\u0001Randy": [
-      2664,
-      2909
-    ],
-    "Fit-or-Fold Fred\u0001Station Sal": [
-      3114,
-      2550
-    ],
-    "Fit-or-Fold Fred\u0001Survivor": [
-      2270,
-      3449
-    ],
-    "Fit-or-Fold Fred\u0001TAG": [
-      2846,
-      2803
-    ],
-    "Fit-or-Fold Fred\u0001Tight Ted": [
-      2804,
-      2813
-    ],
-    "Fit-or-Fold Fred\u0001Vanguard": [
-      2280,
-      3331
-    ],
-    "GTO\u0001LAG": [
-      2619,
-      3050
-    ],
-    "GTO\u0001Loose Lucy": [
-      2572,
-      3106
-    ],
-    "GTO\u0001Nit": [
-      2423,
-      3333
-    ],
-    "GTO\u0001Randy": [
-      2061,
-      3675
-    ],
-    "GTO\u0001Station Sal": [
-      2698,
-      2932
-    ],
-    "GTO\u0001Survivor": [
-      1669,
-      4011
-    ],
-    "GTO\u0001TAG": [
-      2402,
-      3293
-    ],
-    "GTO\u0001Tight Ted": [
-      2464,
-      3234
-    ],
-    "GTO\u0001Vanguard": [
-      1666,
-      3923
-    ],
-    "LAG\u0001Loose Lucy": [
-      2715,
-      2967
-    ],
-    "LAG\u0001Nit": [
-      2545,
-      3136
-    ],
-    "LAG\u0001Randy": [
-      2298,
-      3321
-    ],
-    "LAG\u0001Station Sal": [
-      2800,
-      2736
-    ],
-    "LAG\u0001Survivor": [
-      1989,
-      3774
-    ],
-    "LAG\u0001TAG": [
-      2583,
-      3126
-    ],
-    "LAG\u0001Tight Ted": [
-      2598,
-      2960
-    ],
-    "LAG\u0001Vanguard": [
-      2049,
-      3574
-    ],
-    "Loose Lucy\u0001Nit": [
-      2701,
-      2983
-    ],
-    "Loose Lucy\u0001Randy": [
-      2390,
-      3273
-    ],
-    "Loose Lucy\u0001Station Sal": [
-      3008,
-      2674
-    ],
-    "Loose Lucy\u0001Survivor": [
-      2101,
-      3717
-    ],
-    "Loose Lucy\u0001TAG": [
-      2764,
-      2947
-    ],
-    "Loose Lucy\u0001Tight Ted": [
-      2822,
-      2822
-    ],
-    "Loose Lucy\u0001Vanguard": [
-      2099,
-      3507
-    ],
-    "Nit\u0001Randy": [
-      2735,
-      2906
-    ],
-    "Nit\u0001Station Sal": [
-      3120,
-      2495
-    ],
-    "Nit\u0001Survivor": [
-      2343,
-      3401
-    ],
-    "Nit\u0001TAG": [
-      2835,
-      2799
-    ],
-    "Nit\u0001Tight Ted": [
-      2850,
-      2827
-    ],
-    "Nit\u0001Vanguard": [
-      2272,
-      3325
-    ],
-    "Randy\u0001Station Sal": [
-      3501,
-      2147
-    ],
-    "Randy\u0001Survivor": [
-      1844,
-      3858
-    ],
-    "Randy\u0001TAG": [
-      2973,
-      2679
-    ],
-    "Randy\u0001Tight Ted": [
-      2992,
-      2690
-    ],
-    "Randy\u0001Vanguard": [
-      2022,
-      3690
-    ],
-    "Station Sal\u0001Survivor": [
-      1868,
-      3750
-    ],
-    "Station Sal\u0001TAG": [
-      2477,
-      3149
-    ],
-    "Station Sal\u0001Tight Ted": [
-      2500,
-      3117
-    ],
-    "Station Sal\u0001Vanguard": [
-      1877,
-      3615
-    ],
-    "Survivor\u0001TAG": [
-      3400,
+      2392,
       2294
     ],
+    "Adapter\u0001Nit": [
+      2216,
+      2488
+    ],
+    "Adapter\u0001Randy": [
+      2091,
+      2736
+    ],
+    "Adapter\u0001Station Sal": [
+      2547,
+      2256
+    ],
+    "Adapter\u0001Survivor": [
+      1815,
+      2929
+    ],
+    "Adapter\u0001TAG": [
+      2287,
+      2342
+    ],
+    "Adapter\u0001Tight Ted": [
+      2286,
+      2386
+    ],
+    "Adapter\u0001Vanguard": [
+      1898,
+      2878
+    ],
+    "Apex\u0001Fit-or-Fold Fred": [
+      2738,
+      2047
+    ],
+    "Apex\u0001GTO": [
+      3224,
+      1502
+    ],
+    "Apex\u0001LAG": [
+      2958,
+      1819
+    ],
+    "Apex\u0001Loose Lucy": [
+      2876,
+      1768
+    ],
+    "Apex\u0001Nit": [
+      2777,
+      2035
+    ],
+    "Apex\u0001Randy": [
+      2959,
+      1793
+    ],
+    "Apex\u0001Station Sal": [
+      3029,
+      1658
+    ],
+    "Apex\u0001Survivor": [
+      2256,
+      2498
+    ],
+    "Apex\u0001TAG": [
+      2741,
+      2019
+    ],
+    "Apex\u0001Tight Ted": [
+      2881,
+      2048
+    ],
+    "Apex\u0001Vanguard": [
+      2311,
+      2489
+    ],
+    "Fit-or-Fold Fred\u0001GTO": [
+      2786,
+      1987
+    ],
+    "Fit-or-Fold Fred\u0001LAG": [
+      2628,
+      2217
+    ],
+    "Fit-or-Fold Fred\u0001Loose Lucy": [
+      2529,
+      2260
+    ],
+    "Fit-or-Fold Fred\u0001Nit": [
+      2425,
+      2422
+    ],
+    "Fit-or-Fold Fred\u0001Randy": [
+      2406,
+      2469
+    ],
+    "Fit-or-Fold Fred\u0001Station Sal": [
+      2632,
+      2127
+    ],
+    "Fit-or-Fold Fred\u0001Survivor": [
+      1903,
+      2803
+    ],
+    "Fit-or-Fold Fred\u0001TAG": [
+      2363,
+      2350
+    ],
+    "Fit-or-Fold Fred\u0001Tight Ted": [
+      2449,
+      2342
+    ],
+    "Fit-or-Fold Fred\u0001Vanguard": [
+      1991,
+      2847
+    ],
+    "GTO\u0001LAG": [
+      2195,
+      2656
+    ],
+    "GTO\u0001Loose Lucy": [
+      2072,
+      2624
+    ],
+    "GTO\u0001Nit": [
+      2000,
+      2775
+    ],
+    "GTO\u0001Randy": [
+      1745,
+      3170
+    ],
+    "GTO\u0001Station Sal": [
+      2327,
+      2513
+    ],
+    "GTO\u0001Survivor": [
+      1385,
+      3345
+    ],
+    "GTO\u0001TAG": [
+      2022,
+      2764
+    ],
+    "GTO\u0001Tight Ted": [
+      2114,
+      2676
+    ],
+    "GTO\u0001Vanguard": [
+      1546,
+      3284
+    ],
+    "LAG\u0001Loose Lucy": [
+      2305,
+      2429
+    ],
+    "LAG\u0001Nit": [
+      2177,
+      2589
+    ],
+    "LAG\u0001Randy": [
+      2067,
+      2850
+    ],
+    "LAG\u0001Station Sal": [
+      2503,
+      2251
+    ],
+    "LAG\u0001Survivor": [
+      1754,
+      3092
+    ],
+    "LAG\u0001TAG": [
+      2238,
+      2601
+    ],
+    "LAG\u0001Tight Ted": [
+      2253,
+      2537
+    ],
+    "LAG\u0001Vanguard": [
+      1777,
+      3086
+    ],
+    "Loose Lucy\u0001Nit": [
+      2224,
+      2500
+    ],
+    "Loose Lucy\u0001Randy": [
+      2082,
+      2735
+    ],
+    "Loose Lucy\u0001Station Sal": [
+      2517,
+      2215
+    ],
+    "Loose Lucy\u0001Survivor": [
+      1768,
+      3014
+    ],
+    "Loose Lucy\u0001TAG": [
+      2172,
+      2452
+    ],
+    "Loose Lucy\u0001Tight Ted": [
+      2253,
+      2492
+    ],
+    "Loose Lucy\u0001Vanguard": [
+      1861,
+      2841
+    ],
+    "Nit\u0001Randy": [
+      2413,
+      2468
+    ],
+    "Nit\u0001Station Sal": [
+      2705,
+      2123
+    ],
+    "Nit\u0001Survivor": [
+      1933,
+      2872
+    ],
+    "Nit\u0001TAG": [
+      2342,
+      2403
+    ],
+    "Nit\u0001Tight Ted": [
+      2449,
+      2394
+    ],
+    "Nit\u0001Vanguard": [
+      2006,
+      2824
+    ],
+    "Randy\u0001Station Sal": [
+      2930,
+      1920
+    ],
+    "Randy\u0001Survivor": [
+      1512,
+      3281
+    ],
+    "Randy\u0001TAG": [
+      2571,
+      2328
+    ],
+    "Randy\u0001Tight Ted": [
+      2548,
+      2301
+    ],
+    "Randy\u0001Vanguard": [
+      1800,
+      3150
+    ],
+    "Station Sal\u0001Survivor": [
+      1645,
+      3165
+    ],
+    "Station Sal\u0001TAG": [
+      2047,
+      2664
+    ],
+    "Station Sal\u0001Tight Ted": [
+      2198,
+      2611
+    ],
+    "Station Sal\u0001Vanguard": [
+      1672,
+      3135
+    ],
+    "Survivor\u0001TAG": [
+      2848,
+      1901
+    ],
     "Survivor\u0001Tight Ted": [
-      3384,
-      2304
+      2915,
+      1905
     ],
     "Survivor\u0001Vanguard": [
-      2865,
-      2783
+      2523,
+      2278
     ],
     "TAG\u0001Tight Ted": [
-      2818,
-      2794
+      2406,
+      2326
     ],
     "TAG\u0001Vanguard": [
-      2311,
-      3331
+      1913,
+      2805
     ],
     "Tight Ted\u0001Vanguard": [
-      2236,
-      3423
+      1962,
+      2893
     ]
   },
   "players": {
     "Adapter": {
-      "rating": 1187.06,
-      "tables": 12413
+      "rating": 1182.37,
+      "tables": 11381
+    },
+    "Apex": {
+      "rating": 1257.3,
+      "tables": 11442
     },
     "Fit-or-Fold Fred": {
-      "rating": 1198.42,
-      "tables": 12402
+      "rating": 1198.98,
+      "tables": 11494
     },
     "GTO": {
-      "rating": 1139.22,
-      "tables": 12493
+      "rating": 1133.81,
+      "tables": 11495
     },
     "LAG": {
-      "rating": 1167.18,
-      "tables": 12408
+      "rating": 1167.87,
+      "tables": 11550
     },
     "Loose Lucy": {
-      "rating": 1181.09,
-      "tables": 12483
+      "rating": 1175.96,
+      "tables": 11335
     },
     "Nit": {
-      "rating": 1202.14,
-      "tables": 12496
+      "rating": 1198.65,
+      "tables": 11512
     },
     "Randy": {
-      "rating": 1215.63,
-      "tables": 12469
+      "rating": 1204.44,
+      "tables": 11665
     },
     "Station Sal": {
-      "rating": 1157.72,
-      "tables": 12368
+      "rating": 1153.49,
+      "tables": 11478
     },
     "Survivor": {
-      "rating": 1280.94,
-      "tables": 12537
+      "rating": 1276.07,
+      "tables": 11468
     },
     "TAG": {
-      "rating": 1199.74,
-      "tables": 12455
+      "rating": 1196.39,
+      "tables": 11381
     },
     "Tight Ted": {
-      "rating": 1196.28,
-      "tables": 12413
+      "rating": 1190.78,
+      "tables": 11525
     },
     "Vanguard": {
-      "rating": 1274.58,
-      "tables": 12343
+      "rating": 1263.9,
+      "tables": 11554
     }
   },
-  "updated": "2026-09-06T23:28:01+00:00"
+  "updated": "2026-09-07T00:05:43+00:00"
 }

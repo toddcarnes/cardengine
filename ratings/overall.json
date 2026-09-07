@@ -1,55 +1,59 @@
 {
   "players": {
     "Adapter": {
-      "rating": 1199.52,
-      "tables": 115107
+      "rating": 1199.73,
+      "tables": 58800
+    },
+    "Apex": {
+      "rating": 1201.96,
+      "tables": 58833
     },
     "Fit-or-Fold Fred": {
-      "rating": 1200.9,
-      "tables": 115522
+      "rating": 1200.35,
+      "tables": 58832
     },
     "GTO": {
-      "rating": 1198.24,
-      "tables": 115065
+      "rating": 1198.5,
+      "tables": 58698
     },
     "LAG": {
-      "rating": 1199.42,
-      "tables": 114920
+      "rating": 1199.67,
+      "tables": 58939
     },
     "Loose Lucy": {
-      "rating": 1200.34,
-      "tables": 115287
+      "rating": 1200.04,
+      "tables": 58795
     },
     "Nit": {
-      "rating": 1201.03,
-      "tables": 114971
+      "rating": 1200.28,
+      "tables": 58942
     },
     "Randy": {
-      "rating": 1192.3,
-      "tables": 115171
+      "rating": 1196.17,
+      "tables": 58728
     },
     "Station Sal": {
-      "rating": 1197.81,
-      "tables": 115309
+      "rating": 1198.71,
+      "tables": 59025
     },
     "Survivor": {
-      "rating": 1203.82,
-      "tables": 115221
+      "rating": 1201.74,
+      "tables": 58997
     },
     "TAG": {
-      "rating": 1201.62,
-      "tables": 114718
+      "rating": 1200.71,
+      "tables": 58927
     },
     "Tight Ted": {
-      "rating": 1201.09,
-      "tables": 115253
+      "rating": 1200.35,
+      "tables": 59039
     },
     "Vanguard": {
-      "rating": 1203.9,
-      "tables": 115136
+      "rating": 1201.78,
+      "tables": 58925
     }
   },
-  "updated": "2026-09-06T23:28:09+00:00",
+  "updated": "2026-09-07T00:05:48+00:00",
   "variants": [
     {
       "duels": 606450,
@@ -59,19 +63,7 @@
     },
     {
       "duels": 606450,
-      "name": "nlhe-6max-b",
-      "tables": 40430,
-      "weight": 1.6489405556929672e-06
-    },
-    {
-      "duels": 606450,
       "name": "plo-6max",
-      "tables": 40430,
-      "weight": 1.6489405556929672e-06
-    },
-    {
-      "duels": 606450,
-      "name": "plo-6max-b",
       "tables": 40430,
       "weight": 1.6489405556929672e-06
     },
@@ -84,12 +76,6 @@
     {
       "duels": 65520,
       "name": "hu",
-      "tables": 65520,
-      "weight": 1.5262515262515263e-05
-    },
-    {
-      "duels": 65520,
-      "name": "hu-b",
       "tables": 65520,
       "weight": 1.5262515262515263e-05
     }
