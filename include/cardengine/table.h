@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <stdexcept>
 #include <vector>
 
 #include "cardengine/card.h"
@@ -57,6 +59,8 @@ public:
     bool in_hand(int seat) const;
     bool has_folded(int seat) const;
     bool is_all_in(int seat) const;
+    // Draw games: true once the seat has taken its exchange this hand.
+    bool drew(int seat) const;
     int bet(int seat) const;        // Committed this round.
     int committed(int seat) const;  // Committed this hand.
     int current_bet() const { return current_bet_; }
@@ -95,6 +99,17 @@ public:
     // Deals flop (3), turn, or river (1). Throws unless the round is
     // complete and the hand still needs cards.
     void deal_next_street();
+    // Draw games only: exchanges discards for replacements off the shoe.
+    // The seat must be in the hand and not yet drawn; discards name exact
+    // cards by text ("As", "Td") taken from the seat's current hole.
+    // Throws std::logic_error outside the draw street (or after drawing),
+    // std::invalid_argument on bad text, unknown cards, duplicates, or more
+    // than max_draw discards. Stands pat with an empty list.
+    void discard(int seat, const std::vector<std::string>& cards);
+    // Draw street seats still owed their exchange, in turn order from the
+    // button; empty unless the street is Draw (folded and all-in seats are
+    // skipped — they keep their pat hands to showdown).
+    std::vector<int> draws_pending() const;
 
     bool hand_complete() const;
     bool went_to_showdown() const { return showdown_; }
@@ -132,6 +147,7 @@ private:
         bool folded = false;
         bool acted = false;
         bool sitting_out = false;  // Operator flag: skips future hands.
+        bool drew = false;  // Draw games: exchange taken this hand.
         int seen_seq = 0;  // Raise generation this seat has responded to.
         std::vector<Card> hole;
     };
@@ -167,15 +183,32 @@ private:
         all.insert(all.end(), hole.begin(), hole.end());
         return evaluate_best(all);
     }
+    // Best (lowest) 2-7 value on a bare 5-card hole (no board).
+    // Throws std::invalid_argument unless hole is exactly 5 cards.
+    static DeuceValue deuce_value_on(const std::vector<Card>& hole) {
+        if (hole.size() != 5) {
+            throw std::invalid_argument("deuce showdown needs 5 hole cards");
+        }
+        std::array<Card, 5> five{};
+        for (std::size_t k = 0; k < 5; ++k) five[k] = hole[k];
+        return evaluate_deuce(five);
+    }
+    // Unmatched top band returns to its lone owner before the award math
+    // runs (it was never called, so no winner may take it). Returns the
+    // excess to refund (0 when the top band is contested); the caller
+    // applies it to the owner's stack and merges the levels.
+    int unmatched_top_excess(const std::vector<int>& levels) const;
     // Hi-Lo side-pot split: half to the best high hand(s), half to the best
     // qualifying low hand(s) (high scoops when no low qualifies).
     void award_hilo_pot(std::vector<Payout>& payouts,
                         const std::vector<int>& eligible, int amount) const;
     // Multi-board showdown: each contribution band splits across every
     // board (board-major split first, then the per-board rule — hi-lo
-    // halves apply per board, not on the total).
+    // halves apply per board, not on the total). Levels arrive pre-
+    // refunded (settle() returns the unmatched top band first).
     void award_multi_board(std::vector<Payout>& payouts,
                            const std::vector<int>& alive,
+                           const std::vector<int>& levels,
                            const std::vector<std::vector<Card>>& boards) const;
     // One board's share of one contribution band to its winners.
     void award_board_share(std::vector<Payout>& payouts,

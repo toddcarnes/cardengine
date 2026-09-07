@@ -1,0 +1,21 @@
+# CardEngine game file (format 1)
+format_version = 1
+name = "Deuce-to-Seven Lowball 6-max"
+description = "2-7 lowball: 5 private cards, one exchange (up to 3), worst poker hand wins (straights and flushes count against, aces high)"
+num_players = 6
+starting_stack = 10000
+small_blind = 50
+big_blind = 100
+ante = 0
+ante_from = seats
+straddle = 0
+kill = off
+runouts = 1
+hole_cards = 5
+board_cards = 0
+betting = nolimit
+showdown = deuce
+upcards = 0
+bring_in = 0
+max_draw = 3
+max_raises = 4

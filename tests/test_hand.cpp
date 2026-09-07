@@ -11,6 +11,7 @@
 namespace {
 
 using cardengine::Card;
+using cardengine::DeuceValue;
 using cardengine::HandCategory;
 using cardengine::HandValue;
 using cardengine::LowValue;
@@ -261,6 +262,36 @@ int main() {
             bad = true;
         }
         check(bad, "hilo needs 5 board");
+    }
+
+    // 2-7 lowball: 7-5-4-3-2 is the nuts; straights/flushes/pairs lose.
+    {
+        const DeuceValue nuts =
+            evaluate_deuce(five({"7c", "5d", "4h", "3s", "2c"}));
+        const DeuceValue second =
+            evaluate_deuce(five({"8c", "5d", "4h", "3s", "2c"}));
+        check(nuts < second, "7-low beats 8-low");
+        check(!(second < nuts), "8-low loses");
+        // The wheel is a straight: great for high, terrible for deuce.
+        const DeuceValue wheel_low =
+            evaluate_deuce(five({"Ah", "2c", "3d", "4h", "5s"}));
+        check(second < wheel_low, "8-low beats the wheel straight");
+        // Flushes count against: any broken hand beats any flush.
+        const DeuceValue flush =
+            evaluate_deuce(five({"Kc", "Jc", "9c", "7c", "5c"}));
+        const DeuceValue king_high =
+            evaluate_deuce(five({"Kd", "Qh", "Jc", "9s", "7c"}));
+        check(king_high < flush, "king-high beats a flush");
+        // Pairs lose to broken hands; smaller pairs lose less badly.
+        const DeuceValue aces =
+            evaluate_deuce(five({"As", "Ad", "7h", "5c", "3d"}));
+        const DeuceValue deuces =
+            evaluate_deuce(five({"2s", "2d", "7h", "5c", "3d"}));
+        check(king_high < deuces, "broken beats any pair");
+        check(deuces < aces, "deuces beat aces");
+        check(!(nuts < nuts), "nuts tie themselves");
+        check(evaluate_deuce(five({"7c", "5d", "4h", "3s", "2c"})) == nuts,
+              "identical lows tie across suits");
     }
 
     std::cout << "test_hand ok\n";

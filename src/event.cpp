@@ -10,6 +10,7 @@ const char* event_name(const Event& event) {
     if (std::holds_alternative<HandStartedEvent>(event)) return "begin_hand";
     if (std::holds_alternative<ActionTakenEvent>(event)) return "action";
     if (std::holds_alternative<StreetDealtEvent>(event)) return "street";
+    if (std::holds_alternative<DrawEvent>(event)) return "draw";
     if (std::holds_alternative<RunoutDealtEvent>(event)) return "runout";
     if (std::holds_alternative<TimeoutEvent>(event)) return "timeout";
     return "settle";
@@ -31,6 +32,7 @@ std::string street_name(Street street) {
     switch (street) {
         case Street::None: return "none";
         case Street::Preflop: return "preflop";
+        case Street::Draw: return "draw";
         case Street::Flop: return "flop";
         case Street::Turn: return "turn";
         case Street::River: return "river";
@@ -76,6 +78,11 @@ std::string format_event(const Event& event) {
     if (const auto* e = std::get_if<StreetDealtEvent>(&event)) {
         out << "street " << street_name(e->street);
         for (const Card& c : e->cards) out << " " << to_string(c);
+        return out.str();
+    }
+    if (const auto* e = std::get_if<DrawEvent>(&event)) {
+        // Counts only — the cards stay private, like folded hands.
+        out << "draw " << e->seat << " drew " << e->drew;
         return out.str();
     }
     if (const auto* e = std::get_if<RunoutDealtEvent>(&event)) {
@@ -156,6 +163,7 @@ Street parse_street_name(const std::string& text) {
     if (text == "flop") return Street::Flop;
     if (text == "turn") return Street::Turn;
     if (text == "river") return Street::River;
+    if (text == "draw") return Street::Draw;
     throw std::invalid_argument("bad street '" + text + "'");
 }
 
@@ -244,6 +252,15 @@ Event parse_event(const std::string& line, const GameConfig& config) {
                                             toks[i] + "'");
             }
         }
+        return e;
+    }
+    if (toks[0] == "draw") {
+        if (toks.size() != 4 || toks[2] != "drew") {
+            throw std::invalid_argument("draw needs 'draw <seat> drew <n>'");
+        }
+        DrawEvent e;
+        e.seat = parse_count(toks[1], "seat");
+        e.drew = parse_count(toks[3], "drew");
         return e;
     }
     if (toks[0] == "runout") {

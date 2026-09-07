@@ -38,30 +38,41 @@ this project is called CardEngine.)
 | `options` | `options seat S check yes\|no call N raise yes\|no [min M max X]` | For the acting seat; `error no action pending` otherwise. |
 | `act fold\|check\|call` | `ok` | Acts for the current seat. |
 | `act raise <amount>` | `ok` | Amount is the target *total* bet for the round. |
-| `timeout` | `ok` | Folds the acting seat by the clock (disconnect/stalled client). Logged as `timeout <seat> pot <pot>` — bots read it as a fold. |
+| `discard [cards...]` | `ok` | Draw games only: exchanges the named hole cards for replacements (bare `discard` stands pat). Only the pending drawer may move; `draws` names them in turn order. |
+| `draws` | `draws -` or `draws <seat...>` | Draw games only: seats still owed the exchange, button-out. Empty outside the draw street. |
+| `timeout` | `ok` | Folds the acting seat by the clock (disconnect/stalled client). Logged as `timeout <seat> pot <pot>` — bots read it as a fold. Betting only; the draw exchange has no clock (a stuck drawer blocks `deal`). |
 | `deal` | `ok` | Next street; only when the round is complete. |
 | `settle` | `showdown yes\|no`, `payout <seat> <amount>` × n, `ok` | Hand must be complete. |
 | `log` | event lines, then `end` | Append-only hand history (below). |
 | `addbot <seat> <bot-file>` | `ok` | Seats an engine-side bot (see below). |
 | `bots` | `bots -` or `bots <seat...>` | Lists automated seats. |
-| `step` | `ok <seat> <fold\|check\|call\|raise> [amount]` | The botted acting seat acts. Manual `act` on a botted seat errors. |
+| `step` | `ok <seat> <fold\|check\|call\|raise> [amount]` | The botted acting seat acts. Manual `act` on a botted seat errors. On the draw street steps the pending drawer instead (`ok <seat> discard ...`, `-` for pat). |
 | `quit` | `bye` | |
 
 ## State block
 
 ```
-street preflop|flop|turn|river|none|complete
-showdown holdem|omaha|omaha_hilo
+street preflop|draw|flop|turn|river|none|complete
+showdown holdem|omaha|omaha_hilo|stud|draw|deuce
 button <seat>
 acting <seat|-1>
 acting_since <seconds|-1>
 pot <chips>
 current <highest total bet this round>
 board -|<cards...>
+max_draw <n> (draw games only: most cards a seat may exchange)
+draws -|<seats...> (draw street turn order, button-out)
 seat <i> stack <s> bet <b> committed <c> in|out live|folded hole <cards...|-->
 ... (one line per seat)
 end
 ```
+
+Draw games run preflop betting, then a `draw` street where each live seat
+exchanges in turn (`discard As Td`, bare `discard` stands pat, at most
+`max_draw` cards), then betting resumes on the flop slot through the river
+(no board is ever dealt). `deal` advances into and out of the draw street;
+during it `acting` is `-1`, `options`/`act`/`timeout` are refused, and
+`deal` itself waits until `draws` is empty.
 
 `acting_since` is the action-clock start (seconds on the engine's monotonic
 clock, `-1` when nobody holds the action). A host enforces its own limit —
@@ -140,7 +151,8 @@ holds examples. Required key: `format_version = 1`. Optional keys fall back
 to standard Hold'em defaults: `name`, `description`, `num_players`,
 `starting_stack`, `small_blind`, `big_blind`, `ante`, `hole_cards`,
 `board_cards`, `betting = nolimit|limit|potlimit`,
-`showdown = holdem|omaha` (exactly 2+3)`|omaha_hilo` (high/low split, 8-or-better), `max_raises` (limit cap). Unknown keys, bad values,
+`showdown = holdem|omaha` (exactly 2+3)`|omaha_hilo` (high/low split, 8-or-better)`|draw` (5 cards + one exchange, best five wins)`|deuce` (same deal,
+2-7 lowball: worst hand wins, straights and flushes count against), `max_draw` (draw cap 1–5), `max_raises` (limit cap). Unknown keys, bad values,
 and rule combinations the engine can't run are rejected with a line number —
 a friend's hand-edited file can error, never corrupt a game. Full key
 reference (mandatory vs optional, defaults, effects): `docs/CONFIG_FILES.md`.
@@ -161,6 +173,8 @@ their own hole cards by construction via `SeatView`). In-process bots study
 each finished hand through `observe` (public action frequencies only).
 Out-of-process runners (`cardengine_bot`, `examples/match.py`) decide from
 filtered `state <seat>` views plus `options` (see "Separate bot programs").
+On the draw street the runner takes a `draws` line instead and answers
+`discard ...` (bare `discard` stands pat).
 
 ## Who names whom
 
@@ -193,7 +207,8 @@ settle showdown yes payouts 0:300 committed 200,100
 - `begin_hand`: pre-hand stacks, the seed (`-` for from-deck testing deals),
   and dealt hole cards per seat (`|`-separated, positionally).
 - `action`: seat, action, and pot after the action.
-- `street`: only the newly dealt cards.
+- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards).
+- `draw`: one seat's exchange as counts, never cards (`draw 1 drew 3`, `draw 0 drew 0` for pat) — discards stay private like folded hands.
 - `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
   (pot accounting for analysis and learning bots). Never contains hole cards —
   folders' cards appear in `begin_hand` and nowhere else. Run-it-twice hands

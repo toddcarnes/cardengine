@@ -1,8 +1,11 @@
 // Out-of-process bot runner: one seat's brain on a pipe.
 //
 // The host (match script, GUI, future gateway) relays one `state <seat>`
-// block plus one `options` line per decision; this process prints one
-// `act ...` line back. Strict alternation, flushed replies, EOF exits.
+// block plus one decision line per move; this process prints one reply
+// line back. Betting moves forward a state block + `options` line and take
+// back `act ...`; draw exchanges forward a state block + `draws` line and
+// take back `discard ...` (bare `discard` stands pat). Strict alternation,
+// flushed replies, EOF exits.
 // Any malfunction prints `error ...` and exits nonzero — fail loud, so the
 // host can never mistake a crash for a check.
 #include <iostream>
@@ -57,13 +60,22 @@ int main(int argc, char** argv) {
     while (std::getline(std::cin, line)) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
         if (line == "end") {
-            std::string options;
-            if (!std::getline(std::cin, options)) break;
+            // The decision line tells us which half of the contract this
+            // is: `options ...` for betting, `draws ...` for the exchange.
+            std::string decision;
+            if (!std::getline(std::cin, decision)) break;
             try {
-                std::cout << cardengine::decide_from_text(*bot, seat, state,
-                                                          options)
-                          << "\n"
-                          << std::flush;
+                if (decision.rfind("draws", 0) == 0) {
+                    std::cout << cardengine::discard_from_text(*bot, seat,
+                                                               state)
+                              << "\n"
+                              << std::flush;
+                } else {
+                    std::cout << cardengine::decide_from_text(*bot, seat,
+                                                              state, decision)
+                              << "\n"
+                              << std::flush;
+                }
             } catch (const std::exception& e) {
                 std::cout << "error " << e.what() << "\n" << std::flush;
                 return 1;

@@ -213,10 +213,21 @@ SeatView make_view(const Table& table, int seat) {
     view.position = (seat - table.button() + table.num_seats()) %
                     table.num_seats();
     view.showdown = table.config().showdown;
+    view.max_draw = table.config().max_draw;
+    view.drew = table.drew(seat);
     return view;
 }
 
 namespace {
+
+// Discard choice shared by every style's five-card draw logic: keep made
+// hands and strong draws, throw the rest. Returns card texts from the
+// hole (empty = stand pat). Capped at max_draw by the caller.
+std::vector<std::string> draw_keep(const std::vector<Card>& hole,
+                                   bool deuce);
+// Trim a wish list to the house cap (keep order: first cards matter most).
+std::vector<std::string> cap_discards(std::vector<std::string> want,
+                                      int max_draw);
 
 // Uniform random legal action. The baseline every real bot must beat.
 class RandomBot : public Bot {
@@ -242,6 +253,12 @@ public:
 
     const std::string& name() const override { return name_; }
 
+    std::vector<std::string> choose_discards(
+        const SeatView& view) override {
+        const bool deuce = view.showdown == HandConstruction::DeuceSeven;
+        return cap_discards(draw_keep(view.hole, deuce), view.max_draw);
+    }
+
 private:
     std::string name_;
     std::mt19937_64 rng_;
@@ -266,7 +283,53 @@ HandValue omaha_current(const std::vector<Card>& hole,
 OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
                                      const std::vector<Card>& board);
 double made_strength(const SeatView& view) {
-    if (view.board.empty()) {
+    // 2-7 lowball: the worst poker hand wins, so strength runs off the
+    // DeuceValue directly — a pat 7-low is the nuts (~0.95), any broken
+    // hand outranks any pair, and pairs-or-worse fold to pressure.
+    // Straights and flushes are made hands here (penalty 4-5, strength
+    // ~0.10): they beat pure air (which bluffs or folds) but pay off no
+    // real bet — exactly the wheel's station in life.
+    if (view.showdown == HandConstruction::DeuceSeven &&
+        view.board.empty() && view.hole.size() == 5) {
+        std::array<Card, 5> five{};
+        for (std::size_t i = 0; i < 5; ++i) five[i] = view.hole[i];
+        const DeuceValue low = evaluate_deuce(five);
+        if (low.penalty == 0) {
+            // High-first tiebreak: the top card decides (7-high is best).
+            const double high = static_cast<double>(
+                static_cast<int>(low.tiebreak[0]));
+            // 7-low is the nuts (0.95); each pip worse costs ~0.06, down to
+            // a 0.40 floor — smooth enough that J-low still opens but folds
+            // to real pressure.
+            double value = 0.95 - (high - 7.0) * 0.06;
+            if (value < 0.40) value = 0.40;
+            if (value > 0.95) value = 0.95;
+            return value;
+        }
+        double base = 0.05;
+        switch (low.penalty) {
+            case 1: {
+                // Smaller pairs lose less badly (deuces best of a bad lot).
+                const double pair = static_cast<double>(
+                    static_cast<int>(low.tiebreak[0]));
+                base = 0.30 + (14.0 - pair) * 0.008;
+                break;
+            }
+            case 2: base = 0.25; break;
+            case 3: base = 0.20; break;
+            case 4: base = 0.15; break;
+            case 5: base = 0.12; break;
+            default: base = 0.08; break;
+        }
+        return base;
+    }
+    // Five-card draw (high) is a pat hand: judge it the way postflop
+    // judges five cards (category plus kicker), not the way preflop
+    // judges two starting cards. With no draw round wired yet every
+    // 5-card hand is final, so fall through to the category path below.
+    if (view.board.empty() &&
+        !(view.showdown == HandConstruction::DrawFive &&
+          view.hole.size() == 5)) {
         // Omaha deals four: pairs (6 combos, not 1) and rundowns/connectivity
         // dominate; raw high cards leak value without coordination. Hi-Lo
         // adds the other premium: two low cards (A-2 through A-5 wheel cards
@@ -344,11 +407,24 @@ double made_strength(const SeatView& view) {
         std::vector<Rank> ranks;
         for (const Card& c : view.hole) ranks.push_back(c.rank);
         std::sort(ranks.begin(), ranks.end());
-        for (std::size_t i = 1; i < ranks.size(); ++i) {
-            if (ranks[i] == ranks[i - 1]) {
-                return 0.70 +
-                       static_cast<double>(static_cast<int>(ranks[i]) - 2) *
-                           0.02;
+        // Five-card draw (high) holds a pat five: any pair is already a
+        // made hand worth contesting, so score it on the category scale
+        // (pair of aces ~0.70) rather than the two-card starting scale.
+        if (view.showdown == HandConstruction::DrawFive) {
+            for (std::size_t i = 1; i < ranks.size(); ++i) {
+                if (ranks[i] == ranks[i - 1]) {
+                    const double pair =
+                        static_cast<double>(static_cast<int>(ranks[i]));
+                    return 0.52 + (pair - 2.0) * 0.015;
+                }
+            }
+        } else {
+            for (std::size_t i = 1; i < ranks.size(); ++i) {
+                if (ranks[i] == ranks[i - 1]) {
+                    return 0.70 +
+                           static_cast<double>(static_cast<int>(ranks[i]) - 2) *
+                               0.02;
+                }
             }
         }
         const Rank hi = ranks.back();
@@ -603,6 +679,24 @@ protected:
     // AdaptiveBot retunes looseness as it profiles the table.
     BotFile file_;
 
+    // Five-card draw exchange: pat made hands stand, draws keep one,
+    // deuce lows stand on 8-or-better, junk draws to the ace/king.
+    // Mistakes (when they fire) randomize the count, not the cards —
+    // a mistaken bot still throws plausible rags.
+    std::vector<std::string> choose_discards(
+        const SeatView& view) override {
+        const bool deuce = view.showdown == HandConstruction::DeuceSeven;
+        std::vector<std::string> want = draw_keep(view.hole, deuce);
+        std::uniform_real_distribution<double> unit(0.0, 1.0);
+        if (unit(rng_) < file_.mistake_rate && !want.empty() &&
+            view.max_draw > 1) {
+            std::uniform_int_distribution<int> count(
+                0, view.max_draw);
+            want.resize(static_cast<std::size_t>(count(rng_)));
+        }
+        return cap_discards(want, view.max_draw);
+    }
+
     void observe(int, const HandSummary&) override {
         // A new hand starts a new story: last hand's line is over.
         prior_aggressor_ = false;
@@ -853,6 +947,14 @@ public:
 
     const std::string& name() const override { return name_; }
 
+    std::vector<std::string> choose_discards(
+        const SeatView& view) override {
+        // GTO lite: play the same sound discards as everyone else (there
+        // is no balance edge in a 5-card exchange), capped at the house max.
+        const bool deuce = view.showdown == HandConstruction::DeuceSeven;
+        return cap_discards(draw_keep(view.hole, deuce), view.max_draw);
+    }
+
 private:
     int size_bet(const SeatView& view) const {
         const int target =
@@ -868,6 +970,112 @@ private:
     std::mt19937_64 rng_;
     RandomBot random_;
 };
+
+// Defined here (after the bot classes) so the helpers they need stay in
+// one place.
+std::vector<std::string> draw_keep(const std::vector<Card>& hole,
+                                   bool deuce) {
+    std::array<Card, 5> five{};
+    for (std::size_t i = 0; i < 5 && i < hole.size(); ++i) five[i] = hole[i];
+    // Count ranks and suits.
+    int rank_count[15] = {};
+    int suit_count[4] = {};
+    for (const Card& c : hole) {
+        ++rank_count[static_cast<int>(c.rank)];
+        ++suit_count[static_cast<int>(c.suit)];
+    }
+    // Made hands stand pat — pairs included (drawing to two pair is a
+    // classic leak; trips+ doubly so). Deuce made hands are trash, but
+    // they still can't improve by drawing one to a pair... actually they
+    // can: any pair draws three-plus. Only pat broken lows stand pat.
+    const HandValue high = evaluate_five(five);
+    if (!deuce) {
+        if (high.category >= HandCategory::OnePair) return {};
+    } else {
+        const DeuceValue low = evaluate_deuce(five);
+        if (low.penalty == 0 &&
+            static_cast<int>(low.tiebreak[0]) <= 8) {
+            return {};  // Pat 8-low or better: don't break it.
+        }
+    }
+    // Four-flush and open-ender draws keep one card (draw one).
+    for (int suit = 0; suit < 4; ++suit) {
+        if (suit_count[suit] == 4) {
+            for (const Card& c : hole) {
+                if (static_cast<int>(c.suit) != suit) {
+                    return {to_string(c)};
+                }
+            }
+        }
+    }
+    bool present[15] = {};
+    for (const Card& c : hole) {
+        present[static_cast<int>(c.rank)] = true;
+        if (c.rank == Rank::Ace) present[1] = true;
+    }
+    if (!deuce) {
+        for (int start = 1; start <= 10; ++start) {
+            int window = 0;
+            for (int r = start; r < start + 5; ++r) {
+                if (present[r]) ++window;
+            }
+            if (window == 4) {
+                // Keep the four, throw the odd card out.
+                for (const Card& c : hole) {
+                    int v = static_cast<int>(c.rank);
+                    if (v == 14) v = 1;
+                    if (v < start || v >= start + 5) {
+                        return {to_string(c)};
+                    }
+                }
+            }
+        }
+    }
+    // Deuce: keep the four lowest unpaired cards, throw the highest (or a
+    // paired card first — pairs are the worst holding).
+    if (deuce) {
+        int drop = -1;
+        for (std::size_t i = 0; i < hole.size(); ++i) {
+            if (rank_count[static_cast<int>(hole[i].rank)] > 1) {
+                drop = static_cast<int>(i);
+                break;
+            }
+        }
+        if (drop < 0) {
+            drop = 0;
+            for (std::size_t i = 1; i < hole.size(); ++i) {
+                if (hole[i].rank > hole[static_cast<std::size_t>(drop)].rank) {
+                    drop = static_cast<int>(i);
+                }
+            }
+        }
+        return {to_string(hole[static_cast<std::size_t>(drop)])};
+    }
+    // High draw: keep aces-up starting points (ace + kickers), else throw
+    // the three lowest non-ace cards... classic: keep the ace, draw three.
+    // Simplest sound rule: keep any ace or king, draw the rest (up to cap).
+    std::vector<std::string> out;
+    for (const Card& c : hole) {
+        if (c.rank != Rank::Ace && c.rank != Rank::King) {
+            out.push_back(to_string(c));
+        }
+    }
+    if (out.empty()) {
+        // All aces/kings but no pair (impossible with 5 cards... AA KK Q
+        // is a pair) — fall through pat. Unreachable, but keep it total.
+        return {};
+    }
+    return out;
+}
+
+// Trim a wish list to the house cap (keep order: first cards matter most).
+std::vector<std::string> cap_discards(std::vector<std::string> want,
+                                      int max_draw) {
+    if (static_cast<int>(want.size()) > max_draw) {
+        want.resize(static_cast<std::size_t>(max_draw));
+    }
+    return want;
+}
 
 }  // namespace
 

@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "cardengine/bot.h"
 #include "cardengine/card.h"
@@ -94,15 +95,50 @@ void fuzz_hand(Table& table, std::uint64_t seed, std::mt19937_64& rng,
             if (options.can_check) {
                 check(table.to_call(seat) == 0, tag + " check facing a bet");
             }
-            table.act(seat, random_legal(table, seat, rng));
+            const Action chosen = random_legal(table, seat, rng);
+            table.act(seat, chosen);
             check(total_chips(table) == before,
                   tag + " chips leaked mid-hand");
+        } else if (!table.draws_pending().empty()) {
+            // Draw exchange: random count of random cards (never more
+            // than the house cap). Chips never move here.
+            const int seat = table.draws_pending()[0];
+            const int cap = table.config().max_draw;
+            std::uniform_int_distribution<int> count(0, cap);
+            const int n = count(rng);
+            const std::vector<cardengine::Card> hole =
+                table.hole_cards(seat);
+            std::vector<int> idx(hole.size());
+            for (std::size_t i = 0; i < idx.size(); ++i) {
+                idx[i] = static_cast<int>(i);
+            }
+            std::shuffle(idx.begin(), idx.end(), rng);
+            std::vector<std::string> discards;
+            for (int k = 0; k < n && k < static_cast<int>(idx.size()); ++k) {
+                discards.push_back(cardengine::to_string(
+                    hole[static_cast<std::size_t>(
+                        idx[static_cast<std::size_t>(k)])]));
+            }
+            table.discard(seat, discards);
+            check(total_chips(table) == before,
+                  tag + " chips leaked in the draw");
+            // No duplicates after the exchange.
+            std::set<std::string> seen;
+            for (int s = 0; s < table.num_seats(); ++s) {
+                if (!table.in_hand(s)) continue;
+                for (const cardengine::Card& card : table.hole_cards(s)) {
+                    const std::string text = cardengine::to_string(card);
+                    check(seen.insert(text).second,
+                          tag + " duplicated card after draw " + text);
+                }
+            }
         } else {
             table.deal_next_street();
         }
     }
     const auto payouts = table.settle();
-    check(total_chips(table) == before, tag + " chips leaked at settle");
+    const int after = total_chips(table);
+    check(after == before, tag + " chips leaked at settle");
     int paid = 0;
     for (const auto& payout : payouts) paid += payout.amount;
     // Payouts never exceed what was committed, and a winner exists.
@@ -140,6 +176,8 @@ void fuzz_config(GameConfig config, const std::string& tag, int hands) {
             if (table.acting() != -1) {
                 table.act(table.acting(),
                            random_legal(table, table.acting(), inner));
+            } else if (!table.draws_pending().empty()) {
+                table.discard(table.draws_pending()[0], {});
             } else {
                 table.deal_next_street();
             }
@@ -199,6 +237,22 @@ int main() {
     hilo_hu.betting = BettingStructure::PotLimit;
     hilo_hu.showdown = HandConstruction::OmahaHiLo;
     fuzz_config(hilo_hu, "hilohu", 60);
+
+    GameConfig draw;
+    draw.num_players = 6;
+    draw.hole_cards = 5;
+    draw.board_cards = 0;
+    draw.max_draw = 3;
+    draw.showdown = HandConstruction::DrawFive;
+    fuzz_config(draw, "draw6", 60);
+
+    GameConfig deuce;
+    deuce.num_players = 6;
+    deuce.hole_cards = 5;
+    deuce.board_cards = 0;
+    deuce.max_draw = 3;
+    deuce.showdown = HandConstruction::DeuceSeven;
+    fuzz_config(deuce, "deuce6", 60);
 
     if (failures == 0) std::cout << "test_fuzz ok\n";
     return failures == 0 ? 0 : 1;

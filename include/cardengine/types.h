@@ -6,7 +6,20 @@
 
 namespace cardengine {
 
-enum class Street : std::uint8_t { None, Preflop, Flop, Turn, River, Complete };
+enum class Street : std::uint8_t {
+    None,
+    Preflop,
+    Flop,
+    Turn,
+    River,
+    Complete,
+    // Five-card draw's exchange street: after the preflop betting round,
+    // live seats discard and redraw, then betting resumes. Reuses the
+    // flop/turn/river betting slots (betting code never names a street),
+    // so it sorts between Preflop and Flop for street comparisons but
+    // deal/hand-complete logic names streets explicitly.
+    Draw
+};
 
 enum class ActionType { Fold, Check, Call, Raise };
 

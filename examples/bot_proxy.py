@@ -63,13 +63,16 @@ def main():
             buf += chunk
         while True:
             state, buf = read_block(sock, buf)
-            # The options line is the last line before the next block starts.
-            while not state or not state[-1].startswith("options"):
+            # The decision line is the last line before the next block
+            # starts: `options ...` for betting, `draws ...` for the draw
+            # exchange (the runner answers `act ...` / `discard ...`).
+            while not state or (not state[-1].startswith("options") and
+                                not state[-1].startswith("draws")):
                 more, buf = read_block(sock, buf)
                 state += more
-            options = state.pop()
+            decision = state.pop()
             bot.stdin.write("\n".join(state) + "\nend\n")
-            bot.stdin.write(options + "\n")
+            bot.stdin.write(decision + "\n")
             bot.stdin.flush()
             reply = bot.stdout.readline()
             if not reply:

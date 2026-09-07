@@ -53,6 +53,7 @@ const std::string& after(const std::vector<std::string>& toks,
 
 Street parse_street(const std::string& text) {
     if (text == "preflop") return Street::Preflop;
+    if (text == "draw") return Street::Draw;
     if (text == "flop") return Street::Flop;
     if (text == "turn") return Street::Turn;
     if (text == "river") return Street::River;
@@ -86,6 +87,12 @@ std::string decide_from_text(Bot& bot, int seat,
                 view.showdown = cardengine::HandConstruction::OmahaTwoAndThree;
             } else if (toks[1] == "omaha_hilo") {
                 view.showdown = cardengine::HandConstruction::OmahaHiLo;
+            } else if (toks[1] == "stud") {
+                view.showdown = cardengine::HandConstruction::StudSeven;
+            } else if (toks[1] == "draw") {
+                view.showdown = cardengine::HandConstruction::DrawFive;
+            } else if (toks[1] == "deuce") {
+                view.showdown = cardengine::HandConstruction::DeuceSeven;
             } else if (toks[1] != "holdem") {
                 throw std::invalid_argument("bad showdown '" + toks[1] + "'");
             }
@@ -158,6 +165,92 @@ std::string decide_from_text(Bot& bot, int seat,
         case ActionType::Call: out << "act call"; break;
         case ActionType::Raise: out << "act raise " << action.amount; break;
     }
+    return out.str();
+}
+
+namespace {
+
+// Shared half of the out-of-process contract: the seat's own hole cards
+// plus the house draw cap, out of a `state <seat>` block. Throws
+// std::invalid_argument on malformed input.
+struct DrawSeat {
+    std::vector<Card> hole;
+    int max_draw = 5;
+};
+
+DrawSeat parse_draw_seat(int seat, const std::string& state_text) {
+    DrawSeat found;
+    bool saw_seat = false;
+    bool saw_showdown = false;
+    HandConstruction showdown = HandConstruction::BestFiveOfAll;
+    for (const std::string& line : lines_of(state_text)) {
+        const std::vector<std::string> toks = tokens(line);
+        if (toks.empty() || toks[0] == "end") continue;
+        if (toks[0] == "showdown" && toks.size() == 2) {
+            saw_showdown = true;
+            if (toks[1] == "draw") {
+                showdown = HandConstruction::DrawFive;
+            } else if (toks[1] == "deuce") {
+                showdown = HandConstruction::DeuceSeven;
+            }
+        } else if (toks[0] == "max_draw" && toks.size() == 2) {
+            found.max_draw = to_int(toks[1], "max draw");
+            if (found.max_draw < 1 || found.max_draw > 5) {
+                throw std::invalid_argument("bad max_draw");
+            }
+        } else if (toks[0] == "seat" && toks.size() >= 11 &&
+                   toks[1] == std::to_string(seat)) {
+            bool alive = false;
+            for (std::size_t i = 0; i < toks.size(); ++i) {
+                if (toks[i] == "live") alive = true;
+            }
+            if (!alive) {
+                throw std::invalid_argument("seat is not live");
+            }
+            bool hole_seen = false;
+            for (std::size_t i = 0; i + 1 < toks.size(); ++i) {
+                if (toks[i] == "hole") {
+                    hole_seen = true;
+                    for (std::size_t k = i + 1; k < toks.size(); ++k) {
+                        if (toks[k] == "--") {
+                            throw std::invalid_argument(
+                                "own hole cards are hidden");
+                        }
+                        found.hole.push_back(parse_card(toks[k]));
+                    }
+                }
+            }
+            if (!hole_seen || found.hole.empty()) {
+                throw std::invalid_argument("own hole cards are missing");
+            }
+            saw_seat = true;
+        }
+    }
+    if (!saw_seat) throw std::invalid_argument("incomplete state block");
+    if (saw_showdown && showdown != HandConstruction::DrawFive &&
+        showdown != HandConstruction::DeuceSeven) {
+        throw std::invalid_argument("not a draw game");
+    }
+    return found;
+}
+
+}  // namespace
+
+std::string discard_from_text(Bot& bot, int seat,
+                              const std::string& state_text) {
+    const DrawSeat found = parse_draw_seat(seat, state_text);
+    SeatView view;
+    view.seat = seat;
+    view.hole = found.hole;
+    view.max_draw = found.max_draw;
+    view.street = Street::Draw;
+    const std::vector<std::string> discards = bot.choose_discards(view);
+    if (static_cast<int>(discards.size()) > view.max_draw) {
+        throw std::invalid_argument("too many discards");
+    }
+    std::ostringstream out;
+    out << "discard";
+    for (const std::string& c : discards) out << " " << c;
     return out.str();
 }
 

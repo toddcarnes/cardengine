@@ -5,6 +5,21 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Variants: five-card draw and 2-7 lowball with a real exchange round
+  (`showdown = draw|deuce`, `games/draw-6max.txt`, `games/deuce-6max.txt`,
+  `max_draw = 1..5`): preflop betting, then each live seat discards up to
+  the cap and redraws off the shoe in turn order (button-out, folded and
+  all-in seats skip), then betting resumes to showdown. Draw = best five
+  wins, deuce = worst hand wins via the 2-7 ranker (7-5-4-3-2 nuts,
+  straights/flushes count against, aces high, identical lows split). New
+  `draw <seat> drew <n>` log lines (counts only — discards stay private),
+  `discard`/`draws` protocol commands, `draws` + `max_draw` state lines,
+  `Bot::choose_discards` (made hands pat, four-flush/straight draws keep
+  one, deuce lows pat on 8-or-better, junk draws to ace/king, capped),
+  out-of-process `discard` replies, and an unmatched-top-band refund at
+  settle (a lone uncalled bet returns instead of padding the pot).
+  `seats × (5 + max_draw)` must fit 52, so the 6-max files play the
+  classic 3-cap.
 - Examples: `host.py` network host reference (TCP seats with `hello`/
   `welcome`, filtered `state <seat>` views, action-clock `timeout`s,
   disconnect `sitout`/`resume`, per-hand `save`) plus `bot_proxy.py`

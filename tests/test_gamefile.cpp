@@ -85,7 +85,7 @@ int main() {
             [] { parse_text("format_version = 1\nbetting = fixed\n"); },
             "bad betting");
         expect_throws<std::invalid_argument>(
-            [] { parse_text("format_version = 1\nshowdown = draw\n"); },
+            [] { parse_text("format_version = 1\nshowdown = chess\n"); },
             "bad showdown");
         const GameFile omaha = parse_text(
             "format_version = 1\nshowdown = Omaha\nhole_cards = 4\n"
@@ -122,6 +122,23 @@ int main() {
             check(stud.config.upcards == 4 && stud.config.bring_in == 10,
                   "stud keys parse");
         }
+        {
+            const GameFile draw = parse_text(
+                "format_version = 1\nshowdown = draw\nhole_cards = 5\n"
+                "board_cards = 0\nmax_draw = 3\n");
+            check(draw.config.showdown == HandConstruction::DrawFive,
+                  "draw parses");
+            check(draw.config.max_draw == 3, "max_draw parses");
+        }
+    }
+
+    // Deuce showdown name parses.
+    {
+        const GameFile deuce = parse_text(
+            "format_version = 1\nshowdown = deuce\nhole_cards = 5\n"
+            "board_cards = 0\nmax_draw = 3\n");
+        check(deuce.config.showdown == HandConstruction::DeuceSeven,
+              "deuce parses");
     }
 
     // Struct validation failures surface as config errors, not silence.
@@ -143,8 +160,10 @@ int main() {
         game.config.num_players = 2;
         game.config.ante = 10;
         game.config.betting = BettingStructure::PotLimit;
-        game.config.showdown = HandConstruction::OmahaHiLo;
-        game.config.hole_cards = 4;
+        game.config.showdown = HandConstruction::DrawFive;
+        game.config.hole_cards = 5;
+        game.config.board_cards = 0;
+        game.config.max_draw = 3;
         game.config.max_raises_per_round = 3;
         std::ostringstream out;
         save_game_file(game, out);
@@ -153,11 +172,15 @@ int main() {
         check(back.name == "Heads-up" && back.config.num_players == 2 &&
                   back.config.ante == 10 &&
                   back.config.betting == BettingStructure::PotLimit &&
-                  back.config.showdown == HandConstruction::OmahaHiLo &&
-                  back.config.hole_cards == 4 &&
+                  back.config.showdown == HandConstruction::DrawFive &&
+                  back.config.hole_cards == 5 &&
+                  back.config.board_cards == 0 &&
+                  back.config.max_draw == 3 &&
                   back.config.max_raises_per_round == 3,
               "string round-trip");
 
+        // File I/O through the CTest working directory (same shape as
+        // test_session/test_protocol: write, read back, delete).
         const char* path = "tmp_test_game_roundtrip.txt";
         {
             std::ofstream file(path);

@@ -79,6 +79,10 @@ struct SeatView {
     // best seat). Heuristics use it to tighten early and loosen late.
     int position = -1;
     int num_seats = 0;
+    // Draw games: most cards this seat may exchange (GameConfig max_draw).
+    int max_draw = 5;
+    // Draw games: true once this seat has taken its exchange this hand.
+    bool drew = false;
     // Hand-construction rule for made-hand evaluation (Omaha bots must use
     // exactly 2 from hand; holdem bots use best-any-five).
     HandConstruction showdown = HandConstruction::BestFiveOfAll;
@@ -112,6 +116,13 @@ public:
     virtual ~Bot() = default;
     virtual Action decide(const SeatView& view) = 0;
     virtual const std::string& name() const = 0;
+    // Draw games only: which hole cards to throw away (by text, e.g.
+    // {"As", "Td"}), replaced off the shoe in order. Empty means stand
+    // pat. Default: never draw (plays every deal pat).
+    virtual std::vector<std::string> choose_discards(const SeatView& view) {
+        (void)view;
+        return {};
+    }
     // Called once per finished hand (driver or session). Default: no memory.
     virtual void observe(int, const HandSummary&) {}
 };

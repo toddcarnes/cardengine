@@ -212,6 +212,9 @@ int main() {
         check(flop.type != ActionType::Fold, "made low does not fold the flop");
     }
 
+    // Draw/deuce betting judgment lives in test_draw (each Table there
+    // owns its draw shoe in one block; see test_draw bot sections).
+
     std::cout << "test_bot ok\n";
     return 0;
 }

@@ -128,11 +128,21 @@ void apply_game_key(GameConfig& config, const std::string& key,
                    s == "seven-stud" || s == "seven_card_stud" ||
                    s == "seven-card-stud") {
             config.showdown = HandConstruction::StudSeven;
+        } else if (s == "draw" || s == "draw5" || s == "five_card_draw" ||
+                   s == "five-card-draw" || s == "fivedraw") {
+            config.showdown = HandConstruction::DrawFive;
+        } else if (s == "deuce" || s == "deuce7" || s == "deuce_seven" ||
+                   s == "deuce-seven" || s == "lowball" || s == "2-7" ||
+                   s == "27" || s == "2to7" || s == "2_7") {
+            config.showdown = HandConstruction::DeuceSeven;
         } else {
             throw std::invalid_argument(
                 "line " + std::to_string(lineno) +
-                ": showdown must be holdem, omaha, omaha_hilo, or stud");
+                ": showdown must be holdem, omaha, omaha_hilo, stud, draw, "
+                "or deuce");
         }
+    } else if (key == "max_draw" || key == "maxdraw") {
+        config.max_draw = parse_int(value, lineno);
     } else if (key == "upcards") {
         config.upcards = parse_int(value, lineno);
     } else if (key == "bring_in" || key == "bringin") {
@@ -185,9 +195,16 @@ void write_game_config(const GameConfig& config, std::ostream& out) {
         case HandConstruction::StudSeven:
             out << "stud\n";
             break;
+        case HandConstruction::DrawFive:
+            out << "draw\n";
+            break;
+        case HandConstruction::DeuceSeven:
+            out << "deuce\n";
+            break;
     }
     out << "upcards = " << config.upcards << "\n";
     out << "bring_in = " << config.bring_in << "\n";
+    out << "max_draw = " << config.max_draw << "\n";
     out << "max_raises = " << config.max_raises_per_round << "\n";
 }
 

@@ -16,14 +16,18 @@ using cardengine::GameConfig;
 using cardengine::Table;
 using testutil::cards;
 using testutil::check;
+using testutil::expect_throws;
 
 void chk(Table& t, int s) { t.act(s, {ActionType::Check, 0}); }
 void call(Table& t, int s) { t.act(s, {ActionType::Call, 0}); }
+void pat(Table& t, int s) { t.discard(s, {}); }
 
 void check_down_streets(Table& t) {
     while (!t.hand_complete()) {
         if (t.acting() != -1) {
             chk(t, t.acting());
+        } else if (!t.draws_pending().empty()) {
+            pat(t, t.draws_pending()[0]);
         } else {
             t.deal_next_street();
         }
@@ -161,7 +165,9 @@ int main() {
         check(t.stack(1) == 9900, "trips lose");
     }
 
-    // No board, five hole cards: four betting rounds, best 5 of 5.
+    // No board, five hole cards: standard betting rounds, best 5 of 5.
+    // This is also the draw-game shape: 5 private cards, no board, one
+    // discard round (up to max_draw each) before the later betting.
     {
         GameConfig c;
         c.num_players = 2;
@@ -180,6 +186,108 @@ int main() {
         check(t.went_to_showdown(), "showdown on hole cards");
         check(t.stack(0) == 10100, "royal wins boardless");
         check(t.stack(1) == 9900, "brick loses");
+    }
+
+    // Boardless games cannot run it twice (spare boards need felt cards).
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 5;
+        c.board_cards = 0;
+        c.runouts = 2;
+        expect_throws<std::invalid_argument>([&] { validate(c); },
+                     "boardless runouts rejected");
+    }
+
+    // Five-card draw (high): pat hands play out across betting, exchange,
+    // betting, showdown. check_down_streets stands pat through the draw
+    // (empty discards), so the royal holds and the 9-high loses.
+    // (Mixed suits on the junk side: no flush interferes with the read.)
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 5;
+        c.board_cards = 0;
+        c.showdown = HandConstruction::DrawFive;
+        Table t(c);
+        // seat1: 2h 3d 4c 5s 9c (9-high); seat0: As Ks Qs Js Ts (royal).
+        // Stub: 10 replacements for a full 5-each draw round (all unique).
+        t.start_hand_from_deck(cards({"2h", "As", "3d", "Ks", "4c", "Qs", "5s",
+                                     "Js", "9c", "Ts", "2d", "3c", "4d", "5d",
+                                     "6d", "7d", "8h", "9d", "Th", "Jh"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.went_to_showdown(), "draw showdown");
+        check(t.stack(0) == 10100, "royal wins the draw");
+        check(t.stack(1) == 9900, "9-high loses the draw");
+    }
+
+    // 2-7 lowball: the worst poker hand wins — 7-5-4-3-2 (the nuts) beats
+    // an 8-low, and a straight (great for high) loses to any broken hand.
+    // (Pat draws, mixed suits, full stub — same shape as the draw test.)
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 5;
+        c.board_cards = 0;
+        c.showdown = HandConstruction::DeuceSeven;
+        Table t(c);
+        // seat1: 8c 5d 4h 3c 2d (8-low); seat0: 7c 5h 4d 3h 2c (the nuts).
+        // (Mixed suits: no flush interferes with the read. Full unique stub.)
+        t.start_hand_from_deck(cards({"8c", "7c", "5d", "5h", "4h", "4d",
+                                     "3c", "3h", "2d", "2c", "2h", "3d",
+                                     "4c", "5c", "6d", "7d", "8h", "9d",
+                                     "Th", "Jh"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.went_to_showdown(), "deuce showdown");
+        check(t.stack(0) == 10100 && t.stack(1) == 9900, "7-low beats 8-low");
+    }
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 5;
+        c.board_cards = 0;
+        c.showdown = HandConstruction::DeuceSeven;
+        Table t(c);
+        // seat1: Ah 2d 3c 4h 5s (the wheel: a straight, terrible for deuce);
+        // seat0: Kc Jh 9c 7d 5h (king-high broken: wins by a mile).
+        // (Full unique stub.)
+        t.start_hand_from_deck(cards({"Ah", "Kc", "2d", "Jh", "3c", "9c",
+                                     "4h", "7d", "5s", "5h", "2h", "3d",
+                                     "4c", "5c", "6d", "7d", "8h", "9d",
+                                     "Th", "Jh"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 10100 && t.stack(1) == 9900,
+              "broken king-high beats the wheel straight");
+    }
+    {
+        // Tied lows split the pot: both seats play matching 7-lows and
+        // suits never break ties, so the 200 pot splits 100/100.
+        // (Mixed suits: no flush interferes with the tie.)
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 5;
+        c.board_cards = 0;
+        c.showdown = HandConstruction::DeuceSeven;
+        Table t(c);
+        t.start_hand_from_deck(cards({"7h", "7c", "5d", "5h", "4h", "4d",
+                                     "3d", "3h", "2d", "2c", "2h", "3c",
+                                     "4c", "5c", "6d", "6h", "8d", "9d",
+                                     "Th", "Jh"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 10000 && t.stack(1) == 10000,
+              "identical lows split");
     }
 
     // Omaha table hand: 4 hole each, royal-over-trips at showdown.

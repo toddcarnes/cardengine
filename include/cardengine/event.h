@@ -39,6 +39,15 @@ struct StreetDealtEvent {
     std::vector<Card> cards;  // Only the newly dealt cards.
 };
 
+// One seat's exchange in a five-card draw game: the count thrown away
+// (and replaced off the top of the shoe). Counts are public — a real
+// table sees how many you draw — but the card identities stay private:
+// folded and discarded cards never reappear after HandStarted.
+struct DrawEvent {
+    int seat = -1;
+    int drew = 0;  // Replacement cards dealt (0 = stood pat).
+};
+
 // An extra runout board for run-it-twice (and triple): board 2+ dealt
 // from the remaining shoe at settle time, deciding its share of every
 // pot. Board 1 is the felt board (the `street` lines); these are the
@@ -65,7 +74,7 @@ struct TimeoutEvent {
 };
 
 using Event = std::variant<HandStartedEvent, ActionTakenEvent,
-                           StreetDealtEvent, RunoutDealtEvent,
+                           StreetDealtEvent, DrawEvent, RunoutDealtEvent,
                            HandSettledEvent, TimeoutEvent>;
 
 const char* event_name(const Event& event);

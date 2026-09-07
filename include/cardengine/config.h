@@ -13,11 +13,16 @@ enum class BettingStructure { NoLimit, Limit, PotLimit };
 // low takes half (exact 2+3 both ways); no qualifying low means high scoops.
 // StudSeven is seven-card stud: no shared board, each seat's own 7 cards
 // (3 down, 4 up) play best-five; upcards are public, downcards private.
+// DrawFive is five-card draw: 5 private cards, one discard/draw round,
+// then best-five showdown. DeuceSeven is 2-7 lowball draw: same deal with
+// the worst hand winning (straights/flushes count against, aces high).
 enum class HandConstruction {
     BestFiveOfAll,
     OmahaTwoAndThree,
     OmahaHiLo,
-    StudSeven
+    StudSeven,
+    DrawFive,
+    DeuceSeven
 };
 
 // Everything a variant needs to change about a game, as data.
@@ -59,6 +64,8 @@ struct GameConfig {
     int bring_in = 0;        // Stud only: forced bet by the lowest upcard on
                              // third street (0 = no bring-in, high hand opens).
                              // Must be below the small blind when set.
+    int max_draw = 5;        // Draw only: most cards a seat may exchange
+                             // (5 = any number, 3 = classic 3-card limit).
     BettingStructure betting = BettingStructure::NoLimit;
     HandConstruction showdown = HandConstruction::BestFiveOfAll;
     int max_raises_per_round = 4;  // Limit betting only (bet + raises cap).

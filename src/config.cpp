@@ -38,6 +38,9 @@ void validate(const GameConfig& config) {
     if (config.bring_in < 0) {
         throw std::invalid_argument("bring_in cannot be negative");
     }
+    if (config.max_draw < 1 || config.max_draw > 5) {
+        throw std::invalid_argument("max_draw must be 1..5");
+    }
     if (config.showdown != HandConstruction::StudSeven) {
         if (config.upcards != 0) {
             throw std::invalid_argument("upcards need stud showdown");
@@ -45,6 +48,11 @@ void validate(const GameConfig& config) {
         if (config.bring_in != 0) {
             throw std::invalid_argument("bring_in needs stud showdown");
         }
+    }
+    if (config.showdown != HandConstruction::DrawFive &&
+        config.showdown != HandConstruction::DeuceSeven &&
+        config.max_draw != 5) {
+        throw std::invalid_argument("max_draw needs draw showdown");
     }
     if (config.hole_cards < 1 || config.hole_cards > 7) {
         throw std::invalid_argument("hole_cards must be 1..7");
@@ -74,6 +82,26 @@ void validate(const GameConfig& config) {
         if (config.bring_in >= config.small_blind && config.bring_in > 0) {
             throw std::invalid_argument("bring_in must be below small_blind");
         }
+    } else if (config.showdown == HandConstruction::DrawFive ||
+               config.showdown == HandConstruction::DeuceSeven) {
+        // Five-card draw / 2-7 lowball: 5 private cards, no board, one
+        // discard round (up to max_draw each).
+        if (config.hole_cards != 5 || config.board_cards != 0) {
+            throw std::invalid_argument(
+                "draw showdown needs hole_cards 5 and board_cards 0");
+        }
+        if (config.max_draw < 1 || config.max_draw > 5) {
+            throw std::invalid_argument("max_draw must be 1..5");
+        }
+        // Replacements come off the same shoe, so the worst case (every
+        // seat drawing the max) must fit one deck. Six draw seats at the
+        // classic 3-card cap deal 48 total (6×(5+3)); anything bigger needs
+        // fewer seats or a smaller cap. The testing seam asks for the same
+        // stub (see start_hand_from_deck).
+        if (config.num_players * (config.hole_cards + config.max_draw) > 52) {
+            throw std::invalid_argument(
+                "not enough cards in the deck for full draws");
+        }
     } else {
         // Best-five showdown needs a total that fits evaluate_best.
         const int total = config.hole_cards + config.board_cards;
@@ -84,6 +112,9 @@ void validate(const GameConfig& config) {
     }
     if (config.num_players * config.hole_cards + config.board_cards > 52) {
         throw std::invalid_argument("not enough cards in the deck");
+    }
+    if (config.board_cards == 0 && config.runouts != 1) {
+        throw std::invalid_argument("runouts need board cards");
     }
     if (config.max_raises_per_round < 1) {
         throw std::invalid_argument("max_raises_per_round must be positive");

@@ -213,6 +213,43 @@ OmahaHiLoValue evaluate_omaha_hilo(const std::vector<Card>& hole,
     return out;
 }
 
+bool operator<(const DeuceValue& a, const DeuceValue& b) {
+    if (a.penalty != b.penalty) return a.penalty < b.penalty;
+    for (std::size_t i = 0; i < a.tiebreak.size(); ++i) {
+        if (a.tiebreak[i] != b.tiebreak[i]) {
+            return a.tiebreak[i] < b.tiebreak[i];
+        }
+    }
+    return false;
+}
+
+DeuceValue evaluate_deuce(const std::array<Card, 5>& cards) {
+    // Rank the hand the way 2-7 does: pairs and better (straights,
+    // flushes, trips, boats, quads) all lose to any no-pair no-straight
+    // no-flush hand. Broken hands compare the top card down (7-5-4-3-2
+    // beats 8-5-4-3-2 on the first card). Made hands keep the high-hand
+    // order with the smaller holding winning (deuces up beats aces up).
+    // Suits never break ties (two identical lows split, as in high poker).
+    const HandValue high = evaluate_five(cards);
+    DeuceValue out;
+    switch (high.category) {
+        case HandCategory::HighCard: out.penalty = 0; break;
+        case HandCategory::OnePair: out.penalty = 1; break;
+        case HandCategory::TwoPair: out.penalty = 2; break;
+        case HandCategory::ThreeOfAKind: out.penalty = 3; break;
+        case HandCategory::Straight: out.penalty = 4; break;
+        case HandCategory::Flush: out.penalty = 5; break;
+        case HandCategory::FullHouse: out.penalty = 6; break;
+        case HandCategory::FourOfAKind: out.penalty = 7; break;
+        case HandCategory::StraightFlush: out.penalty = 8; break;
+    }
+    // Broken and made hands alike keep the high-hand tiebreak order; the
+    // < operator compares it the winning way (smaller high card wins the
+    // lowball). Suits never break ties: identical ranks tie across suits.
+    out.tiebreak = high.tiebreak;
+    return out;
+}
+
 HandValue evaluate_best(const std::vector<Card>& cards) {
     if (cards.size() < 5 || cards.size() > 7) {
         throw std::invalid_argument("evaluate_best needs 5 to 7 cards");

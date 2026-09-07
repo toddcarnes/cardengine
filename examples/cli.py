@@ -198,6 +198,28 @@ def play_hand(engine, seed, auto, botted):
         if acting == -1:
             if engine.send("deal") == ["ok"]:
                 continue
+            raw = engine.send("state")
+            draws = [line for line in raw if line.startswith("draws")]
+            if draws and draws[0] != "draws -":
+                pending = [int(s) for s in draws[0].split()[1:]]
+                drawer = pending[0]
+                if drawer in botted:
+                    print(f"  bot seat {drawer}: {engine.send('step')}")
+                    continue
+                hole = state["seats"][drawer]["hole"]
+                if auto:
+                    reply = engine.send("discard")
+                else:
+                    print(f"street=draw pot={state['pot']} "
+                          f"seat {drawer} {' '.join(hole)}")
+                    raw = input(f"seat {drawer} discards "
+                                f"(e.g. `As Td`, empty stands pat) > ").strip()
+                    reply = engine.send(f"discard {raw}".strip())
+                if reply != ["ok"]:
+                    print(f"  engine refused: {reply}")
+                    if auto:
+                        return False
+                continue
             settle = engine.send("settle")
             for line in settle:
                 print(f"  {line}")

@@ -128,6 +128,47 @@ int main() {
         expect_throws<std::invalid_argument>([&] { validate(s); }, "bring-in needs stud");
     }
 
+    // Draw games: 5 private cards, no board, one discard round (1..5 cap).
+    // Replacements come off the same shoe, so full draws must fit 52.
+    {
+        GameConfig d;
+        d.showdown = HandConstruction::DrawFive;
+        d.hole_cards = 5;
+        d.board_cards = 0;
+        d.max_draw = 3;
+        validate(d);
+        d.max_draw = 0;
+        expect_throws<std::invalid_argument>([&] { validate(d); }, "draw needs 1..5");
+        d.max_draw = 6;
+        expect_throws<std::invalid_argument>([&] { validate(d); }, "draw max 5");
+        d.max_draw = 5;
+        d.num_players = 6;
+        expect_throws<std::invalid_argument>([&] { validate(d); },
+                     "6-handed full draws overflow the deck");
+        d.num_players = 5;
+        validate(d);
+        d = GameConfig{};
+        d.showdown = HandConstruction::DeuceSeven;
+        d.hole_cards = 5;
+        d.board_cards = 0;
+        d.max_draw = 3;
+        validate(d);
+        d.hole_cards = 4;
+        expect_throws<std::invalid_argument>([&] { validate(d); }, "deuce needs 5 hole");
+        d = GameConfig{};
+        d.max_draw = 3;
+        expect_throws<std::invalid_argument>([&] { validate(d); }, "max_draw needs draw");
+    }
+
+    // Boardless games cannot run it twice (no felt to deal spares from).
+    {
+        GameConfig r;
+        r.hole_cards = 5;
+        r.board_cards = 0;
+        r.runouts = 2;
+        expect_throws<std::invalid_argument>([&] { validate(r); }, "boardless runouts");
+    }
+
     c = GameConfig{};
     c.max_raises_per_round = 0;
     expect_throws<std::invalid_argument>([&] { validate(c); }, "max raises positive");

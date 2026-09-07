@@ -59,6 +59,7 @@ std::string street_name(Street street) {
     switch (street) {
         case Street::None: return "none";
         case Street::Preflop: return "preflop";
+        case Street::Draw: return "draw";
         case Street::Flop: return "flop";
         case Street::Turn: return "turn";
         case Street::River: return "river";
@@ -92,7 +93,7 @@ std::string Session::execute(const std::string& raw_line) {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
             return "ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options "
-                   "act timeout deal settle log addbot bots step quit";
+                   "act discard draws timeout deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
         if (command == "save") {
@@ -399,6 +400,30 @@ std::string Session::execute(const std::string& raw_line) {
             active_table().deal_next_street();
             return "ok";
         }
+        if (command == "discard") {
+            // Draw games only: `discard` with no cards stands pat.
+            // Names exact cards from the drawing seat's current hole.
+            const int seat = active_table().draws_pending().empty()
+                                 ? -1
+                                 : active_table().draws_pending()[0];
+            if (seat == -1) return "error no draw pending";
+            if (bots_.count(seat) != 0) {
+                return "error seat " + std::to_string(seat) + " is automated";
+            }
+            active_table().discard(seat, words(rest));
+            return "ok";
+        }
+        if (command == "draws") {
+            const std::vector<int> pending = active_table().draws_pending();
+            std::ostringstream out;
+            out << "draws";
+            if (pending.empty()) {
+                out << " -";
+            } else {
+                for (int s : pending) out << " " << s;
+            }
+            return out.str();
+        }
         if (command == "timeout") {
             const int seat = active_table().acting();
             if (seat == -1) return "error no action pending";
@@ -461,6 +486,27 @@ std::string Session::execute(const std::string& raw_line) {
         }
         if (command == "step") {
             const int seat = active_table().acting();
+            // Draw streets have no acting seat: the pending drawer moves.
+            if (seat == -1 && !active_table().draws_pending().empty()) {
+                const int drawer = active_table().draws_pending()[0];
+                const auto it = bots_.find(drawer);
+                if (it == bots_.end()) {
+                    return "error seat " + std::to_string(drawer) +
+                           " is manual";
+                }
+                const std::vector<std::string> discards =
+                    it->second->choose_discards(
+                        make_view(table_, drawer));
+                active_table().discard(drawer, discards);
+                std::ostringstream out;
+                out << "ok " << drawer << " discard";
+                if (discards.empty()) {
+                    out << " -";
+                } else {
+                    for (const std::string& c : discards) out << " " << c;
+                }
+                return out.str();
+            }
             if (seat == -1) return "error no action pending";
             const auto it = bots_.find(seat);
             if (it == bots_.end()) {
@@ -492,6 +538,9 @@ std::string Session::do_state(int view_seat) const {
         case HandConstruction::BestFiveOfAll: out << "holdem"; break;
         case HandConstruction::OmahaTwoAndThree: out << "omaha"; break;
         case HandConstruction::OmahaHiLo: out << "omaha_hilo"; break;
+        case HandConstruction::StudSeven: out << "stud"; break;
+        case HandConstruction::DrawFive: out << "draw"; break;
+        case HandConstruction::DeuceSeven: out << "deuce"; break;
     }
     out << "\n";
     out << "button " << active_table().button() << "\n";
@@ -506,6 +555,21 @@ std::string Session::do_state(int view_seat) const {
         for (const Card& c : active_table().board()) out << " " << to_string(c);
     }
     out << "\n";
+    if (active_table().config().showdown == HandConstruction::DrawFive ||
+        active_table().config().showdown == HandConstruction::DeuceSeven) {
+        out << "max_draw " << active_table().config().max_draw << "\n";
+    }
+    // Draw games: who still owes the exchange (turn order from the button).
+    {
+        const std::vector<int> pending = active_table().draws_pending();
+        out << "draws";
+        if (pending.empty()) {
+            out << " -";
+        } else {
+            for (int s : pending) out << " " << s;
+        }
+        out << "\n";
+    }
     for (int i = 0; i < active_table().num_seats(); ++i) {
         out << "seat " << i << " stack " << active_table().stack(i) << " bet "
             << active_table().bet(i) << " committed " << active_table().committed(i) << " "

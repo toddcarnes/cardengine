@@ -24,9 +24,28 @@ from cli import parse_options  # noqa: E402
 from cli import parse_state  # noqa: E402
 
 
+def parse_draws(full):
+    """Seats still owed the draw exchange, in turn order ([] when none)."""
+    for line in full:
+        if line.startswith("draws"):
+            parts = line.split()
+            if len(parts) > 1 and parts[1] != "-":
+                return [int(s) for s in parts[1:]]
+            return []
+    return []
+
+
+def draws_line(full):
+    for line in full:
+        if line.startswith("draws"):
+            return line
+    return "draws -"
+
+
 class Runner:
     """One persistent cardengine_bot process. Strict alternation: we write
-    a state block + options line, it prints one act line."""
+    a state block + decision line, it prints one reply line (`act ...`
+    for betting, `discard ...` for the exchange)."""
 
     def __init__(self, bot_exe, seat, bot_file):
         self.seat = seat
@@ -47,6 +66,15 @@ class Runner:
             raise RuntimeError(f"bot seat {self.seat} closed the pipe")
         return reply.strip()
 
+    def discard(self, state_lines, draws_line):
+        self.proc.stdin.write("\n".join(state_lines) + "\nend\n")
+        self.proc.stdin.write(draws_line + "\n")
+        self.proc.stdin.flush()
+        reply = self.proc.stdout.readline()
+        if not reply:
+            raise RuntimeError(f"bot seat {self.seat} closed the pipe")
+        return reply.strip()
+
     def close(self):
         self.proc.stdin.close()
         self.proc.wait(timeout=10)
@@ -60,6 +88,25 @@ def play_hand(engine, runners, seed, auto):
         acting = parse_state(full)["acting"]
         if acting == -1:
             if engine.send("deal") == ["ok"]:
+                continue
+            pending = parse_draws(full)
+            if pending:
+                drawer = pending[0]
+                if drawer in runners:
+                    action = runners[drawer].discard(
+                        engine.send(f"state {drawer}"),
+                        draws_line(full))
+                    print(f"  bot seat {drawer}: {action}")
+                    reply = engine.send(action)
+                elif auto:
+                    reply = engine.send("discard")
+                else:
+                    print(f"  manual seat {drawer} must discard "
+                          f"(e.g. `discard As Td`, bare `discard` stands pat)")
+                    return False
+                if reply != ["ok"]:
+                    print(f"  engine refused: {reply}")
+                    return False
                 continue
             settle = engine.send("settle")
             for line in settle:

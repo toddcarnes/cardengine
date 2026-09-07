@@ -21,7 +21,8 @@ What this host owns (the engine never will):
 Wire protocol (line-based, like the engine's own):
   - server -> client: `welcome <seat> <name>` then, per decision, a
     `state <seat>` block (terminated by `end`) plus one `options` line;
-  - client -> server: one `act ...` line per decision (or `quit` to leave).
+  - client -> server: one `act ...` line per betting decision (or one
+    `discard ...` line per draw exchange, or `quit` to leave).
   Out-of-process `cardengine_bot` programs speak the same two halves
   already (state block + options in, act line out), so a tiny adapter —
   `examples/bot_proxy.py --port ... --seat N --bot FILE` — bridges them.
@@ -174,7 +175,15 @@ class Host:
         proc.stdin.flush()
         return proc.stdout.readline().strip()
 
-    def _await_human(self, seat, options_line, deadline):
+    def _bot_discard(self, seat, draws_line):
+        proc = self.runners[seat]
+        for line in self.engine.send(f"state {seat}"):
+            proc.stdin.write(line + "\n")
+        proc.stdin.write("end\n" + draws_line + "\n")
+        proc.stdin.flush()
+        return proc.stdout.readline().strip()
+
+    def _await_human(self, seat, decision_line, deadline):
         """Pump sockets until this seat answers or the clock runs out."""
         client = self.clients.get(seat)
         if client is None:
@@ -187,8 +196,10 @@ class Host:
         for line in self.engine.send(f"state {seat}"):
             client.send(line)
         client.send("end")
-        client.send(options_line)
+        client.send(decision_line)
         self._flush()
+        # Betting answers `act ...`; the draw exchange answers `discard ...`.
+        want = "discard" if decision_line.startswith("draws") else "act"
         while True:
             remaining = deadline - now_seconds()
             if remaining <= 0:
@@ -205,19 +216,19 @@ class Host:
             client = self.clients.get(seat)
             if client is None:
                 return None  # Left mid-decision: caller times out.
-            # Drain this seat's answer lines (act ... / quit).
+            # Drain this seat's answer lines (`act ...` / `discard ...`).
             answer = None
             leftovers = []
             for line in client.lines():
                 if line == "quit":
                     self._drop(seat, "quit")
                     return None
-                if line.startswith("act") and answer is None:
+                if line.startswith(want) and answer is None:
                     answer = line
                 else:
                     leftovers.append(line)
             for line in leftovers:
-                client.send(f"error expected 'act ...', got {line!r}")
+                client.send(f"error expected '{want} ...', got {line!r}")
             self._flush()
             if answer is not None:
                 return answer
@@ -316,6 +327,36 @@ class Host:
             self._flush()
             if acting == -1:
                 if self.engine.send("deal") == ["ok"]:
+                    continue
+                pending = [line for line in full if line.startswith("draws")]
+                if pending and pending[0] != "draws -":
+                    drawer = int(pending[0].split()[1])
+                    move = None
+                    if drawer in self.runners and drawer not in self.clients:
+                        move = self._bot_discard(drawer, pending[0])
+                        print(f"  bot seat {drawer}: {move}")
+                    elif drawer in self.clients:
+                        deadline = now_seconds() + self.args.action_seconds
+                        move = self._await_human(drawer, pending[0], deadline)
+                        if move is None or not move.startswith("discard"):
+                            print(f"  seat {drawer} timed out; standing pat")
+                            self.engine.send(f"discard")
+                            continue
+                        print(f"  {self.names[drawer]}: {move}")
+                    elif self.args.auto:
+                        move = "discard"
+                    else:
+                        print(f"  seat {drawer} ({self.names[drawer]}) has no "
+                              f"connection; standing pat")
+                        self.engine.send("discard")
+                        continue
+                    reply = self.engine.send(move)
+                    if reply != ["ok"]:
+                        print(f"  engine refused: {reply}")
+                        target = self.clients.get(drawer)
+                        if target is not None:
+                            target.send(f"error {reply[0]}")
+                        return False
                     continue
                 settle = self.engine.send("settle")
                 for line in settle:

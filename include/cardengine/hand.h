@@ -74,6 +74,33 @@ struct OmahaHiLoValue {
     LowValue low;
 };
 
+// 2-7 lowball value: the worse the poker hand, the better the lowball.
+// Straights and flushes count against (a flush is a strong hand, hence a
+// terrible low), aces always high. operator< means "better low": 7-5-4-3-2
+// (the nuts) sorts first; any pair sorts after every broken hand.
+//
+// The tiebreak keeps the high-hand order (top card down): 7-5-4-3-2 beats
+// 8-5-4-3-2 on the first card, deuces up beats aces up the same way.
+// Suits never break ties (identical lows split).
+struct DeuceValue {
+    // Penalty bucket: 0 for a broken hand (no pair, no straight, no
+    // flush), then 1..8 up the poker ladder (pairs ... straight flushes).
+    // Lower bucket always wins; within a bucket the smaller high-hand
+    // tiebreak wins the lowball.
+    int penalty = 0;
+    std::array<Rank, 5> tiebreak{Rank::Ace, Rank::Ace, Rank::Ace,
+                                 Rank::Ace, Rank::Ace};
+
+    bool operator==(const DeuceValue&) const = default;
+};
+
+bool operator<(const DeuceValue& a, const DeuceValue& b);
+
+// Best (lowest) 2-7 value out of exactly 5 cards. Same cards, same winner
+// as evaluate_five reversed — except straights and flushes, which
+// evaluate_five rewards and lowball punishes, so this ranks directly.
+DeuceValue evaluate_deuce(const std::array<Card, 5>& cards);
+
 // High plus best qualifying low (if any) over the same 60 combos.
 // Throws std::invalid_argument for any counts but 4 hole + 5 board.
 OmahaHiLoValue evaluate_omaha_hilo(const std::vector<Card>& hole,
