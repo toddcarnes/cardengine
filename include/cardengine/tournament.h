@@ -59,6 +59,15 @@ public:
     // Between hands only; clears an elimination (with its recorded prize).
     void rebuy(int seat);
 
+    // Final-table deal: the remaining players agree to split the rest of
+    // the pool (listed amounts must sum to exactly pool minus prizes
+    // already awarded) and the tournament ends at once. Places go by stack,
+    // chip leader first; ties break in seat order; earlier busts slide
+    // below in bust order. Between hands only.
+    // Throws std::invalid_argument on a bad split, std::logic_error when
+    // a hand is open or the tournament is already over.
+    void chop(const std::vector<Payout>& deal);
+
     bool complete() const;
     int winner() const;  // Throws std::logic_error unless complete().
     int level_index() const { return level_index_; }

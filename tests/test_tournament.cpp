@@ -172,6 +172,62 @@ int main() {
         expect_throws<std::exception>([&] { tournament.begin_hand(9); }, "no hands when over");
     }
 
+    // Deals split the rest of the pool; places go by stack, leader first.
+    {
+        TournamentConfig config;
+        config.game.num_players = 3;
+        config.buy_in = 1000;
+        Tournament tournament(config);
+        // Bust seat 2 first so the deal must cover two (and must not).
+        tournament.table().set_stack(2, 150);
+        tournament.begin_hand_from_deck(cards({"3c", "7c", "As", "4d", "2d",
+                                              "Ad", "Ks", "Qh", "Jh", "9c",
+                                              "3d"}));
+        tournament.table().act(0, {ActionType::Raise, 10000});
+        tournament.table().act(1, {ActionType::Fold, 0});
+        tournament.table().act(2, {ActionType::Call, 0});
+        play_out(tournament.table());
+        tournament.finish_hand();
+        // Three-way split rejected (seat 2 is out); two-way sums must match.
+        expect_throws<std::exception>(
+            [&] { tournament.chop({{0, 1000}, {1, 1000}, {2, 1000}}); },
+            "deal covers the eliminated");
+        expect_throws<std::exception>(
+            [&] { tournament.chop({{0, 1000}}); }, "deal must cover survivors");
+        expect_throws<std::exception>(
+            [&] { tournament.chop({{0, 1500}, {0, 900}}); }, "deal lists seat twice");
+        expect_throws<std::exception>(
+            [&] { tournament.chop({{0, 1500}, {1, 800}}); }, "deal must sum exactly");
+        expect_throws<std::exception>(
+            [&] { tournament.chop({{0, 1500}, {7, 1500}}); }, "deal seat range");
+        // Stacks lean seat 0: it takes first, seat 1 second; pool accounted.
+        // (Pool is 3000: seat 2 busted with no prizes configured.)
+        tournament.chop({{0, 2000}, {1, 1000}});
+        check(tournament.complete(), "deal ends it");
+        auto standings = tournament.standings();
+        check(standings[0].finish_place == 1, "leader takes place 1");
+        check(standings[0].prize == 2000, "leader takes the deal's first share");
+        check(standings[1].finish_place == 2 && standings[1].prize == 1000,
+              "short stack takes second");
+        check(standings[2].finish_place == 3 && standings[2].prize == 0,
+              "the earlier bust keeps third");
+        check(finishing_order(tournament) == std::vector<int>{0, 1, 2},
+              "order is leader first, then the bust");
+        expect_throws<std::exception>([&] { tournament.chop({{0, 1}, {1, 1}}); },
+                         "no deals when over");
+        expect_throws<std::exception>([&] { tournament.begin_hand(9); }, "no hands after deal");
+    }
+
+    // Deals refuse mid-hand: the cards decide, not the table talk.
+    {
+        TournamentConfig config;
+        config.game.num_players = 2;
+        Tournament tournament(config);
+        tournament.begin_hand(1);
+        expect_throws<std::exception>([&] { tournament.chop({{0, 0}, {1, 0}}); },
+                         "no deals mid-hand");
+    }
+
     // Rebuys restore stacks (and the pool), vacate finishes, never mid-hand.
     {
         TournamentConfig config;
@@ -302,6 +358,7 @@ int main() {
         check(contains(session.execute("tstatus"), "error"), "no tourney yet");
         check(contains(session.execute("tlevel"), "error"), "tlevel needs tourney");
         check(contains(session.execute("trebuy 0"), "error"), "trebuy needs tourney");
+        check(contains(session.execute("tchop 0:100 1:100"), "error"), "tchop needs tourney");
         check(session.execute(std::string("tload ") + path) == "ok", "tload");
         const std::string status = session.execute("tstatus");
         check(contains(status, "tournament level 0/2"), "level line");
@@ -328,6 +385,18 @@ int main() {
         check(contains(done, "payout 1 350"), "BB wins at level 1 (100/200 + antes)");
         const std::string after = session.execute("tstatus");
         check(contains(after, "hands 1/99"), "hand booked");
+        // Chop wiring: usage, shapes, the split, and the closed sign after.
+        check(contains(session.execute("tchop"), "usage"), "tchop usage");
+        check(contains(session.execute("tchop 0-100"), "error"), "tchop bad pair");
+        check(contains(session.execute("tchop 0:100"), "error"), "tchop must cover all");
+        check(contains(session.execute("tchop 0:100 1:100"), "error"), "tchop sums exactly");
+        check(session.execute("tchop 0:150 1:150") == "ok", "tchop splits it");
+        const std::string chopped = session.execute("tstatus");
+        check(contains(chopped, "standing 0 stack") && contains(chopped, "prize 150"),
+              "deal shares booked");
+        check(contains(session.execute("tchop 0:150 1:150"), "error"),
+              "no deals when over");
+        check(contains(session.execute("start 5"), "error"), "no hands after deal");
         // Cash load leaves tournament mode entirely.
         {
             std::ofstream game("tmp_proto_cash.txt");
@@ -341,6 +410,8 @@ int main() {
                   "tlevel cleared with mode");
             check(contains(session.execute("trebuy 0"), "error"),
                   "trebuy cleared with mode");
+            check(contains(session.execute("tchop 0:1 1:1"), "error"),
+                  "tchop cleared with mode");
             std::remove("tmp_proto_cash.txt");
         }
         std::remove(path);

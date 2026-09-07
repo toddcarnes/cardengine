@@ -28,6 +28,7 @@ this project is called CardEngine.)
 | `tstatus` | `tournament ...`, `standing ...` × n, `ok` | Levels, pool, places. |
 | `tlevel` | `ok` | Tournament only: manual clock advance (sticks at final level). |
 | `trebuy <seat>` | `ok` | Tournament only, between hands: top up a live seat or bring back a busted one (adds a buy-in to the pool). Not for sitting-out seats. |
+| `tchop <seat:amount> ...` | `ok` | Tournament only, between hands: final-table deal. One pair per surviving seat, amounts summing to the remaining pool exactly; places go by stack (leader first), tournament ends. |
 | `sitout <seat>` / `resume <seat>` | `ok` | Flag a seat out (disconnect/away) or bring it back. Applies from the next hand; the running hand is unaffected. |
 | `start <seed>` | `ok` | Starts a hand; stacks and button carry over between hands. |
 | `state` | block, then `end` | Full table dump — local trust only (below). |
@@ -192,12 +193,17 @@ level = 50, 100, 0, 10      # small, big, ante, hands (repeatable)
 Places follow bust order (simultaneous busts in seat order); unwon prize
 remainder goes to the champion. Manual clock advances go over the wire
 (`tlevel`), as do rebuys (`trebuy <seat>`, between hands only — the library
-calls `Tournament::advance_level` / `Tournament::rebuy` underneath).
+calls `Tournament::advance_level` / `Tournament::rebuy` underneath). A
+final table may end by agreement instead of cards: `tchop` splits the
+remaining pool exactly as listed (one `seat:amount` pair per survivor),
+awards places by stack with the leader first (earlier busts slide below in
+bust order), and closes the tournament — `tstatus` shows the deal shares,
+further `start` hands are refused.
 
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus tlevel trebuy sitout resume start state options act deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy tchop sitout resume start state options act deal settle log addbot bots step quit
 > start 7
 ok
 > options

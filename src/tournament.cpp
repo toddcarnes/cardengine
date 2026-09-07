@@ -164,6 +164,70 @@ void Tournament::rebuy(int seat) {
     }
 }
 
+void Tournament::chop(const std::vector<Payout>& deal) {
+    if (complete()) throw std::logic_error("tournament is over");
+    if (hand_open_ || (table_.street() != Street::None &&
+                       table_.street() != Street::Complete)) {
+        throw std::logic_error("no deals mid-hand");
+    }
+    const int n = config_.game.num_players;
+    // The survivors: everyone not already eliminated.
+    std::vector<int> survivors;
+    for (int seat = 0; seat < n; ++seat) {
+        if (!eliminated_[static_cast<std::size_t>(seat)]) survivors.push_back(seat);
+    }
+    if (survivors.size() < 2) throw std::logic_error("nobody left to deal with");
+    if (deal.size() != survivors.size()) {
+        throw std::invalid_argument("deal must cover every surviving seat");
+    }
+    std::vector<bool> seen(static_cast<std::size_t>(n), false);
+    int total = 0;
+    for (const Payout& p : deal) {
+        if (p.seat < 0 || p.seat >= n) {
+            throw std::invalid_argument("deal seat out of range");
+        }
+        if (eliminated_[static_cast<std::size_t>(p.seat)]) {
+            throw std::invalid_argument("deal covers an eliminated seat");
+        }
+        if (seen[static_cast<std::size_t>(p.seat)]) {
+            throw std::invalid_argument("deal lists a seat twice");
+        }
+        seen[static_cast<std::size_t>(p.seat)] = true;
+        if (p.amount < 0) throw std::invalid_argument("deal amounts cannot be negative");
+        total += p.amount;
+    }
+    if (total != prize_pool_ - prize_awarded_) {
+        throw std::invalid_argument("deal must split the remaining pool exactly");
+    }
+    // Places by stack, leader first; seat order breaks ties (documented).
+    // Bust-order places are recomputed: the dealers take 1..S by stack,
+    // earlier busts slide below in their bust order.
+    std::vector<int> order = survivors;
+    std::sort(order.begin(), order.end(), [&](int a, int b) {
+        if (table_.stack(a) != table_.stack(b)) return table_.stack(a) > table_.stack(b);
+        return a < b;
+    });
+    std::vector<int> busts;
+    for (int seat = 0; seat < n; ++seat) {
+        if (eliminated_[static_cast<std::size_t>(seat)]) busts.push_back(seat);
+    }
+    std::sort(busts.begin(), busts.end(), [&](int a, int b) {
+        return places_[static_cast<std::size_t>(a)] < places_[static_cast<std::size_t>(b)];
+    });
+    int place = 1;
+    for (int seat : order) {
+        eliminated_[static_cast<std::size_t>(seat)] = true;
+        places_[static_cast<std::size_t>(seat)] = place++;
+    }
+    for (int seat : busts) {
+        places_[static_cast<std::size_t>(seat)] = place++;
+    }
+    for (const Payout& p : deal) {
+        prizes_[static_cast<std::size_t>(p.seat)] = p.amount;
+        prize_awarded_ += p.amount;
+    }
+}
+
 bool Tournament::complete() const {
     int alive = 0;
     for (bool out : eliminated_) {

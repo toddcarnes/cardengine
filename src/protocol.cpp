@@ -88,7 +88,7 @@ std::string Session::execute(const std::string& raw_line) {
     try {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
-            return "ok commands: help load tload tstatus tlevel trebuy sitout resume start state options "
+            return "ok commands: help load tload tstatus tlevel trebuy tchop sitout resume start state options "
                    "act deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
@@ -159,6 +159,40 @@ std::string Session::execute(const std::string& raw_line) {
                 return "error bad seat '" + rest + "'";
             }
             tournament_->rebuy(seat);
+            return "ok";
+        }
+        if (command == "tchop") {
+            if (!tournament_) return "error no tournament loaded";
+            // tchop <seat:amount> ... — one pair per surviving seat.
+            const std::vector<std::string> args = words(rest);
+            if (args.empty()) return "error usage: tchop <seat:amount> ...";
+            std::vector<Payout> deal;
+            for (const std::string& arg : args) {
+                const std::size_t colon = arg.find(':');
+                if (colon == std::string::npos) {
+                    return "error bad deal '" + arg + "'";
+                }
+                int seat = -1;
+                int amount = -1;
+                try {
+                    std::size_t used = 0;
+                    seat = std::stoi(arg.substr(0, colon), &used);
+                    if (used != colon) throw std::invalid_argument("seat");
+                    used = 0;
+                    amount = std::stoi(arg.substr(colon + 1), &used);
+                    if (used != arg.size() - colon - 1) {
+                        throw std::invalid_argument("amount");
+                    }
+                } catch (const std::exception&) {
+                    return "error bad deal '" + arg + "'";
+                }
+                if (seat < 0 || seat >= active_table().num_seats() ||
+                    amount < 0) {
+                    return "error bad deal '" + arg + "'";
+                }
+                deal.push_back({seat, amount});
+            }
+            tournament_->chop(deal);
             return "ok";
         }
         if (command == "sitout" || command == "resume") {

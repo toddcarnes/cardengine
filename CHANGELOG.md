@@ -5,6 +5,9 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Tournaments: `tchop <seat:amount> ...` final-table deals — survivors split
+  the remaining pool exactly, places go by stack (leader first, earlier
+  busts slide below in bust order), and the tournament closes.
 - Protocol: `sitout <seat>` / `resume <seat>` park a disconnected seat
   (posts/dealt nothing from the next hand, button skips it) and bring it
   back; sitting-out seats cannot rebuy. `state` marks them with `out`.
