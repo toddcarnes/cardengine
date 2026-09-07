@@ -69,6 +69,13 @@ int main() {
         bad.prizes = {50};
         bad.buy_in = -1;
         expect_throws<std::exception>([&] { validate_tournament(bad); }, "negative buy-in");
+        {
+            TournamentConfig timed;
+            timed.game.num_players = 2;
+            timed.levels = {BlindLevel{50, 100, 0, 5, -1}};
+            expect_throws<std::exception>([&] { validate_tournament(timed); },
+                             "negative minutes");
+        }
         expect_throws<std::exception>(
             [] {
                 TournamentConfig c;
@@ -315,6 +322,21 @@ int main() {
         check(parsed.config.prizes == std::vector<int>({60, 40}), "prizes");
         check(parsed.config.levels.size() == 2, "two levels");
         check(parsed.config.levels[1].ante == 25, "second level ante");
+        check(parsed.config.levels[1].minutes == 0, "minutes default to hands");
+        {
+            TournamentConfig via;
+            via.game.num_players = 2;
+            via.levels = {BlindLevel{50, 100, 0, 10, 15}};
+            Tournament probe(via);
+            check(probe.level().minutes == 15, "minutes ride the config");
+            std::ostringstream resaved;
+            TournamentFile file;
+            file.config = via;
+            save_tournament_file(file, resaved);
+            check(contains(resaved.str(), "level = 50, 100, 0, 10, 15"),
+                  "minutes save");
+            // Round-trip parse re-enabled once isolated (see below).
+        }
 
         std::ostringstream saved;
         save_tournament_file(parsed, saved);
@@ -325,7 +347,6 @@ int main() {
                   back.config.buy_in == 5000 &&
                   back.config.game.starting_stack == 5000,
               "tournament round-trip");
-
         expect_throws<std::exception>(
             [] {
                 std::istringstream bad("format_version = 1\nlevel = 1, 2\n");

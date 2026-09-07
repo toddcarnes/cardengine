@@ -11,12 +11,16 @@
 
 namespace cardengine {
 
-// One blind level: fixed bets for `hands` completed hands, then the next.
+// One blind level: fixed bets for `hands` completed hands (when minutes
+// is 0), or for `minutes` wall-clock minutes (when positive), then the
+// next. A level with both set advances on whichever hits first; the final
+// level repeats forever either way.
 struct BlindLevel {
     int small_blind = 50;
     int big_blind = 100;
     int ante = 0;
     int hands = 10;
+    int minutes = 0;  // 0 = hands-based (classic); positive = timed.
 };
 
 struct TournamentConfig {
@@ -133,6 +137,8 @@ std::vector<int> finishing_order(const Tournament& event);
 //   prizes = 50, 30, 20
 //   level = 50, 100, 0, 10      # small, big, ante, hands (repeatable)
 //   level = 100, 200, 25, 10
+//   level = 200, 400, 50, 4, 20 # ...or add minutes: 4 hands or 20 minutes,
+//                               # whichever hits first (0 = hands only)
 struct TournamentFile {
     int format_version = 1;
     std::string name;

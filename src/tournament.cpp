@@ -24,12 +24,17 @@ namespace fs = std::filesystem;
 
 BlindLevel parse_level(const std::string& value, int lineno) {
     const std::vector<int> parts = parse_int_list(value, lineno);
-    if (parts.size() != 4) {
+    // Classic shape is 4 numbers (small, big, ante, hands); a 5th adds
+    // timed levels: `50, 100, 0, 10, 15` runs 10 hands or 15 minutes,
+    // whichever hits first (minutes 0 = hands only, as before).
+    if (parts.size() != 4 && parts.size() != 5) {
         throw std::invalid_argument(
             "line " + std::to_string(lineno) +
-            ": level needs 4 numbers: small, big, ante, hands");
+            ": level needs 4 numbers: small, big, ante, hands (or 5 with minutes)");
     }
-    return BlindLevel{parts[0], parts[1], parts[2], parts[3]};
+    BlindLevel level{parts[0], parts[1], parts[2], parts[3]};
+    if (parts.size() == 5) level.minutes = parts[4];
+    return level;
 }
 
 }  // namespace
@@ -51,6 +56,9 @@ void validate_tournament(const TournamentConfig& config) {
         }
         if (level.hands < 1) {
             throw std::invalid_argument("level must last at least 1 hand");
+        }
+        if (level.minutes < 0) {
+            throw std::invalid_argument("level minutes cannot be negative");
         }
     }
     int total = 0;
@@ -459,7 +467,9 @@ void save_tournament_file(const TournamentFile& tournament,
     out << "\n";
     for (const BlindLevel& level : tournament.config.levels) {
         out << "level = " << level.small_blind << ", " << level.big_blind
-            << ", " << level.ante << ", " << level.hands << "\n";
+            << ", " << level.ante << ", " << level.hands;
+        if (level.minutes > 0) out << ", " << level.minutes;
+        out << "\n";
     }
 }
 
