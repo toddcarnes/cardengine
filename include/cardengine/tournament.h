@@ -37,8 +37,10 @@ void validate_tournament(const TournamentConfig& config);
 // A freezeout (or rebuy) tournament above Table: escalating levels,
 // eliminations with finishing places, prize accounting. Table still plays
 // the hands; this director only sets blinds, counts hands, and settles
-// the books at settle time. Time-based level changes are the GUI's job
-// (it calls advance_level); hands-based ones are automatic.
+// the books at settle time. Hands-based level changes are automatic;
+// timed levels advance on the host's clock (it hands the engine stamps via
+// begin_hand_at/finish_hand_at, or plain begin_hand/finish_hand to read
+// the wall clock itself). Manual tlevel jumps still work underneath.
 class Tournament {
 public:
     explicit Tournament(const TournamentConfig& config);
@@ -49,15 +51,37 @@ public:
 
     // Starts a hand at the current level's blinds (Table rejects mid-hand
     // starts as usual). Throws std::logic_error when one player remains.
+    // Stamps the level clock at `now` (seconds, see clock.h); the plain
+    // form reads the wall clock.
     void begin_hand(std::uint64_t seed);
+    void begin_hand_at(std::uint64_t seed, std::int64_t now);
     void begin_hand_from_deck(std::vector<Card> top_first);
+    void begin_hand_from_deck_at(std::vector<Card> top_first, std::int64_t now);
 
     // Books a settled hand: eliminations, prizes, level progress.
     // Throws std::logic_error unless the table hand is settled and unbooked.
+    // Stamps `now` for timed-level accounting; the plain form reads the
+    // wall clock.
     void finish_hand();
+    void finish_hand_at(std::int64_t now);
 
     // Manual level advance for GUI clocks. Sticks at the final level.
+    // The plain form stamps the wall clock; _at takes an injected stamp
+    // (tests, hosts with their own clock).
     void advance_level();
+    void advance_level_at(std::int64_t now);
+
+    // Timed-level clock. Seconds until the current level ends (-1 when the
+    // level is hands-based or already final). Hosts poll this to ring the
+    // bell; the engine advances the level at the next begin/finish (never
+    // mid-hand). The plain form reads the wall clock.
+    std::int64_t level_seconds_left(std::int64_t now) const;
+    std::int64_t level_seconds_left() const;
+    // Applies any due timed advance now (between hands only). Returns true
+    // when the level moved. Hosts call this on their timer tick; dealing
+    // paths call it internally, so a sleeping host still advances on time.
+    bool advance_level_if_due(std::int64_t now);
+    bool advance_level_if_due();
 
     // Adds starting_stack chips for another buy_in into the pool.
     // Between hands only; clears an elimination (with its recorded prize).
@@ -70,6 +94,7 @@ public:
         int button = 0;
         int level_index = 0;
         int hands_into_level = 0;
+        std::int64_t level_elapsed = 0;  // Seconds banked in this level.
         int prize_pool = 0;
         int prize_awarded = 0;
         std::vector<bool> eliminated;
@@ -97,6 +122,8 @@ public:
     int level_index() const { return level_index_; }
     BlindLevel level() const { return config_.levels[static_cast<std::size_t>(level_index_)]; }
     int hands_into_level() const { return hands_into_level_; }
+    // Seconds banked in the current level (timed levels). Resets on entry.
+    std::int64_t level_elapsed() const { return level_elapsed_; }
     int prize_pool() const { return prize_pool_; }
 
     struct Standing {
@@ -113,6 +140,8 @@ private:
     Table table_;
     int level_index_ = 0;
     int hands_into_level_ = 0;
+    std::int64_t level_started_at_ = 0;  // Stamp of the current level's start.
+    std::int64_t level_elapsed_ = 0;     // Banked seconds (across save/load).
     int prize_pool_ = 0;
     int prize_awarded_ = 0;
     bool hand_open_ = false;  // A dealt hand awaits finish_hand().

@@ -5,6 +5,7 @@
 #include "cardengine/bot_runner.h"
 #include "cardengine/card.h"
 #include "cardengine/championship.h"
+#include "cardengine/clock.h"
 #include "cardengine/config.h"
 #include "cardengine/deck.h"
 #include "cardengine/event.h"

@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "cardengine/clock.h"
 #include "cardengine/detail/kv.h"
 #include "cardengine/game_file.h"
 
@@ -84,10 +85,17 @@ Tournament::Tournament(const TournamentConfig& config)
     places_.assign(static_cast<std::size_t>(n), 0);
     prizes_.assign(static_cast<std::size_t>(n), 0);
     prize_pool_ = config_.buy_in * n;
+    level_started_at_ = now_seconds();
 }
 
 void Tournament::begin_hand(std::uint64_t seed) {
+    begin_hand_at(seed, now_seconds());
+}
+
+void Tournament::begin_hand_at(std::uint64_t seed, std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
+    advance_level_if_due(now);
+    level_started_at_ = now;
     const BlindLevel current = level();
     table_.set_blinds(current.small_blind, current.big_blind);
     table_.set_ante(current.ante);
@@ -96,7 +104,14 @@ void Tournament::begin_hand(std::uint64_t seed) {
 }
 
 void Tournament::begin_hand_from_deck(std::vector<Card> top_first) {
+    begin_hand_from_deck_at(std::move(top_first), now_seconds());
+}
+
+void Tournament::begin_hand_from_deck_at(std::vector<Card> top_first,
+                                         std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
+    advance_level_if_due(now);
+    level_started_at_ = now;
     const BlindLevel current = level();
     table_.set_blinds(current.small_blind, current.big_blind);
     table_.set_ante(current.ante);
@@ -104,13 +119,22 @@ void Tournament::begin_hand_from_deck(std::vector<Card> top_first) {
     hand_open_ = true;
 }
 
-void Tournament::finish_hand() {
+void Tournament::finish_hand() { finish_hand_at(now_seconds()); }
+
+void Tournament::finish_hand_at(std::int64_t now) {
     if (!hand_open_) {
         throw std::logic_error("no open hand to finish");
     }
     if (table_.street() != Street::Complete) {
         throw std::logic_error("settle the hand first");
     }
+    // Elapsed clock time counts per completed hand (banked here, so a
+    // save/load between hands loses nothing). Timed expiry itself waits
+    // for the next begin (never mid-hand).
+    if (now >= level_started_at_) {
+        level_elapsed_ += now - level_started_at_;
+    }
+    level_started_at_ = now;
     const int n = config_.game.num_players;
     for (int seat = 0; seat < n; ++seat) {
         if (eliminated_[static_cast<std::size_t>(seat)]) continue;
@@ -138,15 +162,52 @@ void Tournament::finish_hand() {
         level_index_ + 1 < static_cast<int>(config_.levels.size())) {
         ++level_index_;
         hands_into_level_ = 0;
+        level_elapsed_ = 0;
+        level_started_at_ = now;
     }
     hand_open_ = false;
 }
 
 void Tournament::advance_level() {
+    advance_level_at(now_seconds());
+}
+
+void Tournament::advance_level_at(std::int64_t now) {
     if (level_index_ + 1 < static_cast<int>(config_.levels.size())) {
         ++level_index_;
         hands_into_level_ = 0;
+        level_elapsed_ = 0;
+        level_started_at_ = now;
     }
+}
+
+std::int64_t Tournament::level_seconds_left(std::int64_t now) const {
+    const BlindLevel& current = level();
+    if (current.minutes <= 0) return -1;
+    if (level_index_ + 1 >= static_cast<int>(config_.levels.size())) return -1;
+    std::int64_t banked = level_elapsed_;
+    if (now >= level_started_at_) banked += now - level_started_at_;
+    const std::int64_t budget = static_cast<std::int64_t>(current.minutes) * 60;
+    return budget > banked ? budget - banked : 0;
+}
+
+std::int64_t Tournament::level_seconds_left() const {
+    return level_seconds_left(now_seconds());
+}
+
+bool Tournament::advance_level_if_due(std::int64_t now) {
+    if (hand_open_ || (table_.street() != Street::None &&
+                       table_.street() != Street::Complete)) {
+        return false;  // Mid-hand: the next begin/finish applies it.
+    }
+    if (level_seconds_left(now) != 0) return false;
+    const int before = level_index_;
+    advance_level_at(now);
+    return level_index_ != before;
+}
+
+bool Tournament::advance_level_if_due() {
+    return advance_level_if_due(now_seconds());
 }
 
 void Tournament::rebuy(int seat) {
@@ -185,6 +246,7 @@ Tournament::Snapshot Tournament::snapshot() const {
     saved.button = felt.button;
     saved.level_index = level_index_;
     saved.hands_into_level = hands_into_level_;
+    saved.level_elapsed = level_elapsed_;
     saved.prize_pool = prize_pool_;
     saved.prize_awarded = prize_awarded_;
     saved.eliminated = eliminated_;
@@ -209,8 +271,8 @@ void Tournament::restore(const Snapshot& saved) {
     }
     if (saved.level_index < 0 ||
         saved.level_index >= static_cast<int>(saved.config.levels.size()) ||
-        saved.hands_into_level < 0 || saved.prize_pool < 0 ||
-        saved.prize_awarded < 0) {
+        saved.hands_into_level < 0 || saved.level_elapsed < 0 ||
+        saved.prize_pool < 0 || saved.prize_awarded < 0) {
         throw std::invalid_argument("snapshot books out of range");
     }
     config_ = saved.config;
@@ -227,6 +289,8 @@ void Tournament::restore(const Snapshot& saved) {
     table_.set_ante(current.ante);
     level_index_ = saved.level_index;
     hands_into_level_ = saved.hands_into_level;
+    level_elapsed_ = saved.level_elapsed;
+    level_started_at_ = now_seconds();  // Fresh boot: clock restarts here.
     prize_pool_ = saved.prize_pool;
     prize_awarded_ = saved.prize_awarded;
     eliminated_ = saved.eliminated;

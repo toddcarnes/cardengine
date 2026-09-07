@@ -133,6 +133,49 @@ int main() {
             "finishing order before complete");
     }
 
+    // Timed levels bank wall time per hand and fire at the next deal.
+    {
+        TournamentConfig config;
+        config.game.num_players = 2;
+        config.levels = {BlindLevel{50, 100, 0, 100, 10},
+                         BlindLevel{100, 200, 0, 100, 0}};
+        Tournament timed(config);
+        timed.begin_hand_at(1, 1000);
+        check(timed.level_seconds_left(1000) == 600, "ten minutes ahead");
+        play_out(timed.table());
+        timed.finish_hand_at(1090);
+        check(timed.level_elapsed() == 90, "elapsed banked");
+        check(timed.level_seconds_left(1090) == 510, "countdown runs");
+        timed.begin_hand_at(2, 1600);
+        check(timed.level_index() == 1, "clock fires at the deal");
+        check(timed.level_elapsed() == 0, "clock resets on entry");
+        play_out(timed.table());
+        timed.finish_hand_at(1700);
+        check(timed.hands_into_level() == 1, "hands still count");
+        check(timed.level_seconds_left(1700) == -1, "final level never due");
+        // Due polling never fires mid-hand.
+        TournamentConfig quick;
+        quick.game.num_players = 2;
+        quick.levels = {BlindLevel{50, 100, 0, 100, 1},
+                        BlindLevel{100, 200, 0, 100, 0}};
+        Tournament race(quick);
+        race.begin_hand_at(7, 5000);
+        check(!race.advance_level_if_due(6000), "no advance mid-hand");
+        check(race.level_index() == 0, "level waits for the boundary");
+        play_out(race.table());
+        race.finish_hand_at(6000);
+        check(race.level_index() == 0, "hands clock still level 0");
+        // Snapshot carries the banked clock; restore resumes it.
+        const Tournament::Snapshot books = timed.snapshot();
+        check(books.level_elapsed == 100, "snapshot banks the clock");
+        TournamentConfig other;
+        other.game.num_players = 2;
+        Tournament resumed(other);
+        resumed.restore(books);
+        check(resumed.level_elapsed() == 100, "clock survives restore");
+        check(resumed.level_index() == 1, "level survives restore");
+    }
+
     // Busts take places and prizes; the champion takes the remainder.
     {
         TournamentConfig config;
