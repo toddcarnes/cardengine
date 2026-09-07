@@ -77,12 +77,18 @@ struct SeatView {
     int max_raise_to = 0;
     // Table position: clockwise distance from the button (0 = button, the
     // best seat). Heuristics use it to tighten early and loosen late.
+    // (Stud opens by hand strength, so position matters less there.)
     int position = -1;
     int num_seats = 0;
     // Draw games: most cards this seat may exchange (GameConfig max_draw).
     int max_draw = 5;
     // Draw games: true once this seat has taken its exchange this hand.
     bool drew = false;
+    // Stud: face-up cards (own plus every live rival's — public, like the
+    // board) and the shared river card when 8-handed play overflowed.
+    std::vector<Card> up;
+    std::vector<std::vector<Card>> rival_up;
+    std::vector<Card> community;
     // Hand-construction rule for made-hand evaluation (Omaha bots must use
     // exactly 2 from hand; holdem bots use best-any-five).
     HandConstruction showdown = HandConstruction::BestFiveOfAll;

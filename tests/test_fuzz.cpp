@@ -254,6 +254,28 @@ int main() {
     deuce.showdown = HandConstruction::DeuceSeven;
     fuzz_config(deuce, "deuce6", 60);
 
+    GameConfig stud;
+    stud.num_players = 4;
+    stud.hole_cards = 7;
+    stud.board_cards = 0;
+    stud.showdown = HandConstruction::StudSeven;
+    stud.upcards = 4;
+    stud.bring_in = 10;
+    stud.ante = 10;
+    stud.betting = BettingStructure::Limit;
+    fuzz_config(stud, "stud4", 60);
+
+    GameConfig stud8;
+    stud8.num_players = 8;
+    stud8.hole_cards = 7;
+    stud8.board_cards = 0;
+    stud8.showdown = HandConstruction::StudSeven;
+    stud8.upcards = 4;
+    stud8.bring_in = 10;
+    stud8.ante = 10;
+    stud8.betting = BettingStructure::Limit;
+    fuzz_config(stud8, "stud8", 30);
+
     if (failures == 0) std::cout << "test_fuzz ok\n";
     return failures == 0 ? 0 : 1;
 }

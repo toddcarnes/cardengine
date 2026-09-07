@@ -52,7 +52,7 @@ this project is called CardEngine.)
 ## State block
 
 ```
-street preflop|draw|flop|turn|river|none|complete
+street preflop|draw|flop|turn|river|third|fourth|fifth|sixth|seventh|none|complete
 showdown holdem|omaha|omaha_hilo|stud|draw|deuce
 button <seat>
 acting <seat|-1>
@@ -62,8 +62,9 @@ current <highest total bet this round>
 board -|<cards...>
 max_draw <n> (draw games only: most cards a seat may exchange)
 draws -|<seats...> (draw street turn order, button-out)
-seat <i> stack <s> bet <b> committed <c> in|out live|folded hole <cards...|-->
+seat <i> stack <s> bet <b> committed <c> in|out live|folded hole <cards...|--> [up <cards...|-->] (stud only)
 ... (one line per seat)
+community -|<card> (stud only: the shared river card when 8-handed play overflows the shoe)
 end
 ```
 
@@ -73,6 +74,16 @@ exchanges in turn (`discard As Td`, bare `discard` stands pat, at most
 (no board is ever dealt). `deal` advances into and out of the draw street;
 during it `acting` is `-1`, `options`/`act`/`timeout` are refused, and
 `deal` itself waits until `draws` is empty.
+
+Stud games run five streets (`third` through `seventh`): third deals 2
+down + 1 up with the low door card's bring-in opening left of it, fourth
+through sixth add one up card each with the best visible hand opening,
+seventh adds one down card (or a single shared `community` up card when
+the shoe runs dry 8-handed). `hole` carries down cards (owner-only), `up`
+carries face-up cards (public — every live seat's shown, like the board).
+`deal` advances street by street; the log records each round as
+`stud <street> <ups...>` (`stud seventh community Qh` for the shared
+river, bare `stud seventh` for down cards).
 
 `acting_since` is the action-clock start (seconds on the engine's monotonic
 clock, `-1` when nobody holds the action). A host enforces its own limit —
@@ -152,7 +163,7 @@ to standard Hold'em defaults: `name`, `description`, `num_players`,
 `starting_stack`, `small_blind`, `big_blind`, `ante`, `hole_cards`,
 `board_cards`, `betting = nolimit|limit|potlimit`,
 `showdown = holdem|omaha` (exactly 2+3)`|omaha_hilo` (high/low split, 8-or-better)`|draw` (5 cards + one exchange, best five wins)`|deuce` (same deal,
-2-7 lowball: worst hand wins, straights and flushes count against), `max_draw` (draw cap 1–5), `max_raises` (limit cap). Unknown keys, bad values,
+2-7 lowball: worst hand wins, straights and flushes count against)`|stud` (7 cards street-by-street, 4 up, best five of 7 wins), `max_draw` (draw cap 1–5), `max_raises` (limit cap). Unknown keys, bad values,
 and rule combinations the engine can't run are rejected with a line number —
 a friend's hand-edited file can error, never corrupt a game. Full key
 reference (mandatory vs optional, defaults, effects): `docs/CONFIG_FILES.md`.
@@ -207,7 +218,7 @@ settle showdown yes payouts 0:300 committed 200,100
 - `begin_hand`: pre-hand stacks, the seed (`-` for from-deck testing deals),
   and dealt hole cards per seat (`|`-separated, positionally).
 - `action`: seat, action, and pot after the action.
-- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards).
+- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards; stud games log each round as `stud <street> <ups...>`, with `stud seventh community Qh` for the shared river and bare `stud seventh` for down cards).
 - `draw`: one seat's exchange as counts, never cards (`draw 1 drew 3`, `draw 0 drew 0` for pat) — discards stay private like folded hands.
 - `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
   (pot accounting for analysis and learning bots). Never contains hole cards —

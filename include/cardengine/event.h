@@ -39,6 +39,22 @@ struct StreetDealtEvent {
     std::vector<Card> cards;  // Only the newly dealt cards.
 };
 
+// One stud card per live seat (or a single shared river card 8-handed).
+// Up cards are public — every seat's card is listed — so GUI replay and
+// per-seat filters can show exactly what the table saw. Down cards never
+// appear here (they ride in HandStarted and stay private).
+struct StudDealtEvent {
+    Street street = Street::Fourth;
+    bool face_up = true;
+    bool community = false;  // True: `cards` is the shared river card.
+    std::vector<Card> cards;  // Face-up cards in seat order (community: 1).
+    struct SeatCard {
+        int seat = -1;
+        Card card{};
+    };
+    std::vector<SeatCard> per_seat;  // Seat-by-seat deal order.
+};
+
 // One seat's exchange in a five-card draw game: the count thrown away
 // (and replaced off the top of the shoe). Counts are public — a real
 // table sees how many you draw — but the card identities stay private:
@@ -74,8 +90,9 @@ struct TimeoutEvent {
 };
 
 using Event = std::variant<HandStartedEvent, ActionTakenEvent,
-                           StreetDealtEvent, DrawEvent, RunoutDealtEvent,
-                           HandSettledEvent, TimeoutEvent>;
+                           StreetDealtEvent, StudDealtEvent, DrawEvent,
+                           RunoutDealtEvent, HandSettledEvent,
+                           TimeoutEvent>;
 
 const char* event_name(const Event& event);
 

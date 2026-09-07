@@ -10,6 +10,7 @@ const char* event_name(const Event& event) {
     if (std::holds_alternative<HandStartedEvent>(event)) return "begin_hand";
     if (std::holds_alternative<ActionTakenEvent>(event)) return "action";
     if (std::holds_alternative<StreetDealtEvent>(event)) return "street";
+    if (std::holds_alternative<StudDealtEvent>(event)) return "stud";
     if (std::holds_alternative<DrawEvent>(event)) return "draw";
     if (std::holds_alternative<RunoutDealtEvent>(event)) return "runout";
     if (std::holds_alternative<TimeoutEvent>(event)) return "timeout";
@@ -37,6 +38,11 @@ std::string street_name(Street street) {
         case Street::Turn: return "turn";
         case Street::River: return "river";
         case Street::Complete: return "complete";
+        case Street::Third: return "third";
+        case Street::Fourth: return "fourth";
+        case Street::Fifth: return "fifth";
+        case Street::Sixth: return "sixth";
+        case Street::Seventh: return "seventh";
     }
     return "?";  // Unreachable; keeps /W4 happy.
 }
@@ -77,6 +83,14 @@ std::string format_event(const Event& event) {
     }
     if (const auto* e = std::get_if<StreetDealtEvent>(&event)) {
         out << "street " << street_name(e->street);
+        for (const Card& c : e->cards) out << " " << to_string(c);
+        return out.str();
+    }
+    if (const auto* e = std::get_if<StudDealtEvent>(&event)) {
+        // Up cards are public: seat order for face-up rounds, the shared
+        // card for a community river. Down seventh streets log no cards.
+        out << "stud " << street_name(e->street);
+        if (e->community) out << " community";
         for (const Card& c : e->cards) out << " " << to_string(c);
         return out.str();
     }
@@ -164,6 +178,11 @@ Street parse_street_name(const std::string& text) {
     if (text == "turn") return Street::Turn;
     if (text == "river") return Street::River;
     if (text == "draw") return Street::Draw;
+    if (text == "third") return Street::Third;
+    if (text == "fourth") return Street::Fourth;
+    if (text == "fifth") return Street::Fifth;
+    if (text == "sixth") return Street::Sixth;
+    if (text == "seventh") return Street::Seventh;
     throw std::invalid_argument("bad street '" + text + "'");
 }
 
@@ -276,6 +295,29 @@ Event parse_event(const std::string& line, const GameConfig& config) {
                                             toks[i] + "'");
             }
         }
+        return e;
+    }
+    if (toks[0] == "stud") {
+        // `stud <street> [community] <cards...>`: face-up cards in seat
+        // order, or the one shared river card. Down seventh streets log
+        // bare (`stud seventh`).
+        if (toks.size() < 2) throw std::invalid_argument("short stud event");
+        StudDealtEvent e;
+        std::size_t rest = 2;
+        e.street = parse_street_name(toks[1]);
+        if (rest < toks.size() && toks[rest] == "community") {
+            e.community = true;
+            ++rest;
+        }
+        for (std::size_t i = rest; i < toks.size(); ++i) {
+            try {
+                e.cards.push_back(parse_card(toks[i]));
+            } catch (const std::exception&) {
+                throw std::invalid_argument(std::string("bad card '") +
+                                            toks[i] + "'");
+            }
+        }
+        e.face_up = !e.cards.empty() || e.community;
         return e;
     }
     if (toks[0] == "timeout") {

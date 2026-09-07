@@ -5,7 +5,15 @@
 namespace cardengine {
 
 void validate(const GameConfig& config) {
-    if (config.num_players < 2 || config.num_players > 10) {
+    // Seat count first: stud caps at 8 (the standard full table), every
+    // other variant at 10. (Stud's 8 × 7 = 56 exceeds one deck, but stud
+    // deals street-by-street with a community-river fallback — validated
+    // in the stud branch below, not by the generic deck math.)
+    if (config.showdown == HandConstruction::StudSeven) {
+        if (config.num_players < 2 || config.num_players > 8) {
+            throw std::invalid_argument("stud needs 2..8 players");
+        }
+    } else if (config.num_players < 2 || config.num_players > 10) {
         throw std::invalid_argument("num_players must be 2..10");
     }
     if (config.starting_stack < 1) {
@@ -68,13 +76,26 @@ void validate(const GameConfig& config) {
                 "omaha showdown needs hole_cards 4 and board_cards 5");
         }
     } else if (config.showdown == HandConstruction::StudSeven) {
-        // Seven-card stud: 7 private cards (3 down, 4 up), no board.
+        // Seven-card stud: dealt street-by-street (2 down + 1 up, 3 more
+        // up, river down), so the deck only needs third street up front.
+        // Full-table worst case (8 × 7 = 56) exceeds one deck — but folds
+        // shrink demand each street, and a short seventh street plays one
+        // shared up card instead of one per seat, so 8-max is legal.
         if (config.hole_cards != 7 || config.board_cards != 0) {
             throw std::invalid_argument(
                 "stud showdown needs hole_cards 7 and board_cards 0");
         }
         if (config.upcards != 4) {
             throw std::invalid_argument("stud needs upcards 4");
+        }
+        if (config.runouts != 1) {
+            throw std::invalid_argument("stud cannot run it twice");
+        }
+        if (config.straddle != 0) {
+            throw std::invalid_argument("stud has no straddle");
+        }
+        if (config.kill) {
+            throw std::invalid_argument("stud has no kill");
         }
         if (config.bring_in < 0) {
             throw std::invalid_argument("bring_in cannot be negative");
@@ -110,7 +131,8 @@ void validate(const GameConfig& config) {
                 "hole_cards + board_cards must be 5..7 for best-5 showdown");
         }
     }
-    if (config.num_players * config.hole_cards + config.board_cards > 52) {
+    if (config.showdown != HandConstruction::StudSeven &&
+        config.num_players * config.hole_cards + config.board_cards > 52) {
         throw std::invalid_argument("not enough cards in the deck");
     }
     if (config.board_cards == 0 && config.runouts != 1) {

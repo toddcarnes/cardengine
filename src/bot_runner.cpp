@@ -59,6 +59,11 @@ Street parse_street(const std::string& text) {
     if (text == "river") return Street::River;
     if (text == "complete") return Street::Complete;
     if (text == "none") return Street::None;
+    if (text == "third") return Street::Third;
+    if (text == "fourth") return Street::Fourth;
+    if (text == "fifth") return Street::Fifth;
+    if (text == "sixth") return Street::Sixth;
+    if (text == "seventh") return Street::Seventh;
     throw std::invalid_argument("bad street '" + text + "'");
 }
 
@@ -122,12 +127,24 @@ std::string decide_from_text(Bot& bot, int seat,
             for (std::size_t i = 0; i + 1 < toks.size(); ++i) {
                 if (toks[i] == "hole") {
                     hole_seen = true;
+                    // Down cards run to `up` (stud) or the line end; `--`
+                    // means hidden (another seat's filtered view — but this
+                    // branch only runs for our own seat line, so `--` here
+                    // is malformed).
                     for (std::size_t k = i + 1; k < toks.size(); ++k) {
+                        if (toks[k] == "up") break;
                         if (toks[k] == "--") {
                             throw std::invalid_argument(
                                 "own hole cards are hidden");
                         }
                         view.hole.push_back(parse_card(toks[k]));
+                    }
+                } else if (toks[i] == "up") {
+                    // Stud up cards are public; `--` means none yet (or a
+                    // folded seat's hidden board — not ours, but tolerate).
+                    for (std::size_t k = i + 1; k < toks.size(); ++k) {
+                        if (toks[k] == "--") continue;
+                        view.up.push_back(parse_card(toks[k]));
                     }
                 }
             }
@@ -135,6 +152,11 @@ std::string decide_from_text(Bot& bot, int seat,
                 throw std::invalid_argument("own hole cards are missing");
             }
             saw_seat = true;
+        } else if (toks[0] == "community" && toks.size() >= 2) {
+            for (std::size_t i = 1; i < toks.size(); ++i) {
+                if (toks[i] == "-") continue;
+                view.community.push_back(parse_card(toks[i]));
+            }
         }
     }
     if (!saw_street || !saw_board || !saw_pot || !saw_current || !saw_seat) {

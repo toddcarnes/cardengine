@@ -64,6 +64,11 @@ std::string street_name(Street street) {
         case Street::Turn: return "turn";
         case Street::River: return "river";
         case Street::Complete: return "complete";
+        case Street::Third: return "third";
+        case Street::Fourth: return "fourth";
+        case Street::Fifth: return "fifth";
+        case Street::Sixth: return "sixth";
+        case Street::Seventh: return "seventh";
     }
     return "?";  // Unreachable; keeps /W4 happy.
 }
@@ -531,10 +536,13 @@ std::string Session::execute(const std::string& raw_line) {
 }
 
 std::string Session::do_state(int view_seat) const {
+    const Table& table = active_table();
+    const bool is_stud =
+        table.config().showdown == HandConstruction::StudSeven;
     std::ostringstream out;
-    out << "street " << street_name(active_table().street()) << "\n";
+    out << "street " << street_name(table.street()) << "\n";
     out << "showdown ";
-    switch (active_table().config().showdown) {
+    switch (table.config().showdown) {
         case HandConstruction::BestFiveOfAll: out << "holdem"; break;
         case HandConstruction::OmahaTwoAndThree: out << "omaha"; break;
         case HandConstruction::OmahaHiLo: out << "omaha_hilo"; break;
@@ -543,25 +551,25 @@ std::string Session::do_state(int view_seat) const {
         case HandConstruction::DeuceSeven: out << "deuce"; break;
     }
     out << "\n";
-    out << "button " << active_table().button() << "\n";
-    out << "acting " << active_table().acting() << "\n";
-    out << "acting_since " << active_table().acting_since() << "\n";
-    out << "pot " << active_table().pot_total() << "\n";
-    out << "current " << active_table().current_bet() << "\n";
+    out << "button " << table.button() << "\n";
+    out << "acting " << table.acting() << "\n";
+    out << "acting_since " << table.acting_since() << "\n";
+    out << "pot " << table.pot_total() << "\n";
+    out << "current " << table.current_bet() << "\n";
     out << "board";
-    if (active_table().board().empty()) {
+    if (table.board().empty()) {
         out << " -";
     } else {
-        for (const Card& c : active_table().board()) out << " " << to_string(c);
+        for (const Card& c : table.board()) out << " " << to_string(c);
     }
     out << "\n";
-    if (active_table().config().showdown == HandConstruction::DrawFive ||
-        active_table().config().showdown == HandConstruction::DeuceSeven) {
-        out << "max_draw " << active_table().config().max_draw << "\n";
+    if (table.config().showdown == HandConstruction::DrawFive ||
+        table.config().showdown == HandConstruction::DeuceSeven) {
+        out << "max_draw " << table.config().max_draw << "\n";
     }
     // Draw games: who still owes the exchange (turn order from the button).
     {
-        const std::vector<int> pending = active_table().draws_pending();
+        const std::vector<int> pending = table.draws_pending();
         out << "draws";
         if (pending.empty()) {
             out << " -";
@@ -570,23 +578,47 @@ std::string Session::do_state(int view_seat) const {
         }
         out << "\n";
     }
-    for (int i = 0; i < active_table().num_seats(); ++i) {
-        out << "seat " << i << " stack " << active_table().stack(i) << " bet "
-            << active_table().bet(i) << " committed " << active_table().committed(i) << " "
-            << (active_table().in_hand(i) ? "in" : "out") << " "
-            << (active_table().has_folded(i) ? "folded" : "live")
-            << (active_table().sitting_out(i) ? " out" : "") << " hole";
-        // Filtered views hide every other seat's cards; bare `state` is the
-        // local-trust full dump. Folded and out seats always show `--`.
-        const bool show =
-            active_table().in_hand(i) && !active_table().has_folded(i) &&
-            (view_seat < 0 || view_seat == i);
+    for (int i = 0; i < table.num_seats(); ++i) {
+        out << "seat " << i << " stack " << table.stack(i) << " bet "
+            << table.bet(i) << " committed " << table.committed(i) << " "
+            << (table.in_hand(i) ? "in" : "out") << " "
+            << (table.has_folded(i) ? "folded" : "live")
+            << (table.sitting_out(i) ? " out" : "") << " hole";
+        // Filtered views hide every other seat's down cards; bare `state`
+        // is the local-trust full dump. Folded and out seats show `--`.
+        // Stud appends `up` with face-up cards (public — shown for every
+        // live seat, like the board).
+        const bool show = table.in_hand(i) && !table.has_folded(i) &&
+                          (view_seat < 0 || view_seat == i);
         if (show) {
-            for (const Card& c : active_table().hole_cards(i)) {
+            for (const Card& c : table.hole_cards(i)) {
                 out << " " << to_string(c);
             }
         } else {
             out << " --";
+        }
+        if (is_stud) {
+            out << " up";
+            const bool show_up =
+                table.in_hand(i) && !table.has_folded(i);
+            if (show_up && !table.up_cards(i).empty()) {
+                for (const Card& c : table.up_cards(i)) {
+                    out << " " << to_string(c);
+                }
+            } else {
+                out << " --";
+            }
+        }
+        out << "\n";
+    }
+    if (is_stud) {
+        out << "community";
+        if (table.community().empty()) {
+            out << " -";
+        } else {
+            for (const Card& c : table.community()) {
+                out << " " << to_string(c);
+            }
         }
         out << "\n";
     }

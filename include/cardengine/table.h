@@ -8,6 +8,7 @@
 
 #include "cardengine/card.h"
 #include "cardengine/config.h"
+#include "cardengine/deck.h"
 #include "cardengine/event.h"
 #include "cardengine/hand.h"
 #include "cardengine/types.h"
@@ -56,9 +57,18 @@ public:
 
     const std::vector<Card>& board() const { return board_; }
     const std::vector<Card>& hole_cards(int seat) const;
+    // Stud only: face-up cards in deal order (empty for other variants).
+    const std::vector<Card>& up_cards(int seat) const;
+    // Stud river overflow: a single shared up card when the shoe runs dry
+    // 8-handed (empty otherwise). Plays in every remaining hand, like a
+    // one-card board that is also public.
+    const std::vector<Card>& community() const { return community_; }
     bool in_hand(int seat) const;
     bool has_folded(int seat) const;
     bool is_all_in(int seat) const;
+    // Stud only: the third-street bring-in seat (-1 outside stud).
+    // Recomputed live from visible upcards (folds don't change it).
+    int bring_in_seat() const;
     // Draw games: true once the seat has taken its exchange this hand.
     bool drew(int seat) const;
     int bet(int seat) const;        // Committed this round.
@@ -149,19 +159,48 @@ private:
         bool sitting_out = false;  // Operator flag: skips future hands.
         bool drew = false;  // Draw games: exchange taken this hand.
         int seen_seq = 0;  // Raise generation this seat has responded to.
-        std::vector<Card> hole;
+        std::vector<Card> hole;  // Down cards (private).
+        std::vector<Card> up;    // Up cards (public, stud only).
     };
 
     void check_seat(int seat) const;
     int next_in_hand(int from) const;  // Next participating seat at/after from.
+    // Next live (unfolded) seat at/after from; used for stud opening order.
+    int next_live(int from) const;
     bool can_act(int seat) const;      // In hand, not folded, has chips.
     bool needs_action(int seat) const;
     void advance_acting(int from);
+    // Stud betting order: third street opens after the bring-in seat (the
+    // bring-in posts first, action starts left of them); later streets
+    // open on the best visible hand (ties broken clockwise from the
+    // button). Live-only: folded and all-in seats never open.
+    int stud_opener() const;
     void post_blind(int seat, int amount);
+    // Stud up-ranks for action order: high card by rank, then suit
+    // (spades > hearts > diamonds > clubs — the classic bring-in/high
+    // tiebreak suits, used for ordering only, never for showdown).
+    int stud_high_score(int seat) const;
+    int stud_low_score(int seat) const;
+    // Third-street deal + bring-in: 2 down + 1 up per participant (button-
+    // out), antes, then the low upcard's forced bet; action opens left of
+    // it. Deck-backed (shuffled) and shoe-backed (testing seam) halves.
+    void deal_stud_third(Deck& deck);
+    void deal_stud_third_from_shoe();
+    void post_stud_bring_in();
+    void post_stud_antes();
+    void post_stud_forced();
+    // One stud card to every live seat (up when face_up, else down).
+    // Seventh street goes community when the shoe would run dry: a single
+    // shared up card on community_ instead of one per seat.
+    void deal_stud_round(bool face_up, Street street);
+    Card take_card(Deck* deck);
     // Forced bets for the new hand: antes, blinds, straddle. Returns the
     // straddle seat (or -1): preflop action starts after it.
     int post_forced_bets(int participants);
     void begin_round();
+    // Stud variant: same reset, but action opens at the given seat (the
+    // bring-in's left on third, the best visible hand after).
+    void begin_stud_round(int opener);
     void start_hand_common();
     // Limit betting unit: big blind preflop/flop, twice after.
     int fixed_bet_size() const;
@@ -221,6 +260,9 @@ private:
     bool kill_live_ = false;  // Next hand plays double blinds (full kill).
     Street street_ = Street::None;
     std::vector<Card> board_;
+    // Stud river overflow: the shared up card when the shoe runs dry
+    // 8-handed. Empty for every other game and street.
+    std::vector<Card> community_;
     std::vector<Card> shoe_;  // Remaining undealt cards, front = top.
     int acting_ = -1;
     std::int64_t acting_since_ = -1;  // Action-clock start (clock.h seconds).

@@ -215,6 +215,16 @@ SeatView make_view(const Table& table, int seat) {
     view.showdown = table.config().showdown;
     view.max_draw = table.config().max_draw;
     view.drew = table.drew(seat);
+    if (table.config().showdown == HandConstruction::StudSeven) {
+        view.up = table.up_cards(seat);
+        view.community = table.community();
+        for (int i = 0; i < table.num_seats(); ++i) {
+            if (i == seat) continue;
+            if (table.in_hand(i) && !table.has_folded(i)) {
+                view.rival_up.push_back(table.up_cards(i));
+            }
+        }
+    }
     return view;
 }
 
@@ -280,6 +290,9 @@ double card_points(Rank r) {
 // category-based after.
 HandValue omaha_current(const std::vector<Card>& hole,
                         const std::vector<Card>& board);
+HandValue stud_current(const std::vector<Card>& hole,
+                       const std::vector<Card>& up,
+                       const std::vector<Card>& community);
 OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
                                      const std::vector<Card>& board);
 double made_strength(const SeatView& view) {
@@ -325,8 +338,8 @@ double made_strength(const SeatView& view) {
     }
     // Five-card draw (high) is a pat hand: judge it the way postflop
     // judges five cards (category plus kicker), not the way preflop
-    // judges two starting cards. With no draw round wired yet every
-    // 5-card hand is final, so fall through to the category path below.
+    // judges two starting cards. Draw hands reach this path with an empty
+    // board and five hole cards, so fall through to the category path.
     if (view.board.empty() &&
         !(view.showdown == HandConstruction::DrawFive &&
           view.hole.size() == 5)) {
@@ -440,9 +453,15 @@ double made_strength(const SeatView& view) {
     std::vector<Card> all = view.board;
     all.insert(all.end(), view.hole.begin(), view.hole.end());
     HandValue value;
-    if ((view.showdown == HandConstruction::OmahaTwoAndThree ||
-         view.showdown == HandConstruction::OmahaHiLo) &&
-        view.hole.size() == 4 && view.board.size() >= 3) {
+    if (view.showdown == HandConstruction::StudSeven) {
+        // Stud counts its own cards only (down + up, shared river when
+        // dealt); fewer than five cards judges the door and the pair —
+        // evaluate_best needs five, so pad short hands with nothing and
+        // score pairs/high cards on the same scale below.
+        value = stud_current(view.hole, view.up, view.community);
+    } else if ((view.showdown == HandConstruction::OmahaTwoAndThree ||
+                view.showdown == HandConstruction::OmahaHiLo) &&
+               view.hole.size() == 4 && view.board.size() >= 3) {
         value = omaha_current(view.hole, view.board);
         // Hi-Lo postflop: a live low draw (or made low) is worth half the
         // pot on its own — play it like a strong made hand.
@@ -570,6 +589,52 @@ HandValue omaha_current(const std::vector<Card>& hole,
         }
     }
     return best;
+}
+
+// Best five of a stud hand so far: own down + up plus the shared river
+// card when dealt. Fewer than five cards (third street deals three)
+// scores the door and the pair on the made-hand scale: pairs play,
+// three to a flush/straight draw at 0.30, high door cards linger.
+HandValue stud_current(const std::vector<Card>& hole,
+                       const std::vector<Card>& up,
+                       const std::vector<Card>& community) {
+    std::vector<Card> all = hole;
+    all.insert(all.end(), up.begin(), up.end());
+    all.insert(all.end(), community.begin(), community.end());
+    if (all.size() >= 5) return evaluate_best(all);
+    // Short hands: rank pairs first, then high cards. Three cards can't
+    // make a flush or a straight, so trips-or-nothing never fires here —
+    // a wired pair of aces is the whole game on third street.
+    int rank_count[15] = {};
+    for (const Card& c : all) ++rank_count[static_cast<int>(c.rank)];
+    int best_pair = 0;
+    for (int r = 14; r >= 2; --r) {
+        if (rank_count[r] >= 2) {
+            best_pair = r;
+            break;
+        }
+    }
+    HandValue out;
+    if (best_pair > 0) {
+        out.category = HandCategory::OnePair;
+        out.tiebreak[0] = static_cast<Rank>(best_pair);
+        std::size_t k = 1;
+        for (int r = 14; r >= 2 && k < 5; --r) {
+            if (r == best_pair) continue;
+            for (int n = 0; n < rank_count[r] && k < 5; ++n) {
+                out.tiebreak[k++] = static_cast<Rank>(r);
+            }
+        }
+        return out;
+    }
+    out.category = HandCategory::HighCard;
+    std::vector<int> ranks;
+    for (const Card& c : all) ranks.push_back(static_cast<int>(c.rank));
+    std::sort(ranks.begin(), ranks.end(), std::greater<int>());
+    for (std::size_t i = 0; i < ranks.size() && i < 5; ++i) {
+        out.tiebreak[i] = static_cast<Rank>(ranks[i]);
+    }
+    return out;
 }
 
 // Drawing equity: 9 outs per four-flush, 8 per open-ender, times ~4% per

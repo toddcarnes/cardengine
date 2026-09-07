@@ -5,6 +5,17 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Variants: seven-card stud with real rules (`showdown = stud`,
+  `games/stud-8max.txt`, 2–8 seats): third street deals 2 down + 1 up with
+  the low door card's bring-in (action opens left of it), fourth through
+  sixth add one up card each with the best visible hand opening, seventh
+  adds one down card — best five of 7 wins. New `third|fourth|fifth|sixth|
+  seventh` streets, `stud <street> <ups...>` log lines (down streets log
+  bare), `hole` + public `up` seat lines plus a `community` state line, and
+  the classic 8-handed fallback (a short seventh street plays one shared
+  up card). Stud bets limit (small on third/fourth, big from fifth on;
+  completing the bring-in is the minimum, not a full raise). Bots judge
+  their own up + down cards with rival ups visible.
 - Variants: five-card draw and 2-7 lowball with a real exchange round
   (`showdown = draw|deuce`, `games/draw-6max.txt`, `games/deuce-6max.txt`,
   `max_draw = 1..5`): preflop betting, then each live seat discards up to

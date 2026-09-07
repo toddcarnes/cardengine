@@ -104,7 +104,9 @@ int main() {
     c.runouts = 3;
     validate(c);
 
-    // Stud: 7 down/up cards, no board, 4 up, bring-in below the small blind.
+    // Stud: 7 down/up cards, no board, 4 up, bring-in below the small
+    // blind, 2..8 seats (8-max is the standard full table — street
+    // dealing plus the community river fit it in one deck).
     {
         GameConfig s;
         s.showdown = HandConstruction::StudSeven;
@@ -113,11 +115,25 @@ int main() {
         s.upcards = 4;
         s.bring_in = 10;
         validate(s);
+        s.num_players = 8;
+        validate(s);
+        s.num_players = 9;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "stud caps at 8");
+        s.num_players = 6;
         s.upcards = 3;
         expect_throws<std::invalid_argument>([&] { validate(s); }, "stud needs 4 up");
         s.upcards = 4;
         s.bring_in = 50;
         expect_throws<std::invalid_argument>([&] { validate(s); }, "bring-in below SB");
+        s.bring_in = 10;
+        s.runouts = 2;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "stud single board");
+        s.runouts = 1;
+        s.straddle = 200;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "stud no straddle");
+        s.straddle = 0;
+        s.kill = true;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "stud no kill");
     }
     {
         GameConfig s;
