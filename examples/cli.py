@@ -108,20 +108,23 @@ def parse_state(lines):
             state["street"] = parts[1]
         elif parts[0] == "acting":
             state["acting"] = int(parts[1])
+        elif parts[0] == "acting_since":
+            state["acting_since"] = int(parts[1])
         elif parts[0] == "pot":
             state["pot"] = int(parts[1])
         elif parts[0] == "board":
             state["board"] = [] if parts[1] == "-" else parts[1:]
         elif parts[0] == "seat":
-            # seat I stack S bet B committed C in|out live|folded hole ...
+            # seat I stack S bet B committed C in|out live|folded [out] hole ...
             seat = int(parts[1])
+            hole_at = parts.index("hole")
             state["seats"][seat] = {
                 "stack": int(parts[3]),
                 "bet": int(parts[5]),
                 "committed": int(parts[7]),
                 "in": parts[8] == "in",
                 "live": parts[9] == "live",
-                "hole": [] if parts[11] == "--" else parts[11:],
+                "hole": [] if parts[hole_at + 1] == "--" else parts[hole_at + 1:],
             }
     return state
 

@@ -15,9 +15,10 @@
 //   button = 2
 //   buy_in = 10000               # tournament books below (tournament only)
 //   prizes = 50, 30, 20
-//   level = 50, 100, 0, 10       # repeatable
+//   level = 50, 100, 0, 10       # repeatable (or 5 numbers with minutes)
 //   level_index = 1
 //   hands_into_level = 3
+//   level_elapsed = 61           # seconds banked in this level
 //   prize_pool = 60000
 //   prize_awarded = 0
 //   eliminated = 0,0,1,...       # 0 seated / 1 out, per seat
@@ -52,6 +53,7 @@ struct SessionFile {
     int buy_in = 0;
     int level_index = 0;
     int hands_into_level = 0;
+    int level_elapsed = 0;  // Seconds banked in this level (timed levels).
     int prize_pool = 0;
     int prize_awarded = 0;
     std::vector<bool> eliminated;

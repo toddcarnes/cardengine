@@ -218,16 +218,23 @@ int main() {
         play_one_hand(session, 21);
         check(session.execute("tlevel") == "ok", "clock advances");
         check(session.execute("trebuy 0") == "ok", "pool grows");
+        SessionFile on_disk;
+        {
+            check(session.execute("save tmp_session_save.txt") == "ok",
+                  "tournament saves");
+            on_disk = load_session_file("tmp_session_save.txt");
+        }
         const std::string before = session.execute("tstatus");
-        const std::string felt_before = session.execute("state");
-        check(session.execute("save tmp_session_save.txt") == "ok",
-              "tournament saves");
+        check(contains(before, "tournament level 1/2"), "level saved");
+        check(on_disk.level_index == 1 && on_disk.hands_into_level == 0,
+              "level books saved");
         // A fresh session knows nothing until it restores.
         Session reboot;
         check(contains(reboot.execute("tstatus"), "error"), "reboot is empty");
         check(reboot.execute("restore tmp_session_save.txt") == "ok",
               "reboot restores");
         check(reboot.execute("tstatus") == before, "books match the save");
+        const std::string felt_before = session.execute("state");
         const std::string felt_after = reboot.execute("state");
         check(contains(felt_after, "button ") && contains(felt_after, "seat 0 stack "),
               "felt restores with button and stacks");

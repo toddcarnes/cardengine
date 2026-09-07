@@ -119,17 +119,24 @@ SessionFile parse_session(std::istream& in) {
             session.prizes = parse_int_list(value, lineno);
         } else if (key == "level") {
             const std::vector<int> parts = parse_int_list(value, lineno);
-            if (parts.size() != 4) {
+            if (parts.size() != 4 && parts.size() != 5) {
                 throw std::invalid_argument(
                     "line " + std::to_string(lineno) +
-                    ": level needs 4 numbers: small, big, ante, hands");
+                    ": level needs 4 numbers: small, big, ante, hands (or 5 with minutes)");
             }
-            session.levels.push_back(
-                BlindLevel{parts[0], parts[1], parts[2], parts[3]});
+            BlindLevel level{parts[0], parts[1], parts[2], parts[3]};
+            if (parts.size() == 5) level.minutes = parts[4];
+            session.levels.push_back(level);
         } else if (key == "level_index") {
             session.level_index = parse_int(value, lineno);
         } else if (key == "hands_into_level") {
             session.hands_into_level = parse_int(value, lineno);
+        } else if (key == "level_elapsed") {
+            session.level_elapsed = parse_int(value, lineno);
+            if (session.level_elapsed < 0) {
+                throw std::invalid_argument("line " + std::to_string(lineno) +
+                                            ": level_elapsed cannot be negative");
+            }
         } else if (key == "prize_pool") {
             session.prize_pool = parse_int(value, lineno);
         } else if (key == "prize_awarded") {
@@ -281,10 +288,13 @@ void save_session_file(const SessionFile& session, std::ostream& out) {
         out << "\n";
         for (const BlindLevel& level : session.levels) {
             out << "level = " << level.small_blind << ", " << level.big_blind
-                << ", " << level.ante << ", " << level.hands << "\n";
+                << ", " << level.ante << ", " << level.hands;
+            if (level.minutes > 0) out << ", " << level.minutes;
+            out << "\n";
         }
         out << "level_index = " << session.level_index << "\n";
         out << "hands_into_level = " << session.hands_into_level << "\n";
+        out << "level_elapsed = " << session.level_elapsed << "\n";
         out << "prize_pool = " << session.prize_pool << "\n";
         out << "prize_awarded = " << session.prize_awarded << "\n";
         out << "eliminated = ";

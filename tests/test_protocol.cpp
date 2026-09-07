@@ -167,6 +167,21 @@ int main() {
               "marker cleared");
     }
 
+    // Timeouts and the action clock: the holder folds by the clock.
+    {
+        Session s;
+        check(contains(s.execute("timeout"), "error"), "no timeout idle");
+        check(s.execute("start 7") == "ok", "start");
+        check(contains(s.execute("state"), "acting_since "), "clock reported");
+        const std::string holder = s.execute("options");
+        check(contains(holder, "options seat 3"), "seat 3 holds it");
+        check(s.execute("timeout") == "ok", "timeout folds the holder");
+        const std::string after = s.execute("state");
+        check(contains(find_line(after, "seat 3 "), " folded "),
+              "holder folded");
+        check(contains(s.execute("log"), "timeout 3 pot "), "timeout logged");
+    }
+
     std::cout << "test_protocol ok\n";
     return 0;
 }

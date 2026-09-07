@@ -92,7 +92,7 @@ std::string Session::execute(const std::string& raw_line) {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
             return "ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options "
-                   "act deal settle log addbot bots step quit";
+                   "act timeout deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
         if (command == "save") {
@@ -111,6 +111,7 @@ std::string Session::execute(const std::string& raw_line) {
                 file.buy_in = books.config.buy_in;
                 file.level_index = books.level_index;
                 file.hands_into_level = books.hands_into_level;
+                file.level_elapsed = static_cast<int>(books.level_elapsed);
                 file.prize_pool = books.prize_pool;
                 file.prize_awarded = books.prize_awarded;
                 file.eliminated = books.eliminated;
@@ -157,6 +158,7 @@ std::string Session::execute(const std::string& raw_line) {
                 books.config.buy_in = file.buy_in;
                 books.level_index = file.level_index;
                 books.hands_into_level = file.hands_into_level;
+                books.level_elapsed = file.level_elapsed;
                 books.prize_pool = file.prize_pool;
                 books.prize_awarded = file.prize_awarded;
                 books.eliminated = file.eliminated;
@@ -214,7 +216,14 @@ std::string Session::execute(const std::string& raw_line) {
                 << levels << " hands " << tournament.hands_into_level() << "/"
                 << level.hands << " blinds " << level.small_blind << "/"
                 << level.big_blind << " ante " << level.ante << " pool "
-                << tournament.prize_pool() << "\n";
+                << tournament.prize_pool();
+            if (level.minutes > 0) {
+                const std::int64_t left = tournament.level_seconds_left();
+                out << " elapsed " << tournament.level_elapsed() << "/"
+                    << level.minutes * 60;
+                if (left >= 0) out << " left " << left;
+            }
+            out << "\n";
             for (const Tournament::Standing& standing :
                  tournament.standings()) {
                 out << "standing " << standing.seat << " stack "
@@ -390,6 +399,12 @@ std::string Session::execute(const std::string& raw_line) {
             active_table().deal_next_street();
             return "ok";
         }
+        if (command == "timeout") {
+            const int seat = active_table().acting();
+            if (seat == -1) return "error no action pending";
+            active_table().timeout(seat);
+            return "ok";
+        }
         if (command == "settle") {
             const std::vector<Payout> payouts = active_table().settle();
             std::ostringstream out;
@@ -480,6 +495,7 @@ std::string Session::do_state(int view_seat) const {
         << "\n";
     out << "button " << active_table().button() << "\n";
     out << "acting " << active_table().acting() << "\n";
+    out << "acting_since " << active_table().acting_since() << "\n";
     out << "pot " << active_table().pot_total() << "\n";
     out << "current " << active_table().current_bet() << "\n";
     out << "board";

@@ -38,6 +38,7 @@ this project is called CardEngine.)
 | `options` | `options seat S check yes\|no call N raise yes\|no [min M max X]` | For the acting seat; `error no action pending` otherwise. |
 | `act fold\|check\|call` | `ok` | Acts for the current seat. |
 | `act raise <amount>` | `ok` | Amount is the target *total* bet for the round. |
+| `timeout` | `ok` | Folds the acting seat by the clock (disconnect/stalled client). Logged as `timeout <seat> pot <pot>` — bots read it as a fold. |
 | `deal` | `ok` | Next street; only when the round is complete. |
 | `settle` | `showdown yes\|no`, `payout <seat> <amount>` × n, `ok` | Hand must be complete. |
 | `log` | event lines, then `end` | Append-only hand history (below). |
@@ -52,6 +53,7 @@ this project is called CardEngine.)
 street preflop|flop|turn|river|none|complete
 button <seat>
 acting <seat|-1>
+acting_since <seconds|-1>
 pot <chips>
 current <highest total bet this round>
 board -|<cards...>
@@ -59,6 +61,11 @@ seat <i> stack <s> bet <b> committed <c> in|out live|folded hole <cards...|-->
 ... (one line per seat)
 end
 ```
+
+`acting_since` is the action-clock start (seconds on the engine's monotonic
+clock, `-1` when nobody holds the action). A host enforces its own limit —
+`expired(now, acting_since, limit)` in `clock.h` — and folds the holder with
+`timeout` when the wait runs out. The engine never folds for you.
 
 `bet` is committed this round, `committed` this hand. Folded or out-of-hand
 seats show `hole --`. A sitting-out seat carries an `out` marker after
@@ -161,6 +168,8 @@ settle showdown yes payouts 0:300 committed 200,100
 - `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
   (pot accounting for analysis and learning bots). Never contains hole cards —
   folders' cards appear in `begin_hand` and nowhere else.
+- `timeout`: a clock fold of a seat, with the pot after (`timeout 3 pot 420`).
+  Bots read it as a fold by that seat.
 
 Same caution as `state`: this log records everybody's private cards, so keep
 it on this computer.
@@ -203,7 +212,14 @@ game = ../games/holdem-6max.txt
 buy_in = 10000
 prizes = 50, 30, 20
 level = 50, 100, 0, 10      # small, big, ante, hands (repeatable)
+level = 100, 200, 25, 4, 20 # ...or add minutes: 4 hands or 20 minutes,
+                            # whichever hits first (0 = hands only)
 ```
+
+Timed levels count wall time per completed hand and fire at the next deal
+(never mid-hand) — a slow final table still blinds up on schedule.
+`tstatus` reports the clock on timed levels (`elapsed 61/1200 left 1139`);
+`save` banks it as `level_elapsed` so a reboot keeps the schedule.
 
 Places follow bust order (simultaneous busts in seat order); unwon prize
 remainder goes to the champion. Manual clock advances go over the wire
@@ -218,7 +234,7 @@ further `start` hands are refused.
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act timeout deal settle log addbot bots step quit
 > start 7
 ok
 > options

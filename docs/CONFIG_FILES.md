@@ -164,7 +164,8 @@ wins.
 | Any game-file key | (game/defaults) | Overrides: `num_players`, `starting_stack`, blinds, `ante`, `betting`, `showdown`, etc. |
 | `buy_in` | `0` | What each player pays into the prize pool. Pool = `buy_in × seats`. `0` means play money — chips only, no prizes. |
 | `prizes` | (empty) | Who gets paid, as comma-separated percentages by finishing place: `50, 30, 20` means the winner gets half the pool, second place 30%, third 20%. Must add up to 100 or less; empty means nobody gets paid. Any leftover pennies go to the winner. |
-| `level` | one `50, 100, 0, 10` | Repeatable — write one line per level: `small blind, big blind, ante, hands`. Levels advance automatically once their hands are played; the last level then repeats forever. If you write no levels you get a single `50, 100, 0, 10` level. |
+| `level` | one `50, 100, 0, 10` | Repeatable — write one line per level: `small blind, big blind, ante, hands`. Levels advance automatically once their hands are played; the last level then repeats forever. If you write no levels you get a single `50, 100, 0, 10` level. Append a fifth number for minutes (`50, 100, 0, 10, 15` = 10 hands *or* 15 minutes, whichever hits first); timed expiry fires at the next deal, never mid-hand. |
+| `level_elapsed` | `0` | (Session files only.) Seconds already banked in the current level — written by `save`, resumed by `restore`. |
 
 Tournament rules the file implies:
 
@@ -213,8 +214,9 @@ log for audit and bot training.
 | `stacks` | **required** | Per-seat chips, in order: `10000,9500,...`. |
 | `sitting_out` | all `0` | Per-seat flags (`1` = sitting out): `0,1,0,...`. One entry per seat. |
 | `button` | **required** | Seat holding the dealer button. |
-| `buy_in` / `prizes` / `level` | (tournament) | Tournament schedule and money, same shapes as tournament files (`level` repeatable). |
-| `level_index` / `hands_into_level` | `0` | Where the blind clock stands. |
+| `buy_in` / `prizes` / `level` | (tournament) | Tournament schedule and money, same shapes as tournament files (`level` repeatable, with optional minutes). |
+| `level_index` / `hands_into_level` | `0` | Where the blind clock stands (hands count plus banked wall time below). |
+| `level_elapsed` | `0` | Seconds already banked in the current level (timed levels) — written by `save`, resumed by `restore`. |
 | `prize_pool` / `prize_awarded` | `0` | Chips paid in vs prizes booked so far. |
 | `eliminated` | (tournament) | Per-seat bust flags (`1` = out). One entry per seat. |
 | `places` | (tournament) | Per-seat finishing places (`0` = still playing). One entry per seat. |

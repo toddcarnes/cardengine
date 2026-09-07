@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Clocks: timed blind levels (`level = sb, bb, ante, hands, minutes` — wall
+  time banked per hand, fires at the next deal, never mid-hand;
+  `elapsed/left` in `tstatus`, `level_elapsed` in saves), action clock
+  (`acting_since` in `state`, `timeout` folds the holder by the clock and
+  logs a `timeout` event bots read as a fold). Hosts enforce, engine stamps.
 - Sessions: `save <file>` / `restore <file>` persist the whole game between
   hands (rules, stacks, button, sit-outs, tournament books, raw log) as
   versioned key=value session files; `Table`/`Tournament` snapshot/restore
