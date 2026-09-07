@@ -123,11 +123,20 @@ void apply_game_key(GameConfig& config, const std::string& key,
             config.showdown = HandConstruction::OmahaTwoAndThree;
         } else if (s == "omaha_hilo" || s == "omahahilo" || s == "omaha-hilo") {
             config.showdown = HandConstruction::OmahaHiLo;
+        } else if (s == "stud" || s == "stud7" || s == "stud_seven" ||
+                   s == "stud-seven" || s == "seven_stud" ||
+                   s == "seven-stud" || s == "seven_card_stud" ||
+                   s == "seven-card-stud") {
+            config.showdown = HandConstruction::StudSeven;
         } else {
             throw std::invalid_argument(
                 "line " + std::to_string(lineno) +
-                ": showdown must be holdem, omaha, or omaha_hilo");
+                ": showdown must be holdem, omaha, omaha_hilo, or stud");
         }
+    } else if (key == "upcards") {
+        config.upcards = parse_int(value, lineno);
+    } else if (key == "bring_in" || key == "bringin") {
+        config.bring_in = parse_int(value, lineno);
     } else if (key == "max_raises") {
         config.max_raises_per_round = parse_int(value, lineno);
     } else {
@@ -173,7 +182,12 @@ void write_game_config(const GameConfig& config, std::ostream& out) {
         case HandConstruction::OmahaHiLo:
             out << "omaha_hilo\n";
             break;
+        case HandConstruction::StudSeven:
+            out << "stud\n";
+            break;
     }
+    out << "upcards = " << config.upcards << "\n";
+    out << "bring_in = " << config.bring_in << "\n";
     out << "max_raises = " << config.max_raises_per_round << "\n";
 }
 

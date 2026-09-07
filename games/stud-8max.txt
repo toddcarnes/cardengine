@@ -1,0 +1,20 @@
+# CardEngine game file (format 1)
+format_version = 1
+name = "Seven-Card Stud 8-max"
+description = "No shared board: 2 down + 1 up, bring-in by the low card, 3 more up, river down; best 5 of 7 wins"
+num_players = 8
+starting_stack = 10000
+small_blind = 50
+big_blind = 100
+ante = 10
+ante_from = seats
+straddle = 0
+kill = off
+runouts = 1
+hole_cards = 7
+board_cards = 0
+betting = limit
+showdown = stud
+upcards = 4
+bring_in = 10
+max_raises = 4

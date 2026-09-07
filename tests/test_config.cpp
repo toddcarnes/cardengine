@@ -104,6 +104,30 @@ int main() {
     c.runouts = 3;
     validate(c);
 
+    // Stud: 7 down/up cards, no board, 4 up, bring-in below the small blind.
+    {
+        GameConfig s;
+        s.showdown = HandConstruction::StudSeven;
+        s.hole_cards = 7;
+        s.board_cards = 0;
+        s.upcards = 4;
+        s.bring_in = 10;
+        validate(s);
+        s.upcards = 3;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "stud needs 4 up");
+        s.upcards = 4;
+        s.bring_in = 50;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "bring-in below SB");
+    }
+    {
+        GameConfig s;
+        s.upcards = 1;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "upcards need stud");
+        s = GameConfig{};
+        s.bring_in = 10;
+        expect_throws<std::invalid_argument>([&] { validate(s); }, "bring-in needs stud");
+    }
+
     c = GameConfig{};
     c.max_raises_per_round = 0;
     expect_throws<std::invalid_argument>([&] { validate(c); }, "max raises positive");

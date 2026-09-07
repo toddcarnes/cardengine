@@ -11,7 +11,14 @@ enum class BettingStructure { NoLimit, Limit, PotLimit };
 // five). OmahaTwoAndThree is Omaha-style: exactly 2 from hand + 3 from board.
 // OmahaHiLo splits every pot: best high hand takes half, best 8-or-better
 // low takes half (exact 2+3 both ways); no qualifying low means high scoops.
-enum class HandConstruction { BestFiveOfAll, OmahaTwoAndThree, OmahaHiLo };
+// StudSeven is seven-card stud: no shared board, each seat's own 7 cards
+// (3 down, 4 up) play best-five; upcards are public, downcards private.
+enum class HandConstruction {
+    BestFiveOfAll,
+    OmahaTwoAndThree,
+    OmahaHiLo,
+    StudSeven
+};
 
 // Everything a variant needs to change about a game, as data.
 // Defaults describe standard no-limit Texas Hold'em, which is the test case
@@ -41,9 +48,17 @@ struct GameConfig {
                              // remaining shoe and splits each pot across them
                              // (run-it-twice: all-in cash-game practice that
                              // cuts variance without changing equity).
-    int hole_cards = 2;      // Cards dealt to each seat.
+    int hole_cards = 2;      // Cards dealt to each seat (7 for stud: 3 down,
+                             // 4 up — see upcards below).
     int board_cards = 5;     // Community cards, dealt 3-1-1 across streets
                              // (scaled down when fewer are configured).
+                             // 0 for stud (no shared board).
+    int upcards = 0;         // Stud only: face-up cards per seat (4 for
+                             // seven-card stud: 2 down + 1 up on third street,
+                             // then 1 up each street, 1 down on the river).
+    int bring_in = 0;        // Stud only: forced bet by the lowest upcard on
+                             // third street (0 = no bring-in, high hand opens).
+                             // Must be below the small blind when set.
     BettingStructure betting = BettingStructure::NoLimit;
     HandConstruction showdown = HandConstruction::BestFiveOfAll;
     int max_raises_per_round = 4;  // Limit betting only (bet + raises cap).

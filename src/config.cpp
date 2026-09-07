@@ -32,6 +32,20 @@ void validate(const GameConfig& config) {
     if (config.runouts < 1 || config.runouts > 3) {
         throw std::invalid_argument("runouts must be 1..3");
     }
+    if (config.upcards < 0 || config.upcards > config.hole_cards) {
+        throw std::invalid_argument("upcards cannot exceed hole_cards");
+    }
+    if (config.bring_in < 0) {
+        throw std::invalid_argument("bring_in cannot be negative");
+    }
+    if (config.showdown != HandConstruction::StudSeven) {
+        if (config.upcards != 0) {
+            throw std::invalid_argument("upcards need stud showdown");
+        }
+        if (config.bring_in != 0) {
+            throw std::invalid_argument("bring_in needs stud showdown");
+        }
+    }
     if (config.hole_cards < 1 || config.hole_cards > 7) {
         throw std::invalid_argument("hole_cards must be 1..7");
     }
@@ -44,6 +58,21 @@ void validate(const GameConfig& config) {
         if (config.hole_cards != 4 || config.board_cards != 5) {
             throw std::invalid_argument(
                 "omaha showdown needs hole_cards 4 and board_cards 5");
+        }
+    } else if (config.showdown == HandConstruction::StudSeven) {
+        // Seven-card stud: 7 private cards (3 down, 4 up), no board.
+        if (config.hole_cards != 7 || config.board_cards != 0) {
+            throw std::invalid_argument(
+                "stud showdown needs hole_cards 7 and board_cards 0");
+        }
+        if (config.upcards != 4) {
+            throw std::invalid_argument("stud needs upcards 4");
+        }
+        if (config.bring_in < 0) {
+            throw std::invalid_argument("bring_in cannot be negative");
+        }
+        if (config.bring_in >= config.small_blind && config.bring_in > 0) {
+            throw std::invalid_argument("bring_in must be below small_blind");
         }
     } else {
         // Best-five showdown needs a total that fits evaluate_best.

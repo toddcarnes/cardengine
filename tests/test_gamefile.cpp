@@ -112,6 +112,16 @@ int main() {
         const GameFile runouts = parse_text(
             "format_version = 1\nrunouts = 2\n");
         check(runouts.config.runouts == 2, "runouts parses");
+        {
+            const GameFile stud = parse_text(
+                "format_version = 1\nshowdown = stud\nhole_cards = 7\n"
+                "board_cards = 0\nupcards = 4\nbring_in = 10\n"
+                "betting = limit\n");
+            check(stud.config.showdown == HandConstruction::StudSeven,
+                  "stud parses");
+            check(stud.config.upcards == 4 && stud.config.bring_in == 10,
+                  "stud keys parse");
+        }
     }
 
     // Struct validation failures surface as config errors, not silence.

@@ -28,6 +28,9 @@ namespace cardengine {
 //   board_cards = 5
 //   betting = nolimit          # nolimit | limit | potlimit
 //   showdown = holdem           # holdem | omaha (exactly 2+3) | omaha_hilo
+//                               # | stud (7 cards, 4 up, best 5)
+//   upcards = 0                # stud: face-up cards per seat (4)
+//   bring_in = 0               # stud: low upcard's forced bet (below SB)
 //   max_raises = 4              # limit betting: bets-per-round cap
 //
 // Omitted rules keys fall back to GameConfig defaults. Shared files are
