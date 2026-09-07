@@ -24,3 +24,5 @@ jobs:
           PY="$(command -v python || command -v python3)"
           "$PY" examples/cli.py --auto --hands 2 --seed 42
           "$PY" examples/match.py --auto --bots 1:bots/tight.txt --bots 2:bots/random.txt --hands 2 --seed 7
+          "$PY" examples/host.py --auto --bots 1:bots/tight.txt --hands 2 --seed 7 --port 18447 --save "$RUNNER_TEMP/host-save.txt"
+          test -f "$RUNNER_TEMP/host-save.txt"

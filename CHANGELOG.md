@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Examples: `host.py` network host reference (TCP seats with `hello`/
+  `welcome`, filtered `state <seat>` views, action-clock `timeout`s,
+  disconnect `sitout`/`resume`, per-hand `save`) plus `bot_proxy.py`
+  bridging `cardengine_bot` programs onto seats. Same match.py shape with
+  sockets instead of pipes; stdlib only.
 - Variants: forced-bet options — live UTG straddle (`straddle = 2×BB`: posts,
   sets the bet, acts last preflop with the raiser's option), button ante
   (`ante_from = button`: button posts the whole table's ante), full kill

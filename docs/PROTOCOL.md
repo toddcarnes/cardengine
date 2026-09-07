@@ -102,8 +102,36 @@ anything goes wrong it prints an error and stops with a failure signal
 instead of guessing a move. The bot program reads only its own seat's private
 cards, so even a tampered-with bot cannot see more than its filtered view
 allows. `examples/match.py` is the reference host: one engine plus one bot
-program per seat. A future network version would reuse exactly this shape,
-with internet connections in place of these local message pipes.
+program per seat.
+
+## Network hosts
+
+`examples/host.py` is the same shape with TCP sockets instead of local
+pipes: one engine process plus one seat per connection. The wire protocol is
+line-based, like the engine's own:
+
+- Client connects and sends `hello <seat>` (or bare `hello` for the first
+  free seat); the host replies `welcome <seat> <name>`.
+- Per decision the host sends that seat's `state <seat>` block (`end`
+  terminated) plus one `options` line; the client replies one `act ...`
+  line. Clients send nothing else except `quit` to leave.
+- `examples/bot_proxy.py` bridges a `cardengine_bot` program onto a seat,
+  so bots and humans share one host without special cases.
+
+The host owns everything the engine never will: the seat roster (names live
+host-side; the engine only numbers seats), the action clock (`--action-seconds`,
+enforced with `timeout` when the wait runs out — the engine stamps, the host
+folds), disconnects (`sitout` parks a dead connection, `resume` reseats a
+live one — see below for the mid-hand rule), and crash recovery (`--save`
+writes a session file after every hand; a rebooted host `restore`s it).
+Filtered views are the security boundary: the host forwards `state <seat>`,
+never bare `state`, so a tampered client sees exactly its own hole cards.
+
+A dead connection mid-decision folds by the clock (`timeout`); a dead
+connection between decisions parks with `sitout` and the next hand deals
+around it. A seat that reconnects (`hello <seat>`) resumes with `resume` —
+stack intact, no rebuy, no lost chips. `sitout` mid-hand is legal but waits:
+the running hand is unaffected, and the flag bites from the next deal.
 
 ## Game files
 
