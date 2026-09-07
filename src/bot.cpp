@@ -769,6 +769,12 @@ HandSummary summarize_hand(const std::vector<Event>& events, std::size_t begin,
                 seat.folded = false;
                 if (action->action.type == ActionType::Raise) ++seat.raises;
             }
+        } else if (const auto* timed = std::get_if<TimeoutEvent>(&event)) {
+            if (timed->seat < 0 ||
+                static_cast<std::size_t>(timed->seat) >= summary.seats.size()) {
+                throw std::invalid_argument("timeout from unknown seat");
+            }
+            summary.seats[static_cast<std::size_t>(timed->seat)].folded = true;
         } else if (const auto* settled = std::get_if<HandSettledEvent>(&event)) {
             if (settled->committed.size() != summary.seats.size()) {
                 throw std::invalid_argument("settle does not match its hand");

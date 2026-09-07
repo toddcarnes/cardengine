@@ -78,6 +78,19 @@ public:
     // Applies one action for the acting seat. Throws std::logic_error on a
     // wrong turn and std::invalid_argument on an illegal action.
     void act(int seat, const Action& action);
+    // The host gave up waiting: folds the acting seat by the clock and logs
+    // a timeout event (the seat's cards stay hidden, like any other fold).
+    // Stamps `at` (seconds, see clock.h); the plain form reads the wall
+    // clock. Throws std::logic_error unless that seat holds the action.
+    void timeout(int seat);
+    void timeout_at(int seat, std::int64_t at);
+    // Stamp of the last action-clock (re)start: hand deal, a taken action,
+    // or a new street (-1 when no action is pending). Seconds, see clock.h.
+    // Hosts poll `expired(now, acting_since(), limit)` and call timeout().
+    std::int64_t acting_since() const { return acting_since_; }
+    // Test seam: re-stamp the action clock (hosts never call this — time
+    // only moves forward through act/deal/timeout).
+    void set_acting_since_for_tests(std::int64_t at) { acting_since_ = at; }
 
     // Deals flop (3), turn, or river (1). Throws unless the round is
     // complete and the hand still needs cards.
@@ -146,6 +159,7 @@ private:
     std::vector<Card> board_;
     std::vector<Card> shoe_;  // Remaining undealt cards, front = top.
     int acting_ = -1;
+    std::int64_t acting_since_ = -1;  // Action-clock start (clock.h seconds).
     int current_bet_ = 0;
     int last_raise_size_ = 0;
     int round_seq_ = 0;  // Bumped by every full raise.

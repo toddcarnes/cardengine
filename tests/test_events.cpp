@@ -181,14 +181,43 @@ int main() {
         table.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d",
                                          "8h", "9s", "Tc", "Jd", "Qh"}));
         fold(table, 0);
-        fold(table, 1);
+        table.timeout(1);  // Clock folds the second seat; cards stay hidden.
         table.settle();
         for (const Event& e : table.events()) {
             const Event back = parse_event(format_event(e), config);
             check(event_name(back) == event_name(e), "name round-trips");
             check(format_event(back) == format_event(e), "text round-trips");
         }
-        // Seeded deals and showdowns round-trip too (seed, hit cards).
+        const auto* timed = std::get_if<TimeoutEvent>(&table.events()[2]);
+        check(timed != nullptr && timed->seat == 1 && timed->pot_after == 150,
+              "timeout event recorded");
+        check(format_event(table.events()[2]) == "timeout 1 pot 150",
+              "timeout text");
+        const HandSummary summary =
+            summarize_hand(table.events(), 0, table.events().size());
+        check(summary.seats[1].folded, "timeout reads as a fold");
+        expect_throws<std::logic_error>(
+            [&] {
+                Table idle(config);
+                idle.timeout(0);
+            },
+            "timeout with no hand");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("timeout 1", c);
+            },
+            "short timeout");
+        expect_throws<std::invalid_argument>(
+            [] {
+                GameConfig c;
+                parse_event("timeout 1 pot -5", c);
+            },
+            "negative timeout pot");
+    }
+
+    // Seeded deals and showdowns round-trip too (seed, hit cards).
+    {
         GameConfig hu;
         hu.num_players = 2;
         Table show(hu);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include "cardengine/clock.h"
 #include "cardengine/deck.h"
 #include "cardengine/hand.h"
 
@@ -271,7 +272,26 @@ void Table::act(int seat, const Action& action) {
         }
     }
     advance_acting(seat + 1);
+    acting_since_ = now_seconds();
     events_.push_back(ActionTakenEvent{seat, action, pot_total()});
+}
+
+void Table::timeout(int seat) { timeout_at(seat, now_seconds()); }
+
+void Table::timeout_at(int seat, std::int64_t at) {
+    check_seat(seat);
+    if (street_ == Street::None || street_ == Street::Complete) {
+        throw std::logic_error("no hand running");
+    }
+    if (seat != acting_) throw std::logic_error("not this seat's turn");
+    Seat& s = seats_[static_cast<std::size_t>(seat)];
+    s.folded = true;
+    s.acted = true;
+    s.seen_seq = round_seq_;
+    (void)at;  // The stamp lives in the order of events, not the event.
+    advance_acting(seat + 1);
+    acting_since_ = now_seconds();
+    events_.push_back(TimeoutEvent{seat, pot_total()});
 }
 
 void Table::deal_next_street() {
@@ -302,6 +322,7 @@ void Table::deal_next_street() {
     }
     events_.push_back(dealt);
     begin_round();
+    acting_since_ = now_seconds();
 }
 
 bool Table::hand_complete() const {
@@ -406,6 +427,7 @@ std::vector<Payout> Table::settle() {
     events_.push_back(settled);
     street_ = Street::Complete;
     acting_ = -1;
+    acting_since_ = -1;
     // Advance the button to the next seated player with chips who is not
     // sitting out.
     for (int k = 1; k <= num_seats(); ++k) {
@@ -495,6 +517,7 @@ void Table::restore(const Snapshot& saved) {
     board_.clear();
     shoe_.clear();
     acting_ = -1;
+    acting_since_ = -1;
     current_bet_ = 0;
     last_raise_size_ = 0;
     round_seq_ = 0;
@@ -627,6 +650,7 @@ void Table::start_hand_common() {
     round_seq_ = 0;
     raises_this_round_ = 0;
     advance_acting(bb + 1);
+    acting_since_ = now_seconds();
 }
 
 }  // namespace cardengine

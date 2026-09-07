@@ -10,6 +10,7 @@ const char* event_name(const Event& event) {
     if (std::holds_alternative<HandStartedEvent>(event)) return "begin_hand";
     if (std::holds_alternative<ActionTakenEvent>(event)) return "action";
     if (std::holds_alternative<StreetDealtEvent>(event)) return "street";
+    if (std::holds_alternative<TimeoutEvent>(event)) return "timeout";
     return "settle";
 }
 
@@ -74,6 +75,10 @@ std::string format_event(const Event& event) {
     if (const auto* e = std::get_if<StreetDealtEvent>(&event)) {
         out << "street " << street_name(e->street);
         for (const Card& c : e->cards) out << " " << to_string(c);
+        return out.str();
+    }
+    if (const auto* e = std::get_if<TimeoutEvent>(&event)) {
+        out << "timeout " << e->seat << " pot " << e->pot_after;
         return out.str();
     }
     const auto& e = std::get<HandSettledEvent>(event);
@@ -232,6 +237,15 @@ Event parse_event(const std::string& line, const GameConfig& config) {
                                             toks[i] + "'");
             }
         }
+        return e;
+    }
+    if (toks[0] == "timeout") {
+        if (toks.size() != 4 || toks[2] != "pot") {
+            throw std::invalid_argument("timeout needs 'timeout <seat> pot <pot>'");
+        }
+        TimeoutEvent e;
+        e.seat = parse_count(toks[1], "seat");
+        e.pot_after = parse_count(toks[3], "pot");
         return e;
     }
     if (toks[0] == "settle") {

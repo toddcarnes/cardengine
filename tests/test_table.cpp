@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "cardengine/clock.h"
 #include "cardengine/config.h"
 #include "cardengine/table.h"
 #include "helpers.h"
@@ -13,6 +14,7 @@ namespace {
 
 using cardengine::Action;
 using cardengine::ActionType;
+using cardengine::expired;
 using cardengine::GameConfig;
 using cardengine::Table;
 using testutil::cards;
@@ -310,6 +312,26 @@ int main() {
         expect_throws<std::logic_error>([&] { t.set_blinds(50, 100); }, "blinds mid-hand");
         expect_throws<std::invalid_argument>([&] { t.act(9, {ActionType::Fold, 0}); },
                                 "seat out of range");
+        expect_throws<std::logic_error>([&] { t.timeout(1); }, "timeout out of turn");
+        expect_throws<std::invalid_argument>([&] { t.timeout(9); }, "timeout seat range");
+    }
+
+    // The action clock stamps every (re)start; timeouts fold by the clock.
+    {
+        Table t(three_max());
+        check(t.acting_since() == -1, "idle clock is -1");
+        t.start_hand(7);
+        check(t.acting_since() >= 0, "deal starts the clock");
+        const int first = t.acting();
+        t.set_acting_since_for_tests(1000);
+        check(t.acting_since() == 1000, "test seam re-stamps");
+        check(expired(1000 + 29, t.acting_since(), 30) == false, "not yet due");
+        check(expired(1000 + 30, t.acting_since(), 30), "due at the limit");
+        check(expired(999, t.acting_since(), 30) == false, "newer boot never due");
+        t.timeout_at(first, 1000 + 30);
+        check(t.has_folded(first), "timeout folds the holder");
+        check(t.acting() != first, "action moves on");
+        check(t.acting_since() >= 0, "timeout restarts the clock");
     }
 
     // Chip conservation across full hands and button rotation.

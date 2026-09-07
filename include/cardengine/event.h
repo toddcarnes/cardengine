@@ -45,8 +45,17 @@ struct HandSettledEvent {
     std::vector<int> committed;  // Per seat, pre-award (pot accounting).
 };
 
+// A forced fold by the clock: seat timed out holding the action. Not a
+// decision — the host gave up waiting (disconnect, stalled client) and the
+// engine recorded who folded and what the pot stood at. Bots read it as a
+// fold by that seat.
+struct TimeoutEvent {
+    int seat = -1;
+    int pot_after = 0;
+};
+
 using Event = std::variant<HandStartedEvent, ActionTakenEvent,
-                           StreetDealtEvent, HandSettledEvent>;
+                           StreetDealtEvent, HandSettledEvent, TimeoutEvent>;
 
 const char* event_name(const Event& event);
 
