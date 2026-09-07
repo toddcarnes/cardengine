@@ -17,12 +17,25 @@ enum class HandConstruction { BestFiveOfAll, OmahaTwoAndThree, OmahaHiLo };
 // Defaults describe standard no-limit Texas Hold'em, which is the test case
 // the config design is proven against. Future variants (Omaha-style hole
 // counts, stud-style boards, limit betting) plug in here, not in Table.
+// Where antes come from. EverySeat: each participant posts `ante`
+// (classic). ButtonOnly: the button posts the whole table's ante at once
+// (one `ante × seats` payment — faster live dealing, same dead money).
+enum class AnteSource { EverySeat, ButtonOnly };
+
 struct GameConfig {
     int num_players = 6;     // Seats at the table, 2..10.
     int starting_stack = 10000;
     int small_blind = 50;
     int big_blind = 100;
     int ante = 0;            // Dead money from every participant each hand.
+    AnteSource ante_from = AnteSource::EverySeat;
+    int straddle = 0;        // Optional blind 2× the big blind, posted by the
+                             // seat after the big blind (UTG). 0 = no straddle.
+                             // The straddler acts last preflop (live straddle:
+                             // they may raise their own blind when it returns).
+    bool kill = false;       // Double the blinds for the next hand after any
+                             // pot over 10× the big blind (full kill: the
+                             // trigger hand's winner posts the extra blind).
     int hole_cards = 2;      // Cards dealt to each seat.
     int board_cards = 5;     // Community cards, dealt 3-1-1 across streets
                              // (scaled down when fewer are configured).

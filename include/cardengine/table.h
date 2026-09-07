@@ -142,6 +142,9 @@ private:
     bool needs_action(int seat) const;
     void advance_acting(int from);
     void post_blind(int seat, int amount);
+    // Forced bets for the new hand: antes, blinds, straddle. Returns the
+    // straddle seat (or -1): preflop action starts after it.
+    int post_forced_bets(int participants);
     void begin_round();
     void start_hand_common();
     // Limit betting unit: big blind preflop/flop, twice after.
@@ -159,6 +162,7 @@ private:
     GameConfig config_;
     std::vector<Seat> seats_;
     int button_ = 0;
+    bool kill_live_ = false;  // Next hand plays double blinds (full kill).
     Street street_ = Street::None;
     std::vector<Card> board_;
     std::vector<Card> shoe_;  // Remaining undealt cards, front = top.

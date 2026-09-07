@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Variants: forced-bet options — live UTG straddle (`straddle = 2×BB`: posts,
+  sets the bet, acts last preflop with the raiser's option), button ante
+  (`ante_from = button`: button posts the whole table's ante), full kill
+  (`kill = on`: blinds double the hand after a 10×BB pot). Config + file
+  keys with validation.
 - Variants: Omaha Hi-Lo (`showdown = omaha_hilo`, `games/omaha-hilo-6max.txt`)
   — 8-or-better low evaluator under exact 2+3 construction, every pot split
   high/low (high scoops unqualified, odd chip to high first, quartering

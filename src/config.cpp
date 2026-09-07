@@ -23,6 +23,12 @@ void validate(const GameConfig& config) {
     if (config.ante < 0) {
         throw std::invalid_argument("ante cannot be negative");
     }
+    if (config.straddle < 0) {
+        throw std::invalid_argument("straddle cannot be negative");
+    }
+    if (config.straddle > 0 && config.straddle != 2 * config.big_blind) {
+        throw std::invalid_argument("straddle must be twice the big blind");
+    }
     if (config.hole_cards < 1 || config.hole_cards > 7) {
         throw std::invalid_argument("hole_cards must be 1..7");
     }

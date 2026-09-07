@@ -101,6 +101,14 @@ int main() {
             "format_version = 1\nshowdown = Omaha-Hilo\nhole_cards = 4\n");
         check(hilo_dash.config.showdown == HandConstruction::OmahaHiLo,
               "omaha-hilo parses");
+        const GameFile forced = parse_text(
+            "format_version = 1\nante = 10\nante_from = button\n"
+            "straddle = 200\nkill = on\n");
+        check(forced.config.ante == 10, "ante parses");
+        check(forced.config.ante_from == AnteSource::ButtonOnly,
+              "button ante parses");
+        check(forced.config.straddle == 200, "straddle parses");
+        check(forced.config.kill, "kill parses");
     }
 
     // Struct validation failures surface as config errors, not silence.

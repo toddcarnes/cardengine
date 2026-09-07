@@ -48,6 +48,65 @@ int main() {
         check(t.pot_total() == 180, "antes in the pot");
     }
 
+    // Button ante: the button posts the whole table's ante at once.
+    {
+        GameConfig c;
+        c.num_players = 3;
+        c.ante = 10;
+        c.ante_from = AnteSource::ButtonOnly;
+        Table t(c);
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d", "8h",
+                                     "9s", "Tc", "Jd", "Qh"}));
+        check(t.committed(0) == 30, "button posts 3x ante");
+        check(t.committed(1) == 50, "SB posts blind only");
+        check(t.committed(2) == 100, "BB posts blind only");
+        check(t.pot_total() == 180, "same dead money, one payer");
+    }
+
+    // Live straddle: UTG posts 2× BB and acts last preflop.
+    {
+        GameConfig c;
+        c.num_players = 4;
+        c.straddle = 200;
+        Table t(c);
+        t.start_hand_from_deck(cards({"2c", "3d", "4h", "5s", "6c", "7d",
+                                     "8h", "9s", "Tc", "Jd", "Qh", "Kd",
+                                     "Ah"}));
+        // Button 0: SB seat1 (50), BB seat2 (100), straddle seat3 (200).
+        check(t.committed(1) == 50, "SB posts");
+        check(t.committed(2) == 100, "BB posts");
+        check(t.committed(3) == 200, "straddle posts 2x BB");
+        check(t.current_bet() == 200, "straddle sets the bet");
+        check(t.acting() == 0, "action starts after the straddle");
+        check(t.pot_total() == 350, "straddle in the pot");
+        // UTG calls the blind, the straddler checks their option.
+        call(t, 0);
+        call(t, 1);
+        call(t, 2);
+        chk(t, 3);
+        t.deal_next_street();
+        check(t.board().size() == 3, "flop deals after the option");
+    }
+
+    // Full kill: a pot over 10× BB doubles next hand's blinds once.
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.kill = true;
+        Table t(c);
+        // Hand 1: shove preflop so the pot clears 1000 (10× 100).
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d"}));
+        t.act(0, {ActionType::Raise, 5000});
+        t.act(1, {ActionType::Call, 0});
+        check_down_streets(t);
+        t.settle();
+        // Hand 2 plays double blinds: SB 100, BB 200.
+        t.start_hand(99);
+        check(t.committed(0) + t.committed(1) >= 300 - 0, "kill doubles blinds");
+        check(t.current_bet() == 200, "kill BB is 200");
+    }
+
     // A short stack antes itself all in and can still win the hand.
     {
         GameConfig c;

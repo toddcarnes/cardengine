@@ -10,7 +10,7 @@ Verified 2026-09-05: configure + build + `ctest` pass with CMake 4.3.4 / VS 2026
   Umbrella header; engine modules: `card.h` (`Rank` 2–14 / `Suit` / `Card`, `"Qh"` notation + `parse_card`),
   `deck.h` (`Deck`, deterministic `shuffle(seed)`), `hand.h` (`evaluate_five` / `evaluate_best`, `HandValue` with
   category + significance-ordered tiebreak). `evaluate_best` takes 5–7 cards; throws otherwise.
-  Table engine: `config.h` (`GameConfig`: seats/stacks/blinds, `ante`, `hole_cards`/`board_cards` with deck-math
+  Table engine: `config.h` (`GameConfig`: seats/stacks/blinds, `ante` (+`ante_from` seats/button) / `straddle` (live UTG 2×BB) / `kill` (double blinds after a 10×BB pot), `hole_cards`/`board_cards` with deck-math
   validation, `BettingStructure` NoLimit/Limit/PotLimit + `validate`), `table.h` (`Table`: blinds incl.
   heads-up button-as-SB, fixed/pot-limit rules in `options`/`act` with min-raise + closed action on short all-ins, side pots, showdown with
   odd chips clockwise from button, `settle()` advances button). `start_hand_from_deck` is the deterministic testing seam.

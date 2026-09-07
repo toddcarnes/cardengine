@@ -72,6 +72,30 @@ void apply_game_key(GameConfig& config, const std::string& key,
         config.big_blind = parse_int(value, lineno);
     } else if (key == "ante") {
         config.ante = parse_int(value, lineno);
+    } else if (key == "ante_from") {
+        const std::string a = lower(value);
+        if (a == "seats" || a == "every_seat" || a == "everyseat") {
+            config.ante_from = AnteSource::EverySeat;
+        } else if (a == "button" || a == "button_only" || a == "buttononly") {
+            config.ante_from = AnteSource::ButtonOnly;
+        } else {
+            throw std::invalid_argument(
+                "line " + std::to_string(lineno) +
+                ": ante_from must be seats or button");
+        }
+    } else if (key == "straddle") {
+        config.straddle = parse_int(value, lineno);
+    } else if (key == "kill") {
+        const std::string k = lower(value);
+        if (k == "on" || k == "yes" || k == "true" || k == "1") {
+            config.kill = true;
+        } else if (k == "off" || k == "no" || k == "false" || k == "0") {
+            config.kill = false;
+        } else {
+            throw std::invalid_argument(
+                "line " + std::to_string(lineno) +
+                ": kill must be on or off");
+        }
     } else if (key == "hole_cards") {
         config.hole_cards = parse_int(value, lineno);
     } else if (key == "board_cards") {
@@ -116,6 +140,11 @@ void write_game_config(const GameConfig& config, std::ostream& out) {
     out << "small_blind = " << config.small_blind << "\n";
     out << "big_blind = " << config.big_blind << "\n";
     out << "ante = " << config.ante << "\n";
+    out << "ante_from = "
+        << (config.ante_from == AnteSource::ButtonOnly ? "button" : "seats")
+        << "\n";
+    out << "straddle = " << config.straddle << "\n";
+    out << "kill = " << (config.kill ? "on" : "off") << "\n";
     out << "hole_cards = " << config.hole_cards << "\n";
     out << "board_cards = " << config.board_cards << "\n";
     out << "betting = ";

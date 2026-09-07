@@ -418,6 +418,11 @@ std::vector<Payout> Table::settle() {
     for (const Payout& p : payouts) {
         seats_[static_cast<std::size_t>(p.seat)].stack += p.amount;
     }
+    // Full kill: a pot over 10× the big blind doubles next hand's blinds.
+    // The trigger hand's winner posts the extra blind (tracked live).
+    if (config_.kill && pot_total() > 10 * config_.big_blind) {
+        kill_live_ = true;
+    }
     HandSettledEvent settled;
     settled.showdown = showdown_;
     settled.payouts = payouts;
@@ -699,18 +704,50 @@ void Table::start_hand_common() {
     last_payouts_.clear();
     board_.clear();
 
+    const int open_from = post_forced_bets(participants);
+
+    street_ = Street::Preflop;
+    // post_forced_bets sets the live bet (straddle/kill-aware blind levels).
+    round_seq_ = 0;
+    raises_this_round_ = 0;
+    advance_acting(open_from + 1);
+    acting_since_ = now_seconds();
+}
+
+// Antes, blinds, and the optional live straddle, in posting order. Blind
+// levels double while a kill is live (consumed by this hand). Returns the
+// seat preflop action starts after: the straddler when live, else the big
+// blind. Heads-up the button is the small blind; otherwise SB/BB are the
+// first two participants left of the button, and the straddle is the next
+// participant after the big blind.
+int Table::post_forced_bets(int participants) {
+    const int small = config_.small_blind * (kill_live_ ? 2 : 1);
+    const int big = config_.big_blind * (kill_live_ ? 2 : 1);
+    kill_live_ = false;
     // Antes are dead money: everyone pays before the blinds go in.
-    // Short stacks ante what they have and play on from there.
-    for (int i = 0; i < num_seats(); ++i) {
-        Seat& s = seats_[static_cast<std::size_t>(i)];
-        if (!s.in_hand || config_.ante == 0) continue;
-        const int pay = config_.ante < s.stack ? config_.ante : s.stack;
-        s.stack -= pay;
-        s.committed += pay;
+    // Short stacks ante what they have and play on from there. Button-ante
+    // games charge the whole table's ante to the button at once.
+    if (config_.ante > 0) {
+        if (config_.ante_from == AnteSource::ButtonOnly) {
+            Seat& button = seats_[static_cast<std::size_t>(button_)];
+            if (button.in_hand) {
+                const int total = config_.ante * participants;
+                const int pay = total < button.stack ? total : button.stack;
+                button.stack -= pay;
+                button.committed += pay;
+            }
+        } else {
+            for (int i = 0; i < num_seats(); ++i) {
+                Seat& s = seats_[static_cast<std::size_t>(i)];
+                if (!s.in_hand) continue;
+                const int pay =
+                    config_.ante < s.stack ? config_.ante : s.stack;
+                s.stack -= pay;
+                s.committed += pay;
+            }
+        }
     }
 
-    // Blinds. Heads-up the button is the small blind; otherwise SB/BB are
-    // the first two participants left of the button.
     int sb = button_;
     int bb = button_;
     if (participants == 2) {
@@ -720,16 +757,25 @@ void Table::start_hand_common() {
         sb = next_in_hand(button_ + 1);
         bb = next_in_hand(sb + 1);
     }
-    post_blind(sb, config_.small_blind);
-    post_blind(bb, config_.big_blind);
-
-    street_ = Street::Preflop;
-    current_bet_ = config_.big_blind;
-    last_raise_size_ = config_.big_blind;
-    round_seq_ = 0;
-    raises_this_round_ = 0;
-    advance_acting(bb + 1);
-    acting_since_ = now_seconds();
+    post_blind(sb, small);
+    post_blind(bb, big);
+    current_bet_ = big;
+    last_raise_size_ = big;
+    // Live straddle: UTG (next participant after the BB) posts 2× BB and
+    // acts last preflop — action opens after them, and the straddle itself
+    // is a live bet they may raise when it returns. Needs 3+ players (a
+    // heads-up straddle would be the button betting into themselves).
+    if (config_.straddle > 0 && participants > 2) {
+        const int st = next_in_hand(bb + 1);
+        // The straddle counts as a full raise for min-raise purposes:
+        // current 2×BB over the 1×BB blind, so the next raise re-raises.
+        const int stab = config_.straddle * (small != config_.small_blind ? 2 : 1);
+        post_blind(st, stab);
+        current_bet_ = stab;
+        last_raise_size_ = stab - big;
+        return st;
+    }
+    return bb;
 }
 
 }  // namespace cardengine

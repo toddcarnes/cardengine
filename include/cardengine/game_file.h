@@ -20,6 +20,9 @@ namespace cardengine {
 //   small_blind = 50
 //   big_blind = 100
 //   ante = 0
+//   ante_from = seats        # seats | button (button posts the whole ante)
+//   straddle = 0             # 0 = off, else twice the big blind (UTG, live)
+//   kill = off               # on = double blinds after a 10xBB pot
 //   hole_cards = 2
 //   board_cards = 5
 //   betting = nolimit          # nolimit | limit | potlimit
@@ -47,7 +50,7 @@ void save_game_file(const GameFile& game, std::ostream& out);
 void apply_game_key(GameConfig& config, const std::string& key,
                     const std::string& value, int lineno);
 
-// Shared writer for the ten game-rule lines (used by both file kinds).
+// Shared writer for the game-rule lines (used by both file kinds).
 void write_game_config(const GameConfig& config, std::ostream& out);
 
 }  // namespace cardengine

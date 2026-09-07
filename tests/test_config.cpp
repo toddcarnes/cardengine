@@ -80,6 +80,20 @@ int main() {
     c.hole_cards = 4;
     validate(c);
 
+    // Forced-bet options: straddle is 2× BB or off, kill/button-ante valid.
+    c = GameConfig{};
+    c.straddle = -10;
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "negative straddle");
+    c.straddle = 150;
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "straddle not 2x BB");
+    c.straddle = 200;
+    validate(c);
+    c.straddle = 0;
+    c.kill = true;
+    c.ante_from = AnteSource::ButtonOnly;
+    c.ante = 10;
+    validate(c);
+
     c = GameConfig{};
     c.max_raises_per_round = 0;
     expect_throws<std::invalid_argument>([&] { validate(c); }, "max raises positive");
