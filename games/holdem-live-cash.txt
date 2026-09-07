@@ -1,15 +1,15 @@
 # CardEngine game file (format 1)
 format_version = 1
-name = "No-Limit Hold'em 6-max"
-description = "Standard cash game: 6 seats, 10000 chips, 50/100 blinds"
+name = "Live Cash Hold'em 6-max"
+description = "Live-room cash game: UTG straddle, button ante, full kill after big pots"
 num_players = 6
 starting_stack = 10000
 small_blind = 50
 big_blind = 100
-ante = 0
-ante_from = seats
-straddle = 0
-kill = off
+ante = 10
+ante_from = button
+straddle = 200
+kill = on
 runouts = 1
 hole_cards = 2
 board_cards = 5
