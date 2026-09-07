@@ -13,6 +13,8 @@ namespace {
 using cardengine::Card;
 using cardengine::HandCategory;
 using cardengine::HandValue;
+using cardengine::LowValue;
+using cardengine::OmahaHiLoValue;
 using testutil::check;
 
 std::array<Card, 5> five(std::initializer_list<const char*> texts) {
@@ -190,6 +192,75 @@ int main() {
             bad = true;
         }
         check(bad, "omaha needs 5 board");
+    }
+
+    // Omaha Hi-Lo: the wheel is the nut low; pairs and 9s don't qualify.
+    {
+        // A2 + 3-4-5 board: high is the wheel straight, low is the nut low.
+        const OmahaHiLoValue scoop = evaluate_omaha_hilo(
+            cards({"Ah", "2c", "Ks", "Qd"}), cards({"3h", "4d", "5s", "Jc", "Td"}));
+        check(scoop.high.category == HandCategory::Straight, "wheel high");
+        check(scoop.low.qualifies, "wheel qualifies");
+        check((scoop.low.descending == std::array<int, 5>{5, 4, 3, 2, 1}),
+              "wheel is the nut low");
+
+        // 7-6 low beats 8-7 low (compare the highest card first).
+        const OmahaHiLoValue seven = evaluate_omaha_hilo(
+            cards({"Ah", "7c", "Ks", "Qd"}), cards({"2h", "3d", "6s", "Jc", "Td"}));
+        const OmahaHiLoValue eight = evaluate_omaha_hilo(
+            cards({"Ah", "8c", "Ks", "Qd"}), cards({"2h", "3d", "7s", "Jc", "Td"}));
+        check(seven.low.qualifies && eight.low.qualifies, "both qualify");
+        check(seven.low < eight.low, "7-low beats 8-low");
+        check(!(eight.low < seven.low), "8-low loses");
+
+        // Aces play both ways: A4 + 2-3-5 board makes a 5-high low.
+        const OmahaHiLoValue aces = evaluate_omaha_hilo(
+            cards({"Ah", "4d", "Ks", "Qd"}), cards({"2h", "3d", "5s", "Jc", "Td"}));
+        check(aces.low.qualifies, "aces low qualifies");
+        check((aces.low.descending == std::array<int, 5>{5, 4, 3, 2, 1}),
+              "ace-four makes the wheel");
+
+        // Counterfeit: A2 with two aces on board pairs the ace — the low
+        // must come from the remaining 2+3 combos (or vanish entirely).
+        const OmahaHiLoValue counterfeit = evaluate_omaha_hilo(
+            cards({"Ah", "2c", "Ks", "Qd"}),
+            cards({"Ad", "As", "7h", "8d", "9s"}));
+        check(!counterfeit.low.qualifies, "paired low cards kill the low");
+
+        // No low possible: K-Q-J board with high hole cards.
+        const OmahaHiLoValue high_only = evaluate_omaha_hilo(
+            cards({"Ah", "Kd", "Qs", "Js"}),
+            cards({"Kc", "Qh", "Jd", "9s", "Ts"}));
+        check(!high_only.low.qualifies, "high cards make no low");
+
+        // Flushes don't spoil lows: four to a low flush still qualifies.
+        const OmahaHiLoValue flush_low = evaluate_omaha_hilo(
+            cards({"Ah", "3h", "Ks", "Qd"}),
+            cards({"2h", "4h", "6h", "Jc", "Td"}));
+        check(flush_low.low.qualifies, "flush cards still make a low");
+
+        // Unqualified sorts after any qualifier; nothing beats itself.
+        LowValue none;
+        check(!(none < seven.low), "no low loses to a qualifier");
+        check(seven.low < none, "qualifier beats no low");
+        check(!(seven.low < seven.low), "low ties itself");
+
+        bool bad = false;
+        try {
+            evaluate_omaha_hilo(cards({"As", "Ks"}),
+                                cards({"Qs", "Js", "Ts", "9c", "8d"}));
+        } catch (const std::invalid_argument&) {
+            bad = true;
+        }
+        check(bad, "hilo needs 4 hole");
+        bad = false;
+        try {
+            evaluate_omaha_hilo(cards({"As", "Ks", "Qd", "Jd"}),
+                                cards({"Qs", "Js", "Ts", "9c"}));
+        } catch (const std::invalid_argument&) {
+            bad = true;
+        }
+        check(bad, "hilo needs 5 board");
     }
 
     std::cout << "test_hand ok\n";

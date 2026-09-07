@@ -23,7 +23,7 @@ namespace cardengine {
 //   hole_cards = 2
 //   board_cards = 5
 //   betting = nolimit          # nolimit | limit | potlimit
-//   showdown = holdem           # holdem | omaha (exactly 2+3)
+//   showdown = holdem           # holdem | omaha (exactly 2+3) | omaha_hilo
 //   max_raises = 4              # limit betting: bets-per-round cap
 //
 // Omitted rules keys fall back to GameConfig defaults. Shared files are

@@ -374,6 +374,10 @@ std::vector<Payout> Table::settle() {
             prev = level;
             if (amount == 0 || eligible.empty()) continue;
 
+            if (config_.showdown == HandConstruction::OmahaHiLo) {
+                award_hilo_pot(payouts, eligible, amount);
+                continue;
+            }
             std::vector<HandValue> values;
             for (int i : eligible) {
                 const Seat& s = seats_[static_cast<std::size_t>(i)];
@@ -446,9 +450,84 @@ HandValue Table::showdown_value(const std::vector<Card>& hole,
     if (config_.showdown == HandConstruction::OmahaTwoAndThree) {
         return evaluate_omaha(hole, board);
     }
+    if (config_.showdown == HandConstruction::OmahaHiLo) {
+        return evaluate_omaha_hilo(hole, board).high;
+    }
     std::vector<Card> all = board;
     all.insert(all.end(), hole.begin(), hole.end());
     return evaluate_best(all);
+}
+
+// Splits one side pot's worth of chips between the best high hand(s) and
+// the best qualifying low hand(s), each half paid clockwise from the
+// button. No qualifying low means high scoops the whole pot. Odd chips on
+// a split go to high first (standard cardroom rule), then clockwise.
+void Table::award_hilo_pot(std::vector<Payout>& payouts,
+                           const std::vector<int>& eligible, int amount) const {
+    std::vector<OmahaHiLoValue> values;
+    for (int i : eligible) {
+        const Seat& s = seats_[static_cast<std::size_t>(i)];
+        values.push_back(evaluate_omaha_hilo(s.hole, board_));
+    }
+    HandValue best_high = values[0].high;
+    for (const OmahaHiLoValue& value : values) {
+        if (best_high < value.high) best_high = value.high;
+    }
+    std::vector<int> high_winners;
+    for (std::size_t k = 0; k < eligible.size(); ++k) {
+        if (values[k].high == best_high) high_winners.push_back(eligible[k]);
+    }
+    // Best qualifying low; empty when nobody makes 8-or-better.
+    std::vector<int> low_winners;
+    bool low_set = false;
+    LowValue best_low;
+    for (std::size_t k = 0; k < eligible.size(); ++k) {
+        if (!values[k].low.qualifies) continue;
+        if (!low_set || values[k].low < best_low) {
+            best_low = values[k].low;
+            low_set = true;
+        }
+    }
+    if (low_set) {
+        for (std::size_t k = 0; k < eligible.size(); ++k) {
+            if (values[k].low.qualifies && !(best_low < values[k].low) &&
+                !(values[k].low < best_low)) {
+                low_winners.push_back(eligible[k]);
+            }
+        }
+    }
+    auto clockwise = [&](int a, int b) {
+        const int da = (a - button_ + num_seats()) % num_seats();
+        const int db = (b - button_ + num_seats()) % num_seats();
+        return da < db;
+    };
+    auto pay_share = [&](const std::vector<int>& winners, int share) {
+        std::vector<int> ordered = winners;
+        std::sort(ordered.begin(), ordered.end(), clockwise);
+        const int each = share / static_cast<int>(ordered.size());
+        const int remainder = share % static_cast<int>(ordered.size());
+        for (std::size_t w = 0; w < ordered.size(); ++w) {
+            const int award =
+                each + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+            auto it = std::find_if(payouts.begin(), payouts.end(),
+                                   [&](const Payout& p) {
+                                       return p.seat == ordered[w];
+                                   });
+            if (it == payouts.end()) {
+                payouts.push_back({ordered[w], award});
+            } else {
+                it->amount += award;
+            }
+        }
+    };
+    if (low_winners.empty()) {
+        pay_share(high_winners, amount);  // No low: high scoops.
+        return;
+    }
+    const int low_half = amount / 2;
+    const int high_half = amount - low_half;  // Odd chip goes high.
+    pay_share(high_winners, high_half);
+    pay_share(low_winners, low_half);
 }
 
 void Table::record_hand_started(std::uint64_t seed, bool seeded) {

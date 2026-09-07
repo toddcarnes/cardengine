@@ -84,6 +84,8 @@ std::string decide_from_text(Bot& bot, int seat,
             // Absent in older streams: holdem construction is the default.
             if (toks[1] == "omaha") {
                 view.showdown = cardengine::HandConstruction::OmahaTwoAndThree;
+            } else if (toks[1] == "omaha_hilo") {
+                view.showdown = cardengine::HandConstruction::OmahaHiLo;
             } else if (toks[1] != "holdem") {
                 throw std::invalid_argument("bad showdown '" + toks[1] + "'");
             }

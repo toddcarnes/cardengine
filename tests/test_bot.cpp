@@ -186,6 +186,32 @@ int main() {
         table.act(flop_actor, flop);
     }
 
+    // Hi-Lo bots value the low: A2 raises preflop, a made low bets the flop.
+    {
+        GameConfig config;
+        config.num_players = 2;
+        config.hole_cards = 4;
+        config.board_cards = 5;
+        config.showdown = HandConstruction::OmahaHiLo;
+        Table table(config);
+        auto bot = make_bot(heuristic_file());
+        // seat1: 9c Tc Jd Qh (high-only); seat0: Ah 2c 7s 8d (nut-low draw).
+        // Board: 3h 4d 6s 9c Kh.
+        table.start_hand_from_deck(cards({"9c", "Ah", "Tc", "2c", "Jd", "7s",
+                                         "Qh", "8d", "3h", "4d", "6s", "9c",
+                                         "Kh"}));
+        const Action open = bot->decide(make_view(table, 0));
+        check_legal(table, 0, open);
+        check(open.type != ActionType::Fold, "A2 low hand continues preflop");
+        table.act(0, {ActionType::Call, 0});
+        table.act(1, {ActionType::Check, 0});
+        table.deal_next_street();
+        const int flop_actor = table.acting();
+        const Action flop = bot->decide(make_view(table, flop_actor));
+        check_legal(table, flop_actor, flop);
+        check(flop.type != ActionType::Fold, "made low does not fold the flop");
+    }
+
     std::cout << "test_bot ok\n";
     return 0;
 }

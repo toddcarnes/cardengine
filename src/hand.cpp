@@ -142,6 +142,77 @@ HandValue evaluate_omaha(const std::vector<Card>& hole,
     return best;
 }
 
+bool operator<(const LowValue& a, const LowValue& b) {
+    // A qualifier beats a non-qualifier; between two qualifiers the lower
+    // low (smaller array) wins; nothing beats itself.
+    if (a.qualifies != b.qualifies) return a.qualifies > b.qualifies;
+    if (!a.qualifies) return false;
+    for (std::size_t i = 0; i < a.descending.size(); ++i) {
+        if (a.descending[i] != b.descending[i]) {
+            return a.descending[i] < b.descending[i];
+        }
+    }
+    return false;
+}
+
+namespace {
+
+// Five low-converted values (ace = 1), high-first, or an unqualified
+// LowValue when any value exceeds 8 or any value repeats.
+LowValue low_five(const std::array<Card, 5>& five) {
+    int values[5] = {};
+    for (std::size_t i = 0; i < 5; ++i) {
+        const int rank = rank_int(five[i].rank);
+        values[i] = (rank == 14) ? 1 : rank;  // Aces play low.
+    }
+    std::sort(values, values + 5, std::greater<int>());
+    for (int value : values) {
+        if (value > 8) return LowValue{};  // Too high for 8-or-better.
+    }
+    for (std::size_t i = 1; i < 5; ++i) {
+        if (values[i] == values[i - 1]) return LowValue{};  // Paired: no low.
+    }
+    LowValue low;
+    low.qualifies = true;
+    for (std::size_t i = 0; i < 5; ++i) low.descending[i] = values[i];
+    return low;
+}
+
+}  // namespace
+
+OmahaHiLoValue evaluate_omaha_hilo(const std::vector<Card>& hole,
+                                   const std::vector<Card>& board) {
+    if (hole.size() != 4 || board.size() != 5) {
+        throw std::invalid_argument(
+            "evaluate_omaha_hilo needs 4 hole + 5 board");
+    }
+    OmahaHiLoValue out;
+    bool high_set = false;
+    for (std::size_t a = 0; a < 4; ++a) {
+        for (std::size_t b = a + 1; b < 4; ++b) {
+            for (std::size_t c = 0; c < 5; ++c) {
+                for (std::size_t d = c + 1; d < 5; ++d) {
+                    for (std::size_t e = d + 1; e < 5; ++e) {
+                        const std::array<Card, 5> five{
+                            hole[a], hole[b], board[c], board[d], board[e]};
+                        const HandValue high = evaluate_five(five);
+                        if (!high_set || out.high < high) {
+                            out.high = high;
+                            high_set = true;
+                        }
+                        const LowValue low = low_five(five);
+                        if (low.qualifies &&
+                            (!out.low.qualifies || low < out.low)) {
+                            out.low = low;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return out;
+}
+
 HandValue evaluate_best(const std::vector<Card>& cards) {
     if (cards.size() < 5 || cards.size() > 7) {
         throw std::invalid_argument("evaluate_best needs 5 to 7 cards");

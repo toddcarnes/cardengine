@@ -487,12 +487,13 @@ std::string Session::execute(const std::string& raw_line) {
 std::string Session::do_state(int view_seat) const {
     std::ostringstream out;
     out << "street " << street_name(active_table().street()) << "\n";
-    out << "showdown "
-        << (active_table().config().showdown ==
-                    HandConstruction::OmahaTwoAndThree
-                ? "omaha"
-                : "holdem")
-        << "\n";
+    out << "showdown ";
+    switch (active_table().config().showdown) {
+        case HandConstruction::BestFiveOfAll: out << "holdem"; break;
+        case HandConstruction::OmahaTwoAndThree: out << "omaha"; break;
+        case HandConstruction::OmahaHiLo: out << "omaha_hilo"; break;
+    }
+    out << "\n";
     out << "button " << active_table().button() << "\n";
     out << "acting " << active_table().acting() << "\n";
     out << "acting_since " << active_table().acting_since() << "\n";

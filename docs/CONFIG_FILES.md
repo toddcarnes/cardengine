@@ -19,7 +19,13 @@ remaining chips. In Texas Hold'em each player gets 2 private (*hole*) cards
 and shares 5 community cards (*the board*: 3 on the *flop*, 1 on the
 *turn*, 1 on the *river*); the best five-card poker hand at the *showdown*
 wins. *Omaha* is a close cousin: 4 hole cards, and you must use exactly 2
-of them with exactly 3 board cards. A *kicker* breaks ties between equal
+of them with exactly 3 board cards. *Omaha Hi-Lo* (or *Omaha 8-or-better*)
+splits the pot: the best high hand takes half and the best low hand — five
+unpaired cards 8 or lower, with the ace playing as 1 — takes the other half.
+A low with 7 as its highest card beats a low topped by 8; straights and
+flushes don't count against the low, so A-2-3-4-5 is the best possible low
+(*the wheel*, which is also a straight for high). With no qualifying low the
+high hand scoops the whole pot. A *kicker* breaks ties between equal
 hands (pair of kings with an ace kicker beats pair of kings with a queen
 kicker). An *out* is an unseen card that would improve your hand — holding
 four hearts leaves nine hearts unseen, so nine outs. *Pot odds* compare what
@@ -73,7 +79,7 @@ everything else falls back to standard no-limit Hold'em.
 | `hole_cards` | `2` | Private cards dealt to each seat, 1–7. |
 | `board_cards` | `5` | Shared community cards, 0–5. Normally dealt 3 on the flop, 1 on the turn, 1 on the river; if you configure fewer, the early streets simply deal fewer (a 4-board deals 3, then 1, then nothing). With zero board cards the game still runs all four betting rounds on private cards alone. |
 | `betting` | `nolimit` | `nolimit`: raise any amount from the minimum up to all your chips. `limit`: bets come in fixed sizes only — one big blind before and on the flop, twice the big blind on the turn and river — with a cap per round (see `max_raises`). `potlimit`: raises are capped at what is already in the pot plus the call you are matching (a middle ground between the other two). The minimum raise works the same in all three. |
-| `showdown` | `holdem` | `holdem`: the winner is whoever makes the best five cards out of everything. `omaha`: you must use exactly 2 of your hole cards plus exactly 3 board cards (requires 4 hole + 5 board cards). This one rule is what makes Omaha play so differently: hands run much closer together, because everybody is choosing from more combinations. |
+| `showdown` | `holdem` | `holdem`: the winner is whoever makes the best five cards out of everything. `omaha`: you must use exactly 2 of your hole cards plus exactly 3 board cards (requires 4 hole + 5 board cards). This one rule is what makes Omaha play so differently: hands run much closer together, because everybody is choosing from more combinations. `omaha_hilo` (or `omaha-hilo`): same 4-hole/2+3 deal, but every pot splits — the best high hand takes half and the best 8-or-better low (five unpaired ranks 8 or lower, ace plays low, straights and flushes ignored) takes half. No qualifying low means the high scoops. The odd chip on a split goes to high first, then clockwise from the button. |
 | `max_raises` | `4` | Limit betting only: aggressive bets allowed per round, opening bet included (`4` = the opening bet plus up to 3 re-raises, then everyone may only call or fold). A player whose remaining chips cannot reach the fixed size may still go all-in for what they have; that short all-in does not use up the cap. |
 
 Cross-key rules (rejected with an explanation, never silently adjusted).
@@ -81,7 +87,7 @@ For example, a file asking for 4 hole cards and 5 board cards under Hold'em
 rules is refused, because no five-card hand can be judged from nine cards:
 
 - `hole_cards + board_cards` must be 5–7 in `holdem` mode.
-- `omaha` mode requires exactly 4 hole + 5 board.
+- `omaha` and `omaha_hilo` modes require exactly 4 hole + 5 board.
 - `seats × hole + board` must fit one 52-card deck (10-player Hold'em uses 25 cards, so there is plenty of room).
 
 Example — turn the stock game into a tight limit game by changing three lines:

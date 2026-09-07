@@ -5,6 +5,12 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Variants: Omaha Hi-Lo (`showdown = omaha_hilo`, `games/omaha-hilo-6max.txt`)
+  — 8-or-better low evaluator under exact 2+3 construction, every pot split
+  high/low (high scoops unqualified, odd chip to high first, quartering
+  paid clockwise), bots play both ways (wheel-card preflop premium, low
+  call discount, postflop live-low strength).
+
 ## 0.4.0 — Wave 2: persistence and clocks
 
 - Clocks: timed blind levels (`level = sb, bb, ante, hands, minutes` — wall

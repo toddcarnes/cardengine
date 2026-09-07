@@ -145,6 +145,136 @@ int main() {
         check(t.stack(0) == 10100 && t.stack(1) == 9900, "royal beats trips");
     }
 
+    // Omaha Hi-Lo: the same royal scoops when no low qualifies, then the
+    // low half goes to the A2 hand while high keeps its half.
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // seat1: Qh Qd 4c 5d (trip queens); seat0: As Ks 2c 3d (royal).
+        // Board Qs Js Ts 9h 2h: no 8-or-better low possible.
+        t.start_hand_from_deck(cards({"Qh", "As", "Qd", "Ks", "4c", "2c",
+                                     "5d", "3d", "Qs", "Js", "Ts", "9h",
+                                     "2h"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.went_to_showdown(), "hilo showdown");
+        check(t.stack(0) == 10100 && t.stack(1) == 9900,
+              "no low means high scoops");
+    }
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // seat1: Ah 2c Ks Qd; seat0: As Ks Qs Js.
+        // Board 3h 4d 5s Jc Td: seat1 holds the wheel both ways (scoop)
+        // until the low half splits — seat0 has no low, seat1 takes both.
+        t.start_hand_from_deck(cards({"Ah", "As", "2c", "Ks", "Ks", "Qs",
+                                     "Qd", "Js", "3h", "4d", "5s", "Jc",
+                                     "Td"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 9900 && t.stack(1) == 10100,
+              "wheel both ways scoops");
+    }
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // seat1: Ac Kd 9s Ts (high-only aces); seat0: Ah 2c 7d 9h.
+        // Board 4s 5c Jh Qd Ks: seat0's wheel-straight takes high AND the
+        // A-2-4-5 low hangs on — seat1's bare aces take nothing.
+        t.start_hand_from_deck(cards({"Ac", "Ah", "Kd", "2c", "9s", "7d",
+                                     "Ts", "9h", "4s", "5c", "Jh", "Qd",
+                                     "Ks"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 9900 && t.stack(1) == 10100,
+              "low straight scoops the high-only hand");
+    }
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // Split halves: seat1 Ah 2c 7s 8d (6-high low + ace-high),
+        // seat0 Ks Kd Qs Qd (trip kings high, no low: kings/queens only).
+        // Board 3h 4d 6s 9c Kh: trips take high, A-2-3-4-6 takes low
+        // (no wheel for anyone: no 5 on board). 200 pot splits 100/100.
+        t.start_hand_from_deck(cards({"Ah", "Ks", "2c", "Kd", "7s", "Qs",
+                                     "8d", "Qd", "3h", "4d", "6s", "9c",
+                                     "Kh"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 10000 && t.stack(1) == 10000,
+              "high and low split the pot");
+        check(t.went_to_showdown(), "split is a showdown");
+    }
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // Full house scoops when the board can't make a low: seat1 Ac Kd
+        // 7h 8c (trip queens, ace kicker), seat0 Ks Kd Qs Qd (kings-full).
+        // Board 3h 4d 9s 9c Kh: only 3,4 play low, so no low is possible.
+        t.start_hand_from_deck(cards({"Ac", "Ks", "Kd", "Kd", "7h", "Qs",
+                                     "8c", "Qd", "3h", "4d", "9s", "9c",
+                                     "Kh"}));
+        call(t, 0);
+        chk(t, 1);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 10100 && t.stack(1) == 9900,
+              "full house scoops with no low possible");
+    }
+    {
+        // Quartering: one high winner plus two tied low winners splits
+        // 150/75/75 on a 300 pot.
+        GameConfig c;
+        c.num_players = 3;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // seat0 Ks Kd Qs Qd (trip kings high); seat1 Ad 2d 7c 8c and seat2
+        // Ah 2c 7d 8h share the nut A-2-3-4-6 low. Board 3h 4d 6s 9c Kh.
+        // (Deal starts left of the button: seat1, seat2, seat0.)
+        t.start_hand_from_deck(cards({"Ad", "Ah", "Ks", "2d", "2c", "Kd",
+                                     "7c", "7d", "Qs", "8c", "8h", "Qd",
+                                     "3h", "4d", "6s", "9c", "Kh"}));
+        call(t, 0);
+        call(t, 1);
+        chk(t, 2);
+        check_down_streets(t);
+        t.settle();
+        check(t.stack(0) == 10000 - 100 + 150, "high takes half");
+        check(t.stack(1) == 10000 - 100 + 75, "tied low quarters");
+        check(t.stack(2) == 10000 - 100 + 75, "tied low quarters");
+        check(t.went_to_showdown(), "quarter is a showdown");
+    }
+
     std::cout << "test_variants ok\n";
     return 0;
 }

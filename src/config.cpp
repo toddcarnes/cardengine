@@ -29,7 +29,8 @@ void validate(const GameConfig& config) {
     if (config.board_cards < 0 || config.board_cards > 5) {
         throw std::invalid_argument("board_cards must be 0..5");
     }
-    if (config.showdown == HandConstruction::OmahaTwoAndThree) {
+    if (config.showdown == HandConstruction::OmahaTwoAndThree ||
+        config.showdown == HandConstruction::OmahaHiLo) {
         // Omaha deals 4 hole + 5 board and constructs exactly 2+3.
         if (config.hole_cards != 4 || config.board_cards != 5) {
             throw std::invalid_argument(

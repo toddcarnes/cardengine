@@ -95,10 +95,12 @@ void apply_game_key(GameConfig& config, const std::string& key,
             config.showdown = HandConstruction::BestFiveOfAll;
         } else if (s == "omaha") {
             config.showdown = HandConstruction::OmahaTwoAndThree;
+        } else if (s == "omaha_hilo" || s == "omahahilo" || s == "omaha-hilo") {
+            config.showdown = HandConstruction::OmahaHiLo;
         } else {
             throw std::invalid_argument(
                 "line " + std::to_string(lineno) +
-                ": showdown must be holdem or omaha");
+                ": showdown must be holdem, omaha, or omaha_hilo");
         }
     } else if (key == "max_raises") {
         config.max_raises_per_round = parse_int(value, lineno);
@@ -135,6 +137,9 @@ void write_game_config(const GameConfig& config, std::ostream& out) {
             break;
         case HandConstruction::OmahaTwoAndThree:
             out << "omaha\n";
+            break;
+        case HandConstruction::OmahaHiLo:
+            out << "omaha_hilo\n";
             break;
     }
     out << "max_raises = " << config.max_raises_per_round << "\n";

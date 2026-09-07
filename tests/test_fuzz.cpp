@@ -186,6 +186,20 @@ int main() {
     plo_hu.showdown = HandConstruction::OmahaTwoAndThree;
     fuzz_config(plo_hu, "plohu", 60);
 
+    GameConfig hilo;
+    hilo.num_players = 6;
+    hilo.hole_cards = 4;
+    hilo.betting = BettingStructure::PotLimit;
+    hilo.showdown = HandConstruction::OmahaHiLo;
+    fuzz_config(hilo, "hilo6", 60);
+
+    GameConfig hilo_hu;
+    hilo_hu.num_players = 2;
+    hilo_hu.hole_cards = 4;
+    hilo_hu.betting = BettingStructure::PotLimit;
+    hilo_hu.showdown = HandConstruction::OmahaHiLo;
+    fuzz_config(hilo_hu, "hilohu", 60);
+
     if (failures == 0) std::cout << "test_fuzz ok\n";
     return failures == 0 ? 0 : 1;
 }

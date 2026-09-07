@@ -151,6 +151,10 @@ private:
     // Showdown value under the configured construction rule.
     HandValue showdown_value(const std::vector<Card>& hole,
                              const std::vector<Card>& board) const;
+    // Hi-Lo side-pot split: half to the best high hand(s), half to the best
+    // qualifying low hand(s) (high scoops when no low qualifies).
+    void award_hilo_pot(std::vector<Payout>& payouts,
+                        const std::vector<int>& eligible, int amount) const;
 
     GameConfig config_;
     std::vector<Seat> seats_;

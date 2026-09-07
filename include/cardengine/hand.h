@@ -50,4 +50,33 @@ HandValue evaluate_best(const std::vector<Card>& cards);
 HandValue evaluate_omaha(const std::vector<Card>& hole,
                          const std::vector<Card>& board);
 
+// Omaha Hi-Lo low hand (8-or-better): five unpaired ranks, all 8 or lower,
+// ace counting as 1, straights and flushes ignored. `descending` holds the
+// low-converted values (ace = 1) sorted high-first, so the better low is
+// the lexicographically smaller array (wheel {5,4,3,2,1} is the nuts).
+// operator< means "better low" (smaller) — the reverse sense of HandValue,
+// documented here so call sites read plainly. Unqualified sorts after any
+// qualifier.
+struct LowValue {
+    bool qualifies = false;
+    // Low values high-first (ace = 1, 1..8); Rank::Two padding when empty.
+    std::array<int, 5> descending{9, 9, 9, 9, 9};
+
+    bool operator==(const LowValue&) const = default;
+};
+
+bool operator<(const LowValue& a, const LowValue& b);
+
+// Both halves of an Omaha Hi-Lo showdown under exact 2+3 construction.
+// `low` is unqualified when no 2+3 combo makes 8-or-better.
+struct OmahaHiLoValue {
+    HandValue high;
+    LowValue low;
+};
+
+// High plus best qualifying low (if any) over the same 60 combos.
+// Throws std::invalid_argument for any counts but 4 hole + 5 board.
+OmahaHiLoValue evaluate_omaha_hilo(const std::vector<Card>& hole,
+                                   const std::vector<Card>& board);
+
 }  // namespace cardengine

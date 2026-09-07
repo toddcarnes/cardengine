@@ -73,6 +73,13 @@ int main() {
     c.board_cards = 4;
     expect_throws<std::invalid_argument>([&] { validate(c); }, "omaha needs 5 board cards");
 
+    // Hi-Lo shares the Omaha deal (20 cards + 5 board, exact 2+3 both ways).
+    c = GameConfig{};
+    c.showdown = HandConstruction::OmahaHiLo;
+    expect_throws<std::invalid_argument>([&] { validate(c); }, "hilo needs 4 hole cards");
+    c.hole_cards = 4;
+    validate(c);
+
     c = GameConfig{};
     c.max_raises_per_round = 0;
     expect_throws<std::invalid_argument>([&] { validate(c); }, "max raises positive");

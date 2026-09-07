@@ -9,7 +9,9 @@ enum class BettingStructure { NoLimit, Limit, PotLimit };
 
 // How the showdown winner is found. BestFiveOfAll is Hold'em-style (any
 // five). OmahaTwoAndThree is Omaha-style: exactly 2 from hand + 3 from board.
-enum class HandConstruction { BestFiveOfAll, OmahaTwoAndThree };
+// OmahaHiLo splits every pot: best high hand takes half, best 8-or-better
+// low takes half (exact 2+3 both ways); no qualifying low means high scoops.
+enum class HandConstruction { BestFiveOfAll, OmahaTwoAndThree, OmahaHiLo };
 
 // Everything a variant needs to change about a game, as data.
 // Defaults describe standard no-limit Texas Hold'em, which is the test case

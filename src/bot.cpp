@@ -263,11 +263,16 @@ double card_points(Rank r) {
 // category-based after.
 HandValue omaha_current(const std::vector<Card>& hole,
                         const std::vector<Card>& board);
+OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
+                                     const std::vector<Card>& board);
 double made_strength(const SeatView& view) {
     if (view.board.empty()) {
         // Omaha deals four: pairs (6 combos, not 1) and rundowns/connectivity
-        // dominate; raw high cards leak value without coordination.
-        if (view.showdown == HandConstruction::OmahaTwoAndThree) {
+        // dominate; raw high cards leak value without coordination. Hi-Lo
+        // adds the other premium: two low cards (A-2 through A-5 wheel cards
+        // best) that can scoop or split the low half.
+        if (view.showdown == HandConstruction::OmahaTwoAndThree ||
+            view.showdown == HandConstruction::OmahaHiLo) {
             std::vector<Rank> ranks;
             for (const Card& c : view.hole) ranks.push_back(c.rank);
             std::sort(ranks.begin(), ranks.end());
@@ -312,7 +317,26 @@ double made_strength(const SeatView& view) {
                                  static_cast<int>(ranks[0]);
                 const bool connected = span <= 5;
                 if (connected) value += 0.06;
-                if (suited_max < 2 && !connected) value = 0.0;
+                // Hi-Lo low premium: two wheel cards (A + 2/3/4/5, pairs
+                // excepted — a paired ace can't make the low) play for half
+                // the pot on their own. Set AFTER the trash gate: A2 with
+                // nothing else is a low draw, not PLO trash.
+                bool hilo_low_draw = false;
+                if (view.showdown == HandConstruction::OmahaHiLo &&
+                    pairs == 0) {
+                    int low_cards = 0;
+                    bool has_ace = false;
+                    for (Rank r : ranks) {
+                        const int v = static_cast<int>(r);
+                        if (v == 14) has_ace = true;
+                        if (v == 14 || (v >= 2 && v <= 5)) ++low_cards;
+                    }
+                    hilo_low_draw = (low_cards >= 2);
+                    if (hilo_low_draw) {
+                        value = has_ace ? 0.34 : 0.22;
+                    }
+                }
+                if (suited_max < 2 && !connected && !hilo_low_draw) value = 0.0;
                 if (value > 0.75) value = 0.75;
             }
             return value;
@@ -340,9 +364,29 @@ double made_strength(const SeatView& view) {
     std::vector<Card> all = view.board;
     all.insert(all.end(), view.hole.begin(), view.hole.end());
     HandValue value;
-    if (view.showdown == HandConstruction::OmahaTwoAndThree &&
+    if ((view.showdown == HandConstruction::OmahaTwoAndThree ||
+         view.showdown == HandConstruction::OmahaHiLo) &&
         view.hole.size() == 4 && view.board.size() >= 3) {
         value = omaha_current(view.hole, view.board);
+        // Hi-Lo postflop: a live low draw (or made low) is worth half the
+        // pot on its own — play it like a strong made hand.
+        if (view.showdown == HandConstruction::OmahaHiLo &&
+            view.board.size() >= 3) {
+            const OmahaHiLoValue hilo =
+                evaluate_partial_hilo(view.hole, view.board);
+            if (hilo.low.qualifies) {
+                double low_strength = 0.55;
+                if (hilo.low.descending[0] <= 6) low_strength = 0.65;
+                if (hilo.low.descending[0] <= 5 &&
+                    hilo.low.descending[1] <= 4) {
+                    low_strength = 0.72;  // Nut-ish low: bet it.
+                }
+                double total = low_strength;
+                // Both ways (good high + good low) is the scoop premium.
+                if (value.category >= HandCategory::TwoPair) total = 0.85;
+                return total > 1.0 ? 1.0 : total;
+            }
+        }
     } else {
         value = evaluate_best(all);
     }
@@ -365,9 +409,68 @@ double made_strength(const SeatView& view) {
     return total;
 }
 
-// Best five right now under exact-2-from-hand rules, for a 3-5 card board.
-// At 5 board cards this is exactly evaluate_omaha; earlier streets judge
-// the made hand so far (draws are scored separately).
+// Partial Hi-Lo on a 3-4 card board: high is the best exact-2+3 five so
+// far; low qualifies only when the board already shows 3+ distinct
+// 8-or-better ranks (a 1- or 2-low flop cannot make a low yet, however
+// pretty the hole cards). At 5 board cards this is evaluate_omaha_hilo.
+OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
+                                     const std::vector<Card>& board) {
+    OmahaHiLoValue out;
+    out.high = omaha_current(hole, board);
+    int low_ranks[5] = {};
+    int distinct = 0;
+    bool seen[15] = {};
+    for (const Card& c : board) {
+        int v = static_cast<int>(c.rank);
+        if (v == 14) v = 1;
+        if (v > 8) continue;
+        if (!seen[v]) {
+            seen[v] = true;
+            low_ranks[distinct++] = v;
+        }
+    }
+    if (distinct < 3) return out;  // No low possible yet.
+    bool low_set = false;
+    for (std::size_t a = 0; a < hole.size(); ++a) {
+        for (std::size_t b = a + 1; b < hole.size(); ++b) {
+            int ha = static_cast<int>(hole[a].rank);
+            int hb = static_cast<int>(hole[b].rank);
+            if (ha == 14) ha = 1;
+            if (hb == 14) hb = 1;
+            if (ha > 8 || hb > 8 || ha == hb) continue;
+            // Best 3 board lows to pair with these two hole lows.
+            std::sort(low_ranks, low_ranks + distinct, std::greater<int>());
+            for (int c = 0; c < distinct; ++c) {
+                for (int d = c + 1; d < distinct; ++d) {
+                    for (int e = d + 1; e < distinct; ++e) {
+                        const int combo[5] = {ha, hb, low_ranks[c],
+                                              low_ranks[d], low_ranks[e]};
+                        bool paired = false;
+                        for (int i = 0; i < 5 && !paired; ++i) {
+                            for (int k = i + 1; k < 5; ++k) {
+                                if (combo[i] == combo[k]) paired = true;
+                            }
+                        }
+                        if (paired) continue;
+                        LowValue low;
+                        low.qualifies = true;
+                        int sorted[5] = {combo[0], combo[1], combo[2],
+                                         combo[3], combo[4]};
+                        std::sort(sorted, sorted + 5, std::greater<int>());
+                        for (int i = 0; i < 5; ++i) {
+                            low.descending[i] = sorted[i];
+                        }
+                        if (!low_set || low < out.low) {
+                            out.low = low;
+                            low_set = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return out;
+}
 HandValue omaha_current(const std::vector<Card>& hole,
                         const std::vector<Card>& board) {
     bool best_set = false;
@@ -408,7 +511,8 @@ double draw_equity(const SeatView& view) {
     }
     for (const Card& c : view.board) count_suit(c);
     int outs = 0;
-    const bool omaha = view.showdown == HandConstruction::OmahaTwoAndThree;
+    const bool omaha = view.showdown == HandConstruction::OmahaTwoAndThree ||
+                       view.showdown == HandConstruction::OmahaHiLo;
     for (int suit = 0; suit < 4; ++suit) {
         // Omaha needs exactly 2 from hand: a four-flush is only live with
         // 2+ hole cards of the suit.
@@ -457,6 +561,22 @@ double strength(const SeatView& view, double position_weight) {
     if (total < 0.0) total = 0.0;
     if (total > 1.0) total = 1.0;
     return total;
+}
+
+// Two unpaired wheel cards (A + 2/3/4/5) in four: the Hi-Lo low draw
+// that contests half the pot preflop.
+bool wheel_draw(const std::vector<Card>& hole) {
+    if (hole.size() != 4) return false;
+    int low_cards = 0;
+    bool paired_ace = false;
+    for (std::size_t i = 0; i < hole.size(); ++i) {
+        const int v = static_cast<int>(hole[i].rank);
+        if (v == 14 || (v >= 2 && v <= 5)) ++low_cards;
+        for (std::size_t k = i + 1; k < hole.size(); ++k) {
+            if (hole[i].rank == hole[k].rank && v == 14) paired_ace = true;
+        }
+    }
+    return low_cards >= 2 && !paired_ace;
 }
 
 class HeuristicBot : public Bot {
@@ -524,6 +644,14 @@ protected:
         if (file_.planning > 0) {
             equity = planned_equity(view, s);
         }
+        // Hi-Lo low discount: with two wheel cards the call contests half
+        // the pot on its own, so the pot-odds bar halves (a low draw at
+        // 2x pot odds plays like a high draw at even money).
+        double bar_scale = 1.0;
+        if (view.showdown == HandConstruction::OmahaHiLo &&
+            view.board.empty() && wheel_draw(view.hole)) {
+            bar_scale = 0.45;
+        }
         if (equity >= 0.62 + premium && view.can_raise) {
             return {ActionType::Raise, size_bet(view)};
         }
@@ -531,11 +659,11 @@ protected:
             static_cast<double>(view.to_call) /
             static_cast<double>(view.pot + view.to_call);
         if (view.can_raise &&
-            equity + file_.looseness * 0.25 >= pot_odds * 2.0 + premium) {
+            equity + file_.looseness * 0.25 >= pot_odds * 2.0 * bar_scale + premium) {
             return {ActionType::Call, 0};
         }
         if (!view.can_raise &&
-            equity + file_.looseness * 0.25 >= pot_odds + premium) {
+            equity + file_.looseness * 0.25 >= pot_odds * bar_scale + premium) {
             return {ActionType::Call, 0};
         }
         return {ActionType::Fold, 0};

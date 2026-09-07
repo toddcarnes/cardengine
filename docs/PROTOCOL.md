@@ -51,6 +51,7 @@ this project is called CardEngine.)
 
 ```
 street preflop|flop|turn|river|none|complete
+showdown holdem|omaha|omaha_hilo
 button <seat>
 acting <seat|-1>
 acting_since <seconds|-1>
@@ -111,7 +112,7 @@ holds examples. Required key: `format_version = 1`. Optional keys fall back
 to standard Hold'em defaults: `name`, `description`, `num_players`,
 `starting_stack`, `small_blind`, `big_blind`, `ante`, `hole_cards`,
 `board_cards`, `betting = nolimit|limit|potlimit`,
-`showdown = holdem|omaha` (exactly 2+3), `max_raises` (limit cap). Unknown keys, bad values,
+`showdown = holdem|omaha` (exactly 2+3)`|omaha_hilo` (high/low split, 8-or-better), `max_raises` (limit cap). Unknown keys, bad values,
 and rule combinations the engine can't run are rejected with a line number —
 a friend's hand-edited file can error, never corrupt a game. Full key
 reference (mandatory vs optional, defaults, effects): `docs/CONFIG_FILES.md`.
