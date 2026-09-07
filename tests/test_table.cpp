@@ -335,6 +335,58 @@ int main() {
         check(t.button() == 0, "button rotated 0->1->2->0");
     }
 
+    // Sit-outs skip the hand: no cards, no blinds, no button.
+    {
+        Table t(three_max());
+        t.set_sitting_out(0, true);
+        check(t.sitting_out(0) && !t.sitting_out(1) && !t.sitting_out(2),
+              "flags read back");
+        expect_throws<std::invalid_argument>([&] { t.set_sitting_out(9, true); },
+                                "sitout seat range");
+        expect_throws<std::invalid_argument>([&] { t.sitting_out(9); },
+                                "sitting_out seat range");
+        t.start_hand(7);
+        check(!t.in_hand(0) && t.in_hand(1) && t.in_hand(2),
+              "sitter skips the deal");
+        expect_throws<std::logic_error>([&] { t.hole_cards(0); }, "sitter has no cards");
+        check(t.hole_cards(1).size() == 2, "live seat dealt two");
+        check(t.hole_cards(2).size() == 2, "second live seat dealt two");
+        // One participant cannot start a hand: needs at least two.
+        Table short_handed(three_max());
+        short_handed.set_sitting_out(0, true);
+        short_handed.set_sitting_out(1, true);
+        expect_throws<std::logic_error>([&] { short_handed.start_hand(7); },
+                           "lone seat cannot play");
+        // Mid-hand flips wait for the next hand; the running hand is safe.
+        t.set_sitting_out(1, true);  // Legal mid-hand, ignored until next deal.
+        check(t.in_hand(1), "running hand unaffected");
+        t.set_sitting_out(0, false);
+        t.set_sitting_out(1, false);
+        t.set_sitting_out(2, false);
+        while (!t.hand_complete()) {
+            if (t.acting() != -1) {
+                const int a = t.acting();
+                if (t.options(a).can_check) {
+                    chk(t, a);
+                } else {
+                    call(t, a);
+                }
+            } else {
+                t.deal_next_street();
+            }
+        }
+        t.settle();
+        check(total_chips(t) == 30000, "conserved around sitouts");
+        // Button skips sitters: seat 0 out, seats 1+2 play, button stays
+        // off the sitter and no blind touches them.
+        t.set_sitting_out(0, true);
+        t.start_hand(8);
+        check(t.button() != 0, "button skips the sitter");
+        check(!t.in_hand(0) && t.in_hand(1) && t.in_hand(2),
+              "sitter skips the next hand too");
+        check(t.committed(0) == 0, "sitter posts nothing");
+    }
+
     std::cout << "test_table ok\n";
     return 0;
 }

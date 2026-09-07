@@ -39,6 +39,12 @@ public:
     int stack(int seat) const;
     // Setup/operator control (tests, tournaments, rebuys). Not part of play.
     void set_stack(int seat, int chips);
+    // Sit-out control: a sitting-out seat posts nothing, is dealt nothing,
+    // and is skipped for blinds/button until resumed. Applies from the next
+    // hand (safe to flip mid-hand: the running hand is unaffected). Stacks,
+    // eliminations, and bot seatings are left alone.
+    void set_sitting_out(int seat, bool out);
+    bool sitting_out(int seat) const;
     // Tournament level changes between hands (never mid-hand).
     void set_blinds(int small, int big);
     void set_ante(int ante);
@@ -96,6 +102,7 @@ private:
         bool in_hand = false;
         bool folded = false;
         bool acted = false;
+        bool sitting_out = false;  // Operator flag: skips future hands.
         int seen_seq = 0;  // Raise generation this seat has responded to.
         std::vector<Card> hole;
     };

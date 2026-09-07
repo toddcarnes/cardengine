@@ -30,6 +30,16 @@ void Table::set_stack(int seat, int chips) {
     seats_[static_cast<std::size_t>(seat)].stack = chips;
 }
 
+void Table::set_sitting_out(int seat, bool out) {
+    check_seat(seat);
+    seats_[static_cast<std::size_t>(seat)].sitting_out = out;
+}
+
+bool Table::sitting_out(int seat) const {
+    check_seat(seat);
+    return seats_[static_cast<std::size_t>(seat)].sitting_out;
+}
+
 void Table::set_blinds(int small, int big) {
     if (street_ != Street::None && street_ != Street::Complete) {
         throw std::logic_error("cannot change blinds mid-hand");
@@ -171,8 +181,10 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
     if (street_ != Street::None && street_ != Street::Complete) {
         throw std::logic_error("hand already running");
     }
-    const int funded = static_cast<int>(std::count_if(
-        seats_.begin(), seats_.end(), [](const Seat& s) { return s.stack > 0; }));
+    const int funded = static_cast<int>(
+        std::count_if(seats_.begin(), seats_.end(), [](const Seat& s) {
+            return s.stack > 0 && !s.sitting_out;
+        }));
     if (funded < 2) throw std::logic_error("need at least 2 players");
     const std::size_t need = static_cast<std::size_t>(funded * config_.hole_cards +
                                                       config_.board_cards);
@@ -394,10 +406,12 @@ std::vector<Payout> Table::settle() {
     events_.push_back(settled);
     street_ = Street::Complete;
     acting_ = -1;
-    // Advance the button to the next seated player with chips.
+    // Advance the button to the next seated player with chips who is not
+    // sitting out.
     for (int k = 1; k <= num_seats(); ++k) {
         const int s = (button_ + k) % num_seats();
-        if (seats_[static_cast<std::size_t>(s)].stack > 0) {
+        if (seats_[static_cast<std::size_t>(s)].stack > 0 &&
+            !seats_[static_cast<std::size_t>(s)].sitting_out) {
             button_ = s;
             break;
         }
@@ -480,11 +494,12 @@ void Table::post_blind(int seat, int amount) {
 }
 
 void Table::begin_round() {
+    ++round_seq_;  // New betting round: everyone owes fresh action.
     for (Seat& s : seats_) {
         if (!s.in_hand) continue;
         s.bet = 0;
         s.acted = false;
-        s.seen_seq = round_seq_;
+        s.seen_seq = round_seq_ - 1;
     }
     current_bet_ = 0;
     last_raise_size_ = fixed_bet_size();
@@ -506,7 +521,7 @@ void Table::start_hand_common() {
     for (Seat& s : seats_) {
         s.bet = 0;
         s.committed = 0;
-        s.in_hand = s.stack > 0;
+        s.in_hand = s.stack > 0 && !s.sitting_out;
         s.folded = false;
         s.acted = false;
         s.seen_seq = 0;

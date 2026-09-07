@@ -150,6 +150,9 @@ void Tournament::rebuy(int seat) {
         table_.street() != Street::Complete) {
         throw std::logic_error("no rebuys mid-hand");
     }
+    if (table_.sitting_out(seat)) {
+        throw std::logic_error("seat is sitting out");
+    }
     table_.set_stack(seat, table_.stack(seat) + config_.game.starting_stack);
     prize_pool_ += config_.buy_in;
     // A returning player vacates their recorded finish (and prize).

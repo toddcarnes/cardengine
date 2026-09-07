@@ -143,6 +143,30 @@ int main() {
         check(contains(s.execute("state x"), "error"), "bad seat text");
     }
 
+    // Sit-out flags: usage, range, the marker in state, and the next hand.
+    {
+        Session s;
+        check(contains(s.execute("sitout"), "usage"), "sitout usage");
+        check(contains(s.execute("resume"), "usage"), "resume usage");
+        check(contains(s.execute("sitout x"), "error"), "sitout bad text");
+        check(contains(s.execute("sitout 9"), "error"), "sitout range");
+        check(s.execute("sitout 0") == "ok", "sitout applies");
+        const std::string flagged = s.execute("state");
+        check(contains(find_line(flagged, "seat 0 "), " out hole"),
+              "marker on sitting-out seat");
+        check(!contains(find_line(flagged, "seat 2 "), " out hole"),
+              "no marker on live seat");
+        check(s.execute("start 7") == "ok", "start skips sitters");
+        const std::string dealt = s.execute("state");
+        check(contains(find_line(dealt, "seat 0 "), " out hole --"),
+              "sitter dealt out");
+        check(contains(find_line(dealt, "seat 2 "), " in live hole"),
+              "live seat dealt in");
+        check(s.execute("resume 0") == "ok", "resume applies");
+        check(!contains(find_line(s.execute("state"), "seat 0 "), " out hole"),
+              "marker cleared");
+    }
+
     std::cout << "test_protocol ok\n";
     return 0;
 }

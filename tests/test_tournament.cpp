@@ -22,7 +22,8 @@ using testutil::check;
 using testutil::contains;
 using testutil::expect_throws;
 
-void play_out(Table& table) {    using cardengine::ActionType;
+void play_out(Table& table) {
+    using cardengine::ActionType;
     while (!table.hand_complete()) {
         if (table.acting() != -1) {
             const int seat = table.acting();
@@ -204,6 +205,18 @@ int main() {
                   tournament.table().in_hand(2),
               "rebought seat plays on");
         expect_throws<std::exception>([&] { tournament.rebuy(0); }, "no rebuys mid-hand");
+        // Sitting out blocks rebuys; flags only bite from the next deal.
+        tournament.table().set_sitting_out(0, true);
+        expect_throws<std::exception>([&] { tournament.rebuy(0); }, "no rebuys while out");
+        tournament.table().set_sitting_out(0, false);
+        play_out(tournament.table());
+        tournament.finish_hand();
+        // From the next deal the sitter skips while the live seats play on.
+        tournament.table().set_sitting_out(1, true);
+        tournament.begin_hand(3);
+        check(!tournament.table().in_hand(1), "sitter skips the deal");
+        check(tournament.table().in_hand(0) && tournament.table().in_hand(2),
+              "live seats play on");
     }
 
     // Table blind controls validate and refuse mid-hand changes.

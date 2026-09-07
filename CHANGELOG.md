@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Protocol: `sitout <seat>` / `resume <seat>` park a disconnected seat
+  (posts/dealt nothing from the next hand, button skips it) and bring it
+  back; sitting-out seats cannot rebuy. `state` marks them with `out`.
+- Table: fixed postflop opening action (new betting round now reopens
+  action for every live seat instead of stalling on all-checks).
 - Protocol: `tlevel` (manual tournament clock advance) and `trebuy <seat>`
   (between-hands top-up / bust-out return) expose the existing
   `Tournament::advance_level` / `rebuy` library calls over the wire.

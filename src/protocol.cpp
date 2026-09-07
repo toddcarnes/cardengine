@@ -88,7 +88,7 @@ std::string Session::execute(const std::string& raw_line) {
     try {
         const auto [command, rest] = split_first(line);
         if (command == "help") {
-            return "ok commands: help load tload tstatus tlevel trebuy start state options "
+            return "ok commands: help load tload tstatus tlevel trebuy sitout resume start state options "
                    "act deal settle log addbot bots step quit";
         }
         if (command == "quit") return "bye";
@@ -159,6 +159,24 @@ std::string Session::execute(const std::string& raw_line) {
                 return "error bad seat '" + rest + "'";
             }
             tournament_->rebuy(seat);
+            return "ok";
+        }
+        if (command == "sitout" || command == "resume") {
+            if (rest.empty()) {
+                return "error usage: " + command + " <seat>";
+            }
+            std::size_t used = 0;
+            int seat = -1;
+            try {
+                seat = std::stoi(rest, &used);
+            } catch (const std::exception&) {
+                return "error bad seat '" + rest + "'";
+            }
+            if (used != rest.size() || seat < 0 ||
+                seat >= active_table().num_seats()) {
+                return "error bad seat '" + rest + "'";
+            }
+            active_table().set_sitting_out(seat, command == "sitout");
             return "ok";
         }
         if (command == "start") {
@@ -349,7 +367,8 @@ std::string Session::do_state(int view_seat) const {
         out << "seat " << i << " stack " << active_table().stack(i) << " bet "
             << active_table().bet(i) << " committed " << active_table().committed(i) << " "
             << (active_table().in_hand(i) ? "in" : "out") << " "
-            << (active_table().has_folded(i) ? "folded" : "live") << " hole";
+            << (active_table().has_folded(i) ? "folded" : "live")
+            << (active_table().sitting_out(i) ? " out" : "") << " hole";
         // Filtered views hide every other seat's cards; bare `state` is the
         // local-trust full dump. Folded and out seats always show `--`.
         const bool show =

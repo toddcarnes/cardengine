@@ -27,7 +27,8 @@ this project is called CardEngine.)
 | `tload <tournament-file>` | `ok` | Tournament mode (below); clears bots. |
 | `tstatus` | `tournament ...`, `standing ...` × n, `ok` | Levels, pool, places. |
 | `tlevel` | `ok` | Tournament only: manual clock advance (sticks at final level). |
-| `trebuy <seat>` | `ok` | Tournament only, between hands: top up a live seat or bring back a busted one (adds a buy-in to the pool). |
+| `trebuy <seat>` | `ok` | Tournament only, between hands: top up a live seat or bring back a busted one (adds a buy-in to the pool). Not for sitting-out seats. |
+| `sitout <seat>` / `resume <seat>` | `ok` | Flag a seat out (disconnect/away) or bring it back. Applies from the next hand; the running hand is unaffected. |
 | `start <seed>` | `ok` | Starts a hand; stacks and button carry over between hands. |
 | `state` | block, then `end` | Full table dump — local trust only (below). |
 | `state <seat>` | block, then `end` | That seat's view: own hole cards shown, all other seats `--`. |
@@ -57,7 +58,14 @@ end
 ```
 
 `bet` is committed this round, `committed` this hand. Folded or out-of-hand
-seats show `hole --`.
+seats show `hole --`. A sitting-out seat carries an `out` marker after
+`live`/`folded` (`seat 0 ... live out hole --`); it is dealt nothing and
+posts nothing until resumed.
+
+A host parks a disconnected player with `sitout`, keeps dealing to everyone
+else, and seats them back with `resume` — no rebuy, no lost stack, no
+special-casing in the deal loop. Bots on a sitting-out seat simply never
+become `acting`; `step` on them reports no action pending.
 
 > **Trust note (v0):** bare `state` shows every seated player's hole cards. That is
 > correct for local play (several humans sharing one screen, or bots running
@@ -189,7 +197,7 @@ calls `Tournament::advance_level` / `Tournament::rebuy` underneath).
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus tlevel trebuy start state options act deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy sitout resume start state options act deal settle log addbot bots step quit
 > start 7
 ok
 > options
