@@ -5,6 +5,10 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Bots: PLO trash gate (zero-leg coordination unplayable, one leg calls
+  but never opens, two legs play; double-suited + tight adds a kicker)
+  replacing the failed call discount (it fed Randy multi-way pots).
+  GTO deuce value raises pat 7-lows and keeps lesser pat lows.
 - Bots: PLO call discount for coordinated hands with live draws
   (bar_scale 0.6 postflop, gated on draw equity so naked pairs still pay
   full price) plus a draw-gated honesty tax (bare pairs without draws

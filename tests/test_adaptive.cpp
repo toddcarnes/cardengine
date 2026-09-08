@@ -350,7 +350,8 @@ int main() {
     }
 
     // Omaha preflop: pairs and coordinated hands raise, bare high cards
-    // with no coordination fold to pressure.
+    // with no coordination fold to pressure. One-legged hands (one suit
+    // or loose connection, not both) call small bets but never open.
     {
         auto bot = make_bot(heuristic_file());
         SeatView omaha = base_view();
@@ -394,6 +395,26 @@ int main() {
         two_pair.max_raise_to = 8000;
         check(bot->decide(two_pair).type == ActionType::Fold,
               "omaha bottom two folds to pressure");
+        // One leg (suited, unconnected, s ~ 0.3): the gate keeps it
+        // above zero — it prices as a caller, not trash. The gate's
+        // job is the zero-vs-nonzero line (junk folds to anything);
+        // exact call/fold at one price is pot-odds arithmetic.
+        SeatView one_leg = base_view();
+        one_leg.showdown = HandConstruction::OmahaTwoAndThree;
+        one_leg.num_seats = 6;
+        one_leg.hole = {card("Ah"), card("Kh"), card("9c"), card("3d")};
+        one_leg.pot = 150;
+        one_leg.to_call = 0;
+        one_leg.call_amount = 0;
+        one_leg.can_check = true;
+        one_leg.can_raise = true;
+        one_leg.current_bet = 100;
+        one_leg.min_raise_to = 200;
+        one_leg.max_raise_to = 8000;
+        check(bot->decide(one_leg).type != ActionType::Raise,
+              "omaha one leg never opens");
+        check(bot->decide(one_leg).type != ActionType::Fold,
+              "omaha one leg checks free");
     }
 
     // Omaha honesty: a bare overpair with no coordination reads as a
@@ -430,8 +451,8 @@ int main() {
               "omaha coordinated aces never raise bare");
     }
 
-    // Omaha discount: a coordinated draw facing one bet calls at the
-    // discounted bar where a naked pair folds. The probe bot runs
+    // Omaha postflop honesty (no discount): the coordinated draw and
+    // the naked pair face the same full-price bar. The probe bot runs
     // looseness 0.0 so the bar (not the looseness subsidy) decides.
     {
         auto tight_caller = make_bot(slider_file(
@@ -454,10 +475,8 @@ int main() {
             v.can_raise = false;
             return v;
         };
-        // The bar math: naked pair s ~ 0.15–0.25 taxed, coordinated
-        // s ~ 0.5. At bet 200 into 400 (pot odds 1/3, raisable bar 2/3):
-        // naked needs 0.67, coordinated-discounted needs 0.40. Assert
-        // the coordinated calls and naked folds exactly there.
+        // Naked pair taxed to high-card strength: folds a pot-sized bet
+        // at full price.
         {
             SeatView vn = plo_call("As", "Ah", "9d", "4c");
             vn.to_call = 200;
@@ -466,18 +485,8 @@ int main() {
             vn.can_raise = true;
             vn.min_raise_to = 300;
             vn.max_raise_to = 8000;
-            SeatView vc = plo_call("As", "Ah", "Ks", "Qd");
-            vc.to_call = 200;
-            vc.call_amount = 200;
-            vc.current_bet = 200;
-            vc.can_raise = true;
-            vc.min_raise_to = 300;
-            vc.max_raise_to = 8000;
-            const Action an = tight_caller->decide(vn);
-            const Action ac = tight_caller->decide(vc);
-            check(an.type == ActionType::Fold, "plo naked folds full price");
-            check(ac.type == ActionType::Call,
-                  "plo coordinated takes the discount");
+            check(tight_caller->decide(vn).type == ActionType::Fold,
+                  "plo naked folds full price");
         }
     }
 

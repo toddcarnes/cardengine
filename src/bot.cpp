@@ -419,9 +419,11 @@ double made_strength(const SeatView& view) {
             } else {
                 value = card_points(ranks[3]) + card_points(ranks[2]) * 0.4;
                 // Coordination: suits together, ranks connected. Bare high
-                // cards with neither are PLO trash (everyone makes hands).
-                // The penalty has to clear the open-raise bar (~0.45), not
-                // just dent the number: -0.3 still calls 2x pot odds.
+                // cards with neither are PLO trash (everyone makes hands) —
+                // and multi-way pots are Randy's harvest, so single-suited
+                // or loosely connected hands grade down too: only
+                // double-suited or tight-connected hands play for a raise,
+                // one-legged coordination calls one bet, trash folds.
                 int suited_max = 0;
                 int suits[4] = {};
                 for (const Card& c : view.hole) {
@@ -430,11 +432,36 @@ double made_strength(const SeatView& view) {
                         suited_max = suits[static_cast<int>(c.suit)];
                     }
                 }
-                if (suited_max >= 2) value += 0.04;
                 const int span = static_cast<int>(ranks[3]) -
                                  static_cast<int>(ranks[0]);
+                const bool tight = span <= 4;
                 const bool connected = span <= 5;
-                if (connected) value += 0.06;
+                const bool double_suited =
+                    suits[0] == 2 || suits[1] == 2 || suits[2] == 2 ||
+                    suits[3] == 2;
+                int legs = 0;
+                if (suited_max >= 2) ++legs;
+                if (connected) ++legs;
+                if (view.showdown == HandConstruction::OmahaTwoAndThree) {
+                    // PLO trash gate: zero legs is unplayable (0.0 folds to
+                    // any pressure); one leg calls one small bet but never
+                    // opens; two legs play poker.
+                    if (legs == 0) {
+                        return 0.0;
+                    }
+                    if (legs == 1) {
+                        value = 0.30 + static_cast<double>(
+                                            static_cast<int>(ranks[3]) - 2) *
+                                            0.005;
+                        if (value > 0.38) value = 0.38;
+                        return value;
+                    }
+                    value += 0.04 + 0.06;
+                    if (double_suited && tight) value += 0.04;
+                } else {
+                    if (suited_max >= 2) value += 0.04;
+                    if (connected) value += 0.06;
+                }
                 // Hi-Lo low premium: two wheel cards (A + 2/3/4/5, pairs
                 // excepted — a paired ace can't make the low) play for half
                 // the pot on their own. Set AFTER the trash gate: A2 with
@@ -879,44 +906,17 @@ protected:
         }
         // Hi-Lo low discount: with two wheel cards the call contests half
         // the pot on its own, so the pot-odds bar halves (a low draw at
-        // 2x pot odds plays like a high draw at even money). PLO gets a
-        // milder sibling: coordinated hands (suit + connectors) realize
-        // equity multi-way far better than bare pairs, so they call one
-        // bet at a discount. Naked pairs pay full price — they are the
-        // leak the honesty tax prices, and no discount should smuggle
-        // them back in.
+        // 2x pot odds plays like a high draw at even money). PLO gets no
+        // discount: the 0.6 experiment fed Randy (multi-way pots are its
+        // harvest — every extra caller is split equity donated). Naked
+        // pairs pay full price, and so does everything else.
         double bar_scale = 1.0;
         if (view.showdown == HandConstruction::OmahaHiLo &&
             view.board.empty() && wheel_draw(view.hole)) {
             bar_scale = 0.45;
-        } else if (view.showdown == HandConstruction::OmahaTwoAndThree &&
-                   view.board.size() >= 3 && omaha_coordinated(view.hole)) {
-            // Coordinated hands with any live draw get the discount
-            // (coordination realizes equity multi-way) — but a bare made
-            // pair must never ride along: the draw gate (not just
-            // coordination) separates them. 0.05 admits backdoors.
-            if (draw_equity(view) > 0.05) bar_scale = 0.6;
         }
         if (equity >= 0.62 + premium && view.can_raise) {
             return {ActionType::Raise, size_bet(view)};
-        }
-        // Omaha coordinated hands facing a capped bet (no raise left):
-        // the discount calls rather than folds — but the value line
-        // above already raised the premiums, so this only rescues draws
-        // and middle grades that priced out at full odds. (The rescue
-        // sits BEFORE the generic capped-bet call below so the discount,
-        // not full price, decides these hands.)
-        if (!view.can_raise &&
-            view.showdown == HandConstruction::OmahaTwoAndThree &&
-            view.board.size() >= 3 && omaha_coordinated(view.hole) &&
-            draw_equity(view) > 0.05) {
-            const double discounted =
-                static_cast<double>(view.to_call) /
-                static_cast<double>(view.pot + view.to_call) * 0.6;
-            if (equity + file_.looseness * 0.25 >= discounted + premium) {
-                return {ActionType::Call, 0};
-            }
-            return {ActionType::Fold, 0};
         }
         const double pot_odds =
             static_cast<double>(view.to_call) /
