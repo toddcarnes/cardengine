@@ -1,0 +1,1494 @@
+{
+  "events": [
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900000.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900001.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900002.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900003.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900004.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900005.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900006.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900007.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900008.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900009.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900010.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900011.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900012.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900013.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900014.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900015.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900016.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900017.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900018.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900019.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900020.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900021.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900022.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900023.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900024.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900025.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900026.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900027.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900028.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900029.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900030.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900031.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900032.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900033.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900034.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900035.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900036.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900037.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900038.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900039.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900040.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900041.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900042.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900043.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900044.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900045.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900046.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900047.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900048.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900049.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900050.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900051.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900052.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900053.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900054.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900055.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900056.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900057.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900058.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900059.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900060.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900061.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900062.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900063.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900064.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900065.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900066.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900067.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900068.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900069.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900070.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900071.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900072.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900073.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900074.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900075.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900076.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900077.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900078.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900079.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900080.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900081.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900082.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900083.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900084.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900085.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900086.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900087.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900088.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900089.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900090.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900091.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900092.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900093.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900094.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900095.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900096.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900097.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900098.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900099.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900100.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900101.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900102.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900103.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900104.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900105.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900106.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900107.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900108.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900109.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900110.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900111.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900112.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900113.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900114.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900115.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900116.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900117.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900118.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900119.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900120.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900121.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900122.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900123.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900124.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900125.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900126.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900127.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900128.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900129.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900130.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900131.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900132.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900133.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900134.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900135.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900136.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900137.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900138.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900139.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900140.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900141.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900142.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900143.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900144.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900145.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900146.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900147.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900148.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900149.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900150.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900151.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900152.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900153.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900154.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900155.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900156.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900157.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900158.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900159.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900160.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900161.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900162.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900163.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900164.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900165.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900166.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900167.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900168.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900169.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900170.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900171.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900172.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900173.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900174.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900175.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900176.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900177.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900178.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900179.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900180.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900181.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900182.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900183.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900184.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900185.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900186.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900187.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900188.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900189.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900190.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900191.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900192.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900193.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900194.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900195.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900196.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900197.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900198.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900199.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900200.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900201.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900202.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900203.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900204.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900205.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900206.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900207.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900208.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900209.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900210.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900211.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900212.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900213.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900214.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900215.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900216.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900217.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900218.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900219.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900220.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900221.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900222.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900223.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900224.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900225.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900226.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900227.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900228.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900229.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900230.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900231.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900232.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900233.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900234.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900235.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900236.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900237.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900238.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900239.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900240.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900241.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900242.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900243.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900244.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900245.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900246.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900247.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900248.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900249.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900250.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900251.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900252.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900253.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900254.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900255.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900256.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900257.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900258.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900259.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900260.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900261.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900262.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900263.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900264.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900265.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900266.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900267.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900268.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900269.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900270.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900271.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900272.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900273.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900274.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900275.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900276.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900277.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900278.csv",
+      "rows": 1555
+    },
+    {
+      "csv": "D:\\src\\cardengine\\.scratch\\twice-6max-900279.csv",
+      "rows": 1555
+    }
+  ],
+  "pairs": {
+    "Adapter\u0001Apex": [
+      35776,
+      49755
+    ],
+    "Adapter\u0001Fit-or-Fold Fred": [
+      42456,
+      46583
+    ],
+    "Adapter\u0001GTO": [
+      44169,
+      39766
+    ],
+    "Adapter\u0001LAG": [
+      41260,
+      41693
+    ],
+    "Adapter\u0001Loose Lucy": [
+      40347,
+      42773
+    ],
+    "Adapter\u0001Nit": [
+      41650,
+      42171
+    ],
+    "Adapter\u0001Randy": [
+      54620,
+      31698
+    ],
+    "Adapter\u0001Station Sal": [
+      41604,
+      41518
+    ],
+    "Adapter\u0001Survivor": [
+      37098,
+      48565
+    ],
+    "Adapter\u0001TAG": [
+      40615,
+      43069
+    ],
+    "Adapter\u0001Tight Ted": [
+      35203,
+      48155
+    ],
+    "Adapter\u0001Vanguard": [
+      28188,
+      49693
+    ],
+    "Apex\u0001Fit-or-Fold Fred": [
+      45347,
+      39433
+    ],
+    "Apex\u0001GTO": [
+      60420,
+      25540
+    ],
+    "Apex\u0001LAG": [
+      50689,
+      34669
+    ],
+    "Apex\u0001Loose Lucy": [
+      49649,
+      36730
+    ],
+    "Apex\u0001Nit": [
+      51024,
+      38816
+    ],
+    "Apex\u0001Randy": [
+      82062,
+      4703
+    ],
+    "Apex\u0001Station Sal": [
+      54410,
+      27975
+    ],
+    "Apex\u0001Survivor": [
+      47366,
+      40591
+    ],
+    "Apex\u0001TAG": [
+      44693,
+      35134
+    ],
+    "Apex\u0001Tight Ted": [
+      50997,
+      34562
+    ],
+    "Apex\u0001Vanguard": [
+      45123,
+      35321
+    ],
+    "Fit-or-Fold Fred\u0001GTO": [
+      55650,
+      34624
+    ],
+    "Fit-or-Fold Fred\u0001LAG": [
+      45749,
+      37379
+    ],
+    "Fit-or-Fold Fred\u0001Loose Lucy": [
+      44979,
+      38351
+    ],
+    "Fit-or-Fold Fred\u0001Nit": [
+      47102,
+      43709
+    ],
+    "Fit-or-Fold Fred\u0001Randy": [
+      59433,
+      23614
+    ],
+    "Fit-or-Fold Fred\u0001Station Sal": [
+      49877,
+      36807
+    ],
+    "Fit-or-Fold Fred\u0001Survivor": [
+      34413,
+      49222
+    ],
+    "Fit-or-Fold Fred\u0001TAG": [
+      42034,
+      38854
+    ],
+    "Fit-or-Fold Fred\u0001Tight Ted": [
+      45997,
+      38025
+    ],
+    "Fit-or-Fold Fred\u0001Vanguard": [
+      36037,
+      48135
+    ],
+    "GTO\u0001LAG": [
+      34621,
+      48833
+    ],
+    "GTO\u0001Loose Lucy": [
+      32923,
+      50866
+    ],
+    "GTO\u0001Nit": [
+      37047,
+      47497
+    ],
+    "GTO\u0001Randy": [
+      48815,
+      32470
+    ],
+    "GTO\u0001Station Sal": [
+      37114,
+      43000
+    ],
+    "GTO\u0001Survivor": [
+      29505,
+      53398
+    ],
+    "GTO\u0001TAG": [
+      29230,
+      48161
+    ],
+    "GTO\u0001Tight Ted": [
+      37813,
+      49410
+    ],
+    "GTO\u0001Vanguard": [
+      28959,
+      56019
+    ],
+    "LAG\u0001Loose Lucy": [
+      38794,
+      44768
+    ],
+    "LAG\u0001Nit": [
+      35556,
+      47889
+    ],
+    "LAG\u0001Randy": [
+      54816,
+      31479
+    ],
+    "LAG\u0001Station Sal": [
+      42569,
+      42684
+    ],
+    "LAG\u0001Survivor": [
+      32094,
+      49741
+    ],
+    "LAG\u0001TAG": [
+      38773,
+      45204
+    ],
+    "LAG\u0001Tight Ted": [
+      40918,
+      39308
+    ],
+    "LAG\u0001Vanguard": [
+      32539,
+      47085
+    ],
+    "Loose Lucy\u0001Nit": [
+      40362,
+      50369
+    ],
+    "Loose Lucy\u0001Randy": [
+      58956,
+      26052
+    ],
+    "Loose Lucy\u0001Station Sal": [
+      50104,
+      39173
+    ],
+    "Loose Lucy\u0001Survivor": [
+      34724,
+      52505
+    ],
+    "Loose Lucy\u0001TAG": [
+      34824,
+      43163
+    ],
+    "Loose Lucy\u0001Tight Ted": [
+      37003,
+      43289
+    ],
+    "Loose Lucy\u0001Vanguard": [
+      29053,
+      49448
+    ],
+    "Nit\u0001Randy": [
+      65547,
+      25417
+    ],
+    "Nit\u0001Station Sal": [
+      47680,
+      39981
+    ],
+    "Nit\u0001Survivor": [
+      36973,
+      45439
+    ],
+    "Nit\u0001TAG": [
+      42424,
+      41434
+    ],
+    "Nit\u0001Tight Ted": [
+      39969,
+      41968
+    ],
+    "Nit\u0001Vanguard": [
+      38062,
+      44629
+    ],
+    "Randy\u0001Station Sal": [
+      32728,
+      54742
+    ],
+    "Randy\u0001Survivor": [
+      6543,
+      79846
+    ],
+    "Randy\u0001TAG": [
+      25811,
+      55842
+    ],
+    "Randy\u0001Tight Ted": [
+      28403,
+      55970
+    ],
+    "Randy\u0001Vanguard": [
+      5721,
+      76167
+    ],
+    "Station Sal\u0001Survivor": [
+      33397,
+      51953
+    ],
+    "Station Sal\u0001TAG": [
+      37894,
+      46820
+    ],
+    "Station Sal\u0001Tight Ted": [
+      38397,
+      45160
+    ],
+    "Station Sal\u0001Vanguard": [
+      25407,
+      50996
+    ],
+    "Survivor\u0001TAG": [
+      41770,
+      38447
+    ],
+    "Survivor\u0001Tight Ted": [
+      46280,
+      34234
+    ],
+    "Survivor\u0001Vanguard": [
+      34678,
+      47823
+    ],
+    "TAG\u0001Tight Ted": [
+      39775,
+      38203
+    ],
+    "TAG\u0001Vanguard": [
+      32824,
+      44127
+    ],
+    "Tight Ted\u0001Vanguard": [
+      35203,
+      43723
+    ]
+  },
+  "players": {
+    "Adapter": {
+      "rating": 1186.32,
+      "tables": 201685
+    },
+    "Apex": {
+      "rating": 1279.74,
+      "tables": 204157
+    },
+    "Fit-or-Fold Fred": {
+      "rating": 1223.27,
+      "tables": 204762
+    },
+    "GTO": {
+      "rating": 1143.82,
+      "tables": 201170
+    },
+    "LAG": {
+      "rating": 1186.12,
+      "tables": 199822
+    },
+    "Loose Lucy": {
+      "rating": 1196.33,
+      "tables": 201841
+    },
+    "Nit": {
+      "rating": 1215.75,
+      "tables": 206543
+    },
+    "Randy": {
+      "rating": 1037.68,
+      "tables": 204291
+    },
+    "Station Sal": {
+      "rating": 1170.42,
+      "tables": 202398
+    },
+    "Survivor": {
+      "rating": 1260.36,
+      "tables": 201321
+    },
+    "TAG": {
+      "rating": 1216.61,
+      "tables": 193825
+    },
+    "Tight Ted": {
+      "rating": 1206.28,
+      "tables": 197593
+    },
+    "Vanguard": {
+      "rating": 1277.3,
+      "tables": 192992
+    }
+  },
+  "rejected_rows": 0,
+  "updated": "2026-09-08T01:51:13+00:00"
+}

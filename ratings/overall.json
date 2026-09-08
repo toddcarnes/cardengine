@@ -1,83 +1,119 @@
 {
   "players": {
     "Adapter": {
-      "rating": 1199.73,
-      "tables": 58800
+      "rating": 1198.77,
+      "tables": 1800209
     },
     "Apex": {
-      "rating": 1201.96,
-      "tables": 58833
+      "rating": 1207.1,
+      "tables": 1831774
     },
     "Fit-or-Fold Fred": {
-      "rating": 1200.35,
-      "tables": 58832
+      "rating": 1203.13,
+      "tables": 1823723
     },
     "GTO": {
-      "rating": 1198.5,
-      "tables": 58698
+      "rating": 1191.86,
+      "tables": 1825040
     },
     "LAG": {
-      "rating": 1199.67,
-      "tables": 58939
+      "rating": 1197.22,
+      "tables": 1837028
     },
     "Loose Lucy": {
-      "rating": 1200.04,
-      "tables": 58795
+      "rating": 1197.49,
+      "tables": 1840491
     },
     "Nit": {
-      "rating": 1200.28,
-      "tables": 58942
+      "rating": 1203.05,
+      "tables": 1850317
     },
     "Randy": {
-      "rating": 1196.17,
-      "tables": 58728
+      "rating": 1187.36,
+      "tables": 1844056
     },
     "Station Sal": {
-      "rating": 1198.71,
-      "tables": 59025
+      "rating": 1195.06,
+      "tables": 1832630
     },
     "Survivor": {
-      "rating": 1201.74,
-      "tables": 58997
+      "rating": 1206.29,
+      "tables": 1823085
     },
     "TAG": {
-      "rating": 1200.71,
-      "tables": 58927
+      "rating": 1202.99,
+      "tables": 1816339
     },
     "Tight Ted": {
-      "rating": 1200.35,
-      "tables": 59039
+      "rating": 1202.52,
+      "tables": 1842908
     },
     "Vanguard": {
-      "rating": 1201.78,
-      "tables": 58925
+      "rating": 1207.16,
+      "tables": 1814587
     }
   },
-  "updated": "2026-09-07T00:05:48+00:00",
+  "updated": "2026-09-08T01:52:25+00:00",
   "variants": [
     {
-      "duels": 606450,
+      "duels": 13062000,
       "name": "nlhe-6max",
-      "tables": 40430,
-      "weight": 1.6489405556929672e-06
+      "tables": 870800,
+      "weight": 7.65579543714592e-08
     },
     {
-      "duels": 606450,
-      "name": "plo-6max",
-      "tables": 40430,
-      "weight": 1.6489405556929672e-06
-    },
-    {
-      "duels": 373200,
+      "duels": 7209461,
       "name": "limit-6max",
-      "tables": 24880,
-      "weight": 2.6795284030010716e-06
+      "tables": 480654,
+      "weight": 1.3870662453129298e-07
     },
     {
-      "duels": 65520,
+      "duels": 6531000,
+      "name": "twice-6max",
+      "tables": 435400,
+      "weight": 1.531159087429184e-07
+    },
+    {
+      "duels": 6531000,
+      "name": "live-6max",
+      "tables": 435400,
+      "weight": 1.531159087429184e-07
+    },
+    {
+      "duels": 6531000,
+      "name": "plo-6max",
+      "tables": 435400,
+      "weight": 1.531159087429184e-07
+    },
+    {
+      "duels": 6531000,
+      "name": "hilo-6max",
+      "tables": 435400,
+      "weight": 1.531159087429184e-07
+    },
+    {
+      "duels": 3265500,
+      "name": "draw-6max",
+      "tables": 217700,
+      "weight": 3.062318174858368e-07
+    },
+    {
+      "duels": 3265500,
+      "name": "deuce-6max",
+      "tables": 217700,
+      "weight": 3.062318174858368e-07
+    },
+    {
+      "duels": 655280,
       "name": "hu",
-      "tables": 65520,
-      "weight": 1.5262515262515263e-05
+      "tables": 655280,
+      "weight": 1.5260651935050666e-06
+    },
+    {
+      "duels": 4553640,
+      "name": "stud-8max",
+      "tables": 162630,
+      "weight": 2.1960453615129874e-07
     }
   ]
 }
