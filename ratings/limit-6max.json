@@ -2,6117 +2,933 @@
   "events": [
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800000.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800001.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800002.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800003.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800004.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800005.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800006.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800007.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800008.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800009.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800010.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800011.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800012.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800013.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800014.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800015.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800016.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800017.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800018.csv",
-      "rows": 22
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800019.csv",
-      "rows": 24
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800020.csv",
-      "rows": 23
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800021.csv",
-      "rows": 22
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800022.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800023.csv",
-      "rows": 22
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800024.csv",
-      "rows": 22
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800025.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800026.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800027.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800028.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800029.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800030.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800031.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800032.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800033.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800034.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800035.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800036.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800037.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800038.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800039.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800040.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800041.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800042.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800043.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800044.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800045.csv",
-      "rows": 12
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800046.csv",
-      "rows": 12
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800047.csv",
-      "rows": 11
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800048.csv",
-      "rows": 10
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800049.csv",
-      "rows": 10
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800050.csv",
-      "rows": 12
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800051.csv",
-      "rows": 11
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800052.csv",
-      "rows": 10
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800053.csv",
-      "rows": 9
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800054.csv",
-      "rows": 9
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800055.csv",
-      "rows": 8
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800056.csv",
-      "rows": 7
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800057.csv",
-      "rows": 6
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800058.csv",
-      "rows": 9
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800059.csv",
-      "rows": 11
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800060.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800061.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800062.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800063.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800064.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800065.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800066.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800067.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800068.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800069.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800070.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800071.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800072.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800073.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800074.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800075.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800076.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800077.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800078.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800079.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800080.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800081.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800082.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800083.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800084.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800085.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800086.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800087.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800088.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800089.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800090.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800091.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800092.csv",
-      "rows": 16
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800093.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800094.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800095.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800096.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800097.csv",
-      "rows": 14
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800098.csv",
-      "rows": 13
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800099.csv",
-      "rows": 12
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800100.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800101.csv",
-      "rows": 15
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800102.csv",
-      "rows": 24
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800103.csv",
-      "rows": 24
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800104.csv",
-      "rows": 23
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800105.csv",
-      "rows": 22
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800106.csv",
-      "rows": 22
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800107.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800108.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800109.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800110.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800111.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800112.csv",
-      "rows": 21
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800113.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800114.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800115.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800116.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800117.csv",
-      "rows": 20
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800118.csv",
-      "rows": 19
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800119.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800120.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800121.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800122.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800123.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800124.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800125.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800126.csv",
-      "rows": 17
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800127.csv",
-      "rows": 18
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800128.csv",
-      "rows": 23
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800129.csv",
-      "rows": 23
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800130.csv",
-      "rows": 24
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800131.csv",
-      "rows": 24
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800132.csv",
-      "rows": 25
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800133.csv",
-      "rows": 24
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800134.csv",
-      "rows": 27
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800135.csv",
-      "rows": 26
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800136.csv",
-      "rows": 25
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800137.csv",
-      "rows": 25
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800138.csv",
-      "rows": 26
+      "rows": 1555
     },
     {
       "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800139.csv",
-      "rows": 25
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800140.csv",
-      "rows": 26
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800141.csv",
-      "rows": 25
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800142.csv",
-      "rows": 24
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800143.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800144.csv",
-      "rows": 24
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800145.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800146.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800147.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800148.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800149.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800150.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800151.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800152.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800153.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800154.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800155.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800156.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800157.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800158.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800159.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800160.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800161.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800162.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800163.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800164.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800165.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800166.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800167.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800168.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800169.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800170.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800171.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800172.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800173.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800174.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800175.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800176.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800177.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800178.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800179.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800180.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800181.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800182.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800183.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800184.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800185.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800186.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800187.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800188.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800189.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800190.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800191.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800192.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800193.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800194.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800195.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800196.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800197.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800198.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800199.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800200.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800201.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800202.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800203.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800204.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800205.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800206.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800207.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800208.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800209.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800210.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800211.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800212.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800213.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800214.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800215.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800216.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800217.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800218.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800219.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800220.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800221.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800222.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800223.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800224.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800225.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800226.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800227.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800228.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800229.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800230.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800231.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800232.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800233.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800234.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800235.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800236.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800237.csv",
-      "rows": 25
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800238.csv",
-      "rows": 25
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800239.csv",
-      "rows": 27
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800240.csv",
-      "rows": 26
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800241.csv",
-      "rows": 25
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800242.csv",
-      "rows": 24
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800243.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800244.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800245.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800246.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800247.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800248.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800249.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800250.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800251.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800252.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800253.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800254.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800255.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800256.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800257.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800258.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800259.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800260.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800261.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800262.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800263.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800264.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800265.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800266.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800267.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800268.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800269.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800270.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800271.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800272.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800273.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800274.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800275.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800276.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800277.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800278.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800279.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800280.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800281.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800282.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800283.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800284.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800285.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800286.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800287.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800288.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800289.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800290.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800291.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800292.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800293.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800294.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800295.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800296.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800297.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800298.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800299.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800300.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800301.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800302.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800303.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800304.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800305.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800306.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800307.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800308.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800309.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800310.csv",
-      "rows": 8
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800311.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800312.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800313.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800314.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800315.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800316.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800317.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800318.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800319.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800320.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800321.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800322.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800323.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800324.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800325.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800326.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800327.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800328.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800329.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800330.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800331.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800332.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800333.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800334.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800335.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800336.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800337.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800338.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800339.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800340.csv",
-      "rows": 24
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800341.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800342.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800343.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800344.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800345.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800346.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800347.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800348.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800349.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800350.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800351.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800352.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800353.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800354.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800355.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800356.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800357.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800358.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800359.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800360.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800361.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800362.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800363.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800364.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800365.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800366.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800367.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800368.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800369.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800370.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800371.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800372.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800373.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800374.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800375.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800376.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800377.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800378.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800379.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800380.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800381.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800382.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800383.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800384.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800385.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800386.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800387.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800388.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800389.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800390.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800391.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800392.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800393.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800394.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800395.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800396.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800397.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800398.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800399.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800400.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800401.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800402.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800403.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800404.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800405.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800406.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800407.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800408.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800409.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800410.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800411.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800412.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800413.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800414.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800415.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800416.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800417.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800418.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800419.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800420.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800421.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800422.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800423.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800424.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800425.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800426.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800427.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800428.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800429.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800430.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800431.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800432.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800433.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800434.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800435.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800436.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800437.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800438.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800439.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800440.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800441.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800442.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800443.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800444.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800445.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800446.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800447.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800448.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800449.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800450.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800451.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800452.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800453.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800454.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800455.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800456.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800457.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800458.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800459.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800460.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800461.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800462.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800463.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800464.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800465.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800466.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800467.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800468.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800469.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800470.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800471.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800472.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800473.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800474.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800475.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800476.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800477.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800478.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800479.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800480.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800481.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800482.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800483.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800484.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800485.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800486.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800487.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800488.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800489.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800490.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800491.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800492.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800493.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800494.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800495.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800496.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800497.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800498.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800499.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800500.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800501.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800502.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800503.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800504.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800505.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800506.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800507.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800508.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800509.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800510.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800511.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800512.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800513.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800514.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800515.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800516.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800517.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800518.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800519.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800520.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800521.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800522.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800523.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800524.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800525.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800526.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800527.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800528.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800529.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800530.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800531.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800532.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800533.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800534.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800535.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800536.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800537.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800538.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800539.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800540.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800541.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800542.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800543.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800544.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800545.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800546.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800547.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800548.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800549.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800550.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800551.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800552.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800553.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800554.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800555.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800556.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800557.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800558.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800559.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800560.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800561.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800562.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800563.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800564.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800565.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800566.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800567.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800568.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800569.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800570.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800571.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800572.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800573.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800574.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800575.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800576.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800577.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800578.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800579.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800580.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800581.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800582.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800583.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800584.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800585.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800586.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800587.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800588.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800589.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800590.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800591.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800592.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800593.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800594.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800595.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800596.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800597.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800598.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800599.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800600.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800601.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800602.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800603.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800604.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800605.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800606.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800607.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800608.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800609.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800610.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800611.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800612.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800613.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800614.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800615.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800616.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800617.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800618.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800619.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800620.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800621.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800622.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800623.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800624.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800625.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800626.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800627.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800628.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800629.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800630.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800631.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800632.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800633.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800634.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800635.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800636.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800637.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800638.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800639.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800640.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800641.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800642.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800643.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800644.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800645.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800646.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800647.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800648.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800649.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800650.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800651.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800652.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800653.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800654.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800655.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800656.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800657.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800658.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800659.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800660.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800661.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800662.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800663.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800664.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800665.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800666.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800667.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800668.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800669.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800670.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800671.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800672.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800673.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800674.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800675.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800676.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800677.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800678.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800679.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800680.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800681.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800682.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800683.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800684.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800685.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800686.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800687.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800688.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800689.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800690.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800691.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800692.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800693.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800694.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800695.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800696.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800697.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800698.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800699.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800700.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800701.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800702.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800703.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800704.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800705.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800706.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800707.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800708.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800709.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800710.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800711.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800712.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800713.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800714.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800715.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800716.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800717.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800718.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800719.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800720.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800721.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800722.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800723.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800724.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800725.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800726.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800727.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800728.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800729.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800730.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800731.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800732.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800733.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800734.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800735.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800736.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800737.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800738.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800739.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800740.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800741.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800742.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800743.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800744.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800745.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800746.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800747.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800748.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800749.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800750.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800751.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800752.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800753.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800754.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800755.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800756.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800757.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800758.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800759.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800760.csv",
-      "rows": 8
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800761.csv",
-      "rows": 7
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800762.csv",
-      "rows": 7
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800763.csv",
-      "rows": 6
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800764.csv",
-      "rows": 5
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800765.csv",
-      "rows": 5
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800766.csv",
-      "rows": 5
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800767.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800768.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800769.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800770.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800771.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800772.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800773.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800774.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800775.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800776.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800777.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800778.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800779.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800780.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800781.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800782.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800783.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800784.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800785.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800786.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800787.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800788.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800789.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800790.csv",
-      "rows": 8
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800791.csv",
-      "rows": 7
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800792.csv",
-      "rows": 8
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800793.csv",
-      "rows": 8
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800794.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800795.csv",
-      "rows": 8
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800796.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800797.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800798.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800799.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800800.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800801.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800802.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800803.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800804.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800805.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800806.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800807.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800808.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800809.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800810.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800811.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800812.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800813.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800814.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800815.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800816.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800817.csv",
-      "rows": 24
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800818.csv",
-      "rows": 23
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800819.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800820.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800821.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800822.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800823.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800824.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800825.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800826.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800827.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800828.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800829.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800830.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800831.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800832.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800833.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800834.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800835.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800836.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800837.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800838.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800839.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800840.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800841.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800842.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800843.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800844.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800845.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800846.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800847.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800848.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800849.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800850.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800851.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800852.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800853.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800854.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800855.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800856.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800857.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800858.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800859.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800860.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800861.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800862.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800863.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800864.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800865.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800866.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800867.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800868.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800869.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800870.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800871.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800872.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800873.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800874.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800875.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800876.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800877.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800878.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800879.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800880.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800881.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800882.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800883.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800884.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800885.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800886.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800887.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800888.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800889.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800890.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800891.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800892.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800893.csv",
-      "rows": 22
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800894.csv",
-      "rows": 21
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800895.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800896.csv",
-      "rows": 20
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800897.csv",
-      "rows": 19
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800898.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800899.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800900.csv",
-      "rows": 18
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800901.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800902.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800903.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800904.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800905.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800906.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800907.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800908.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800909.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800910.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800911.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800912.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800913.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800914.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800915.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800916.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800917.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800918.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800919.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800920.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800921.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800922.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800923.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800924.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800925.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800926.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800927.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800928.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800929.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800930.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800931.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800932.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800933.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800934.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800935.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800936.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800937.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800938.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800939.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800940.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800941.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800942.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800943.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800944.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800945.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800946.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800947.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800948.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800949.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800950.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800951.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800952.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800953.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800954.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800955.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800956.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800957.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800958.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800959.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800960.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800961.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800962.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800963.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800964.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800965.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800966.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800967.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800968.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800969.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800970.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800971.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800972.csv",
-      "rows": 17
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800973.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800974.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800975.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800976.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800977.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800978.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800979.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800980.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800981.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800982.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800983.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800984.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800985.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800986.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800987.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800988.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800989.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800990.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800991.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800992.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800993.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800994.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800995.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800996.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800997.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800998.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-800999.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801000.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801001.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801002.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801003.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801004.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801005.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801006.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801007.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801008.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801009.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801010.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801011.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801012.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801013.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801014.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801015.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801016.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801017.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801018.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801019.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801020.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801021.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801022.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801023.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801024.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801025.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801026.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801027.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801028.csv",
-      "rows": 16
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801029.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801030.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801031.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801032.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801033.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801034.csv",
-      "rows": 10
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801035.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801036.csv",
-      "rows": 9
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801037.csv",
-      "rows": 4
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801038.csv",
-      "rows": 4
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801039.csv",
-      "rows": 3
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801040.csv",
-      "rows": 2
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801041.csv",
-      "rows": 2
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801042.csv",
-      "rows": 2
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801043.csv",
-      "rows": 1
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801044.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801045.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801046.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801047.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801048.csv",
-      "rows": 11
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801049.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801050.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801051.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801052.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801053.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801054.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801055.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801056.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801057.csv",
-      "rows": 13
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801058.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801059.csv",
-      "rows": 12
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801060.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801061.csv",
-      "rows": 15
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801062.csv",
-      "rows": 14
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801063.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801064.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801065.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801066.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801067.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801068.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801069.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801070.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801071.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801072.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801073.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801074.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801075.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801076.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801077.csv",
-      "rows": 464
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801078.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801079.csv",
-      "rows": 463
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801080.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801081.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801082.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801083.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801084.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801085.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801086.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801087.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801088.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801089.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801090.csv",
-      "rows": 140
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801091.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801092.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801093.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801094.csv",
-      "rows": 791
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801095.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801096.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801097.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801098.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801099.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801100.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801101.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801102.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801103.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801104.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801105.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801106.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801107.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801108.csv",
-      "rows": 791
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801109.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801110.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801111.csv",
-      "rows": 417
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801112.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801113.csv",
-      "rows": 371
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801114.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801115.csv",
-      "rows": 417
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801116.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801117.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801118.csv",
-      "rows": 232
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801119.csv",
-      "rows": 418
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801120.csv",
-      "rows": 418
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801121.csv",
-      "rows": 371
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801122.csv",
-      "rows": 418
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801123.csv",
-      "rows": 232
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801124.csv",
-      "rows": 417
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801125.csv",
-      "rows": 417
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801126.csv",
-      "rows": 417
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801127.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801128.csv",
-      "rows": 417
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801129.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801130.csv",
-      "rows": 463
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801131.csv",
-      "rows": 140
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801132.csv",
-      "rows": 93
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801133.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801134.csv",
-      "rows": 139
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801135.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801136.csv",
-      "rows": 371
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801137.csv",
-      "rows": 46
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801138.csv",
-      "rows": 46
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801139.csv",
-      "rows": 324
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801140.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801141.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801142.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801143.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801144.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801145.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801146.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801147.csv",
-      "rows": 326
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801148.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801149.csv",
-      "rows": 326
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801150.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801151.csv",
-      "rows": 279
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801152.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801153.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801154.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801155.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801156.csv",
-      "rows": 325
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801157.csv",
-      "rows": 278
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801158.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801159.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801160.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801161.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801162.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801163.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801164.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801165.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801166.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801167.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801168.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801169.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801170.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801171.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801172.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801173.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801174.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801175.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801176.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801177.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801178.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801179.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801180.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801181.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801182.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801183.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801184.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801185.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801186.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801187.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801188.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801189.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801190.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801191.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801192.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801193.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801194.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801195.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801196.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801197.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801198.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801199.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801200.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801201.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801202.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801203.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801204.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801205.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801206.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801207.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801208.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801209.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801210.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801211.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801212.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801213.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801214.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801215.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801216.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801217.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801218.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801219.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801220.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801221.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801222.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801223.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801224.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801225.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801226.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801227.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801228.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801229.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801230.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801231.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801232.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801233.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801234.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801235.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801236.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801237.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801238.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801239.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801240.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801241.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801242.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801243.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801244.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801245.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801246.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801247.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801248.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801249.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801250.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801251.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801252.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801253.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801254.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801255.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801256.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801257.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801258.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801259.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801260.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801261.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801262.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801263.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801264.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801265.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801266.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801267.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801268.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801269.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801270.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801271.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801272.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801273.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801274.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801275.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801276.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801277.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801278.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801279.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801280.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801281.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801282.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801283.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801284.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801285.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801286.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801287.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801288.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801289.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801290.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801291.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801292.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801293.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801294.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801295.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801296.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801297.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801298.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801299.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801300.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801301.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801302.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801303.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801304.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801305.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801306.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801307.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801308.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801309.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801310.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801311.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801312.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801313.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801314.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801315.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801316.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801317.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801318.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801319.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801320.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801321.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801322.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801323.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801324.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801325.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801326.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801327.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801328.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801329.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801330.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801331.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801332.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801333.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801334.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801335.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801336.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801337.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801338.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801339.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801340.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801341.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801342.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801343.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801344.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801345.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801346.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801347.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801348.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801349.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801350.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801351.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801352.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801353.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801354.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801355.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801356.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801357.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801358.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801359.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801360.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801361.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801362.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801363.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801364.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801365.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801366.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801367.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801368.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801369.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801370.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801371.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801372.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801373.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801374.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801375.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801376.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801377.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801378.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801379.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801380.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801381.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801382.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801383.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801384.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801385.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801386.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801387.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801388.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801389.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801390.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801391.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801392.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801393.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801394.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801395.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801396.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801397.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801398.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801399.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801400.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801401.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801402.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801403.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801404.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801405.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801406.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801407.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801408.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801409.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801410.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801411.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801412.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801413.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801414.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801415.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801416.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801417.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801418.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801419.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801420.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801421.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801422.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801423.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801424.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801425.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801426.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801427.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801428.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801429.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801430.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801431.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801432.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801433.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801434.csv",
-      "rows": 1555
-    },
-    {
-      "csv": "D:\\src\\cardengine\\.scratch\\limit-6max-801435.csv",
       "rows": 1555
     }
   ],
   "pairs": {
     "Adapter\u0001Apex": [
-      45639,
-      51489
+      19958,
+      22721
     ],
     "Adapter\u0001Fit-or-Fold Fred": [
-      38336,
-      52521
+      16808,
+      26926
     ],
     "Adapter\u0001GTO": [
-      63177,
-      27178
+      27379,
+      13552
     ],
     "Adapter\u0001LAG": [
-      47320,
-      41750
+      23491,
+      21876
     ],
     "Adapter\u0001Loose Lucy": [
-      51224,
-      45206
+      23557,
+      19419
     ],
     "Adapter\u0001Nit": [
-      43237,
-      53708
+      21357,
+      24099
     ],
     "Adapter\u0001Randy": [
-      83669,
-      8665
+      38741,
+      3919
     ],
     "Adapter\u0001Station Sal": [
-      49169,
-      42581
+      25056,
+      20082
     ],
     "Adapter\u0001Survivor": [
-      39354,
-      55024
+      16425,
+      23101
     ],
     "Adapter\u0001TAG": [
-      32455,
-      57055
+      17437,
+      26559
     ],
     "Adapter\u0001Tight Ted": [
-      39401,
-      58176
+      16402,
+      25814
     ],
     "Adapter\u0001Vanguard": [
-      41773,
-      56938
+      19181,
+      26210
     ],
     "Apex\u0001Fit-or-Fold Fred": [
-      47550,
-      44067
+      23256,
+      19851
     ],
     "Apex\u0001GTO": [
-      75490,
-      16075
+      32888,
+      6973
     ],
     "Apex\u0001LAG": [
-      50084,
-      39677
+      21645,
+      18501
     ],
     "Apex\u0001Loose Lucy": [
-      57766,
-      39647
+      24954,
+      14928
     ],
     "Apex\u0001Nit": [
-      53601,
-      40334
+      21807,
+      19069
     ],
     "Apex\u0001Randy": [
-      90855,
-      2938
+      42562,
+      1917
     ],
     "Apex\u0001Station Sal": [
-      49197,
-      42389
+      23564,
+      17487
     ],
     "Apex\u0001Survivor": [
-      50155,
-      41482
+      22201,
+      17674
     ],
     "Apex\u0001TAG": [
-      52731,
-      46102
+      22505,
+      21107
     ],
     "Apex\u0001Tight Ted": [
-      47690,
-      47860
+      20927,
+      23192
     ],
     "Apex\u0001Vanguard": [
-      36429,
-      62648
+      17979,
+      25939
     ],
     "Fit-or-Fold Fred\u0001GTO": [
-      72794,
-      12847
+      32618,
+      7230
     ],
     "Fit-or-Fold Fred\u0001LAG": [
-      53241,
-      33536
+      29216,
+      13013
     ],
     "Fit-or-Fold Fred\u0001Loose Lucy": [
-      67180,
-      31536
+      31282,
+      11637
     ],
     "Fit-or-Fold Fred\u0001Nit": [
-      45316,
-      45063
+      20767,
+      20923
     ],
     "Fit-or-Fold Fred\u0001Randy": [
-      90489,
-      3342
+      43586,
+      1181
     ],
     "Fit-or-Fold Fred\u0001Station Sal": [
-      55490,
-      38726
+      27993,
+      15166
     ],
     "Fit-or-Fold Fred\u0001Survivor": [
-      44728,
-      45365
+      20187,
+      18788
     ],
     "Fit-or-Fold Fred\u0001TAG": [
-      41162,
-      53227
+      21408,
+      22363
     ],
     "Fit-or-Fold Fred\u0001Tight Ted": [
-      41616,
-      51873
+      20891,
+      21120
     ],
     "Fit-or-Fold Fred\u0001Vanguard": [
-      39257,
-      54324
+      20482,
+      24363
     ],
     "GTO\u0001LAG": [
-      24762,
-      57958
+      10634,
+      29148
     ],
     "GTO\u0001Loose Lucy": [
-      26307,
-      70108
+      13181,
+      27131
     ],
     "GTO\u0001Nit": [
-      17944,
-      73157
+      9042,
+      33355
     ],
     "GTO\u0001Randy": [
-      69533,
-      16844
+      34913,
+      5846
     ],
     "GTO\u0001Station Sal": [
-      23137,
-      63972
+      13837,
+      27953
     ],
     "GTO\u0001Survivor": [
-      16233,
-      66687
+      6907,
+      27673
     ],
     "GTO\u0001TAG": [
-      15406,
-      75332
+      8802,
+      34945
     ],
     "GTO\u0001Tight Ted": [
-      16725,
-      73335
+      8996,
+      32096
     ],
     "GTO\u0001Vanguard": [
-      16834,
-      77580
+      9081,
+      37185
     ],
     "LAG\u0001Loose Lucy": [
-      49399,
-      44568
+      22793,
+      17545
     ],
     "LAG\u0001Nit": [
-      31348,
-      53954
+      16145,
+      23687
     ],
     "LAG\u0001Randy": [
-      81627,
-      6937
+      40275,
+      1970
     ],
     "LAG\u0001Station Sal": [
-      42292,
-      44146
+      23004,
+      20463
     ],
     "LAG\u0001Survivor": [
-      35541,
-      46455
+      16407,
+      23788
     ],
     "LAG\u0001TAG": [
-      33556,
-      53076
+      16336,
+      28365
     ],
     "LAG\u0001Tight Ted": [
-      38764,
-      54963
+      15672,
+      27825
     ],
     "LAG\u0001Vanguard": [
-      32442,
-      58758
+      15066,
+      26130
     ],
     "Loose Lucy\u0001Nit": [
-      30700,
-      64084
+      15131,
+      26317
     ],
     "Loose Lucy\u0001Randy": [
-      91713,
-      5962
+      38221,
+      2882
     ],
     "Loose Lucy\u0001Station Sal": [
-      45171,
-      48624
+      19983,
+      21609
     ],
     "Loose Lucy\u0001Survivor": [
-      30571,
-      65690
+      12575,
+      25758
     ],
     "Loose Lucy\u0001TAG": [
-      29533,
-      63197
+      12764,
+      27165
     ],
     "Loose Lucy\u0001Tight Ted": [
-      30459,
-      66172
+      14246,
+      22351
     ],
     "Loose Lucy\u0001Vanguard": [
-      29938,
-      71470
+      12556,
+      28140
     ],
     "Nit\u0001Randy": [
-      92954,
-      1411
+      38785,
+      1361
     ],
     "Nit\u0001Station Sal": [
-      53459,
-      36132
+      24012,
+      16668
     ],
     "Nit\u0001Survivor": [
-      47206,
-      44408
+      20280,
+      18264
     ],
     "Nit\u0001TAG": [
-      44462,
-      45693
+      21333,
+      21626
     ],
     "Nit\u0001Tight Ted": [
-      48274,
-      50504
+      18214,
+      22509
     ],
     "Nit\u0001Vanguard": [
-      36987,
-      58538
+      16025,
+      24839
     ],
     "Randy\u0001Station Sal": [
-      7855,
-      81409
+      3697,
+      38184
     ],
     "Randy\u0001Survivor": [
-      3109,
-      82380
+      1629,
+      35386
     ],
     "Randy\u0001TAG": [
-      3478,
-      87687
+      1660,
+      41327
     ],
     "Randy\u0001Tight Ted": [
-      3948,
-      96090
+      1917,
+      40813
     ],
     "Randy\u0001Vanguard": [
-      2922,
-      93483
+      1344,
+      44174
     ],
     "Station Sal\u0001Survivor": [
-      35472,
-      49619
+      14437,
+      25918
     ],
     "Station Sal\u0001TAG": [
-      38948,
-      45932
+      17410,
+      27105
     ],
     "Station Sal\u0001Tight Ted": [
-      40937,
-      55032
+      17005,
+      24651
     ],
     "Station Sal\u0001Vanguard": [
-      39159,
-      53862
+      20287,
+      24739
     ],
     "Survivor\u0001TAG": [
-      39825,
-      48180
+      18088,
+      21576
     ],
     "Survivor\u0001Tight Ted": [
-      43012,
-      50626
+      20089,
+      18312
     ],
     "Survivor\u0001Vanguard": [
-      37893,
-      54984
+      17524,
+      22948
     ],
     "TAG\u0001Tight Ted": [
-      47996,
-      50182
+      18439,
+      25763
     ],
     "TAG\u0001Vanguard": [
-      34761,
-      56518
+      17655,
+      26482
     ],
     "Tight Ted\u0001Vanguard": [
-      38575,
-      61671
+      17915,
+      24006
     ]
   },
   "players": {
     "Adapter": {
-      "rating": 1222.34,
-      "tables": 225009
+      "rating": 1222.09,
+      "tables": 104014
     },
     "Apex": {
-      "rating": 1275.16,
-      "tables": 226379
+      "rating": 1277.11,
+      "tables": 100721
     },
     "Fit-or-Fold Fred": {
-      "rating": 1275.57,
-      "tables": 220718
+      "rating": 1296.04,
+      "tables": 102211
     },
     "GTO": {
-      "rating": 1028.44,
-      "tables": 213883
+      "rating": 1052.75,
+      "tables": 98273
     },
     "LAG": {
-      "rating": 1206.83,
-      "tables": 211231
+      "rating": 1208.93,
+      "tables": 100599
     },
     "Loose Lucy": {
-      "rating": 1176.26,
-      "tables": 231245
+      "rating": 1172.45,
+      "tables": 97225
     },
     "Nit": {
-      "rating": 1275.68,
-      "tables": 222495
+      "rating": 1268.03,
+      "tables": 99123
     },
     "Randy": {
-      "rating": 747.65,
-      "tables": 221860
+      "rating": 741.12,
+      "tables": 101258
     },
     "Station Sal": {
-      "rating": 1221.38,
-      "tables": 216542
+      "rating": 1202.17,
+      "tables": 102062
     },
     "Survivor": {
-      "rating": 1269.26,
-      "tables": 214800
+      "rating": 1275.5,
+      "tables": 93187
     },
     "TAG": {
-      "rating": 1285.49,
-      "tables": 219299
+      "rating": 1280.67,
+      "tables": 103644
     },
     "Tight Ted": {
-      "rating": 1285.41,
-      "tables": 230777
+      "rating": 1288.61,
+      "tables": 99833
     },
     "Vanguard": {
-      "rating": 1330.51,
-      "tables": 229549
+      "rating": 1314.55,
+      "tables": 104050
     }
   },
-  "rejected_rows": 88,
-  "updated": "2026-09-08T01:51:05+00:00"
+  "rejected_rows": 0,
+  "updated": "2026-09-08T03:35:56+00:00"
 }
