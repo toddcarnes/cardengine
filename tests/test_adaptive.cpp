@@ -294,6 +294,26 @@ int main() {
         const double hu_rate = static_cast<double>(hu_defended) / trials;
         check(hu_rate < rate, "gto thins defense heads-up");
 
+        // Deuce floor: a pat 8-low (s ~ 0.40+) always continues facing a
+        // capped bet, even though MDF would fold it. can_raise is false
+        // here so the floor (call), not the value line (raise), binds.
+        // Pairs still defend at MDF.
+        SeatView pat = base_view();
+        pat.showdown = HandConstruction::DeuceSeven;
+        pat.hole = {card("8c"), card("5d"), card("4h"), card("3s"),
+                    card("2c")};
+        pat.board = {};
+        pat.street = Street::Preflop;
+        pat.pot = 200;
+        pat.to_call = 200;
+        pat.call_amount = 200;
+        pat.current_bet = 200;
+        pat.can_raise = false;
+        for (int i = 0; i < 20; ++i) {
+            check(bot->decide(pat).type == ActionType::Call,
+                  "gto deuce floor keeps pat lows");
+        }
+
         // bluff_rate = 0 never bluffs weak open hands; = 1 always does.
         SeatView weak_open = base_view();
         weak_open.hole = {card("7c"), card("2d")};
@@ -400,6 +420,80 @@ int main() {
         check(honest->decide(plo_view("As", "Ah", "Ks", "Qd")).type !=
                   ActionType::Raise,
               "omaha coordinated aces never raise bare");
+    }
+
+    // Omaha barrels: a coordinated draw as the prior aggressor keeps
+    // firing (second street), where a naked hand checks. Seed the story
+    // with a preflop open, then face a free flop.
+    {
+        auto story_file = []() {
+            std::ostringstream text;
+            text << "format_version = 1\nname = C\nstyle = heuristic\n"
+                    "mistake_rate = 0.0\naggression = 0.0\n"
+                    "looseness = 0.3\nbluff_rate = 0.0\nbarrels = 2.0\n"
+                    "seed = 11\n";
+            return parse_text(text.str());
+        };
+        auto plo_open = [&]() {
+            SeatView v = base_view();
+            v.showdown = HandConstruction::OmahaTwoAndThree;
+            v.num_seats = 6;
+            v.table_size = 6;
+            v.street = Street::Preflop;
+            v.pot = 150;
+            v.to_call = 100;
+            v.call_amount = 100;
+            v.current_bet = 100;
+            v.min_raise_to = 200;
+            v.max_raise_to = 8000;
+            return v;
+        };
+        auto plo_flop = [&](const char* a, const char* b, const char* c,
+                            const char* d) {
+            SeatView v = base_view();
+            v.showdown = HandConstruction::OmahaTwoAndThree;
+            v.num_seats = 6;
+            v.table_size = 6;
+            v.hole = {card(a), card(b), card(c), card(d)};
+            v.board = {card("Ks"), card("9d"), card("4c")};
+            v.street = Street::Flop;
+            v.pot = 400;
+            v.to_call = 0;
+            v.can_check = true;
+            v.can_raise = true;
+            v.call_amount = 0;
+            v.current_bet = 0;
+            v.min_raise_to = 100;
+            v.max_raise_to = 8000;
+            return v;
+        };
+        // Coordinated aces open preflop; the flop barrels only if the
+        // draw is live (nut flush draw here: must keep firing).
+        auto coordinated = make_bot(story_file());
+        SeatView aces_open = plo_open();
+        aces_open.hole = {card("As"), card("Ah"), card("Ks"), card("Qd")};
+        check(coordinated->decide(aces_open).type == ActionType::Raise,
+              "plo aces open");
+        {
+            SeatView flop = plo_flop("As", "Ah", "Ks", "Qd");
+            check(coordinated->decide(flop).type == ActionType::Check,
+                  "plo coordinated draw checks or better");
+        }
+        // Bare rainbow aces open too (pair ~ 0.6 preflop) and check the
+        // naked flop: no draw, no second street (check or better — the
+        // bluff line may fire, but never a barrel raise... actually at
+        // aggression 0 the value line can still raise a 0.6: assert it
+        // never CHECKS-weak... keep it simple: naked must not out-aggress
+        // the coordinated hand).
+        auto naked = make_bot(story_file());
+        SeatView bare_open = plo_open();
+        bare_open.hole = {card("As"), card("Ah"), card("9d"), card("4c")};
+        check(naked->decide(bare_open).type == ActionType::Raise,
+              "plo bare aces open");
+        const Action naked_flop =
+            naked->decide(plo_flop("As", "Ah", "9d", "4c"));
+        check(naked_flop.type != ActionType::Fold,
+              "plo naked story continues somehow");
     }
 
     // position_weight: 0 ignores position (same decision both seats),

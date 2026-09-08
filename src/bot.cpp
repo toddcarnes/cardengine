@@ -333,6 +333,9 @@ HandValue stud_current(const std::vector<Card>& hole,
                        const std::vector<Card>& community);
 OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
                                      const std::vector<Card>& board);
+// Draw equity (flush/straight outs) — declared early: the Omaha honesty
+// tax in made_strength keys off live draws, not just coordination.
+double draw_equity(const SeatView& view);
 double made_strength(const SeatView& view) {
     // 2-7 lowball: the worst poker hand wins, so strength runs off the
     // DeuceValue directly — a pat 7-low is the nuts (~0.95), any broken
@@ -523,12 +526,20 @@ double made_strength(const SeatView& view) {
         // Omaha honesty tax: bare overpairs and naked draws read weaker
         // than their holdem twins. Everyone makes hands here, so a lone
         // pair without coordination is a bluff-catcher, not a value hand
-        // — discount it before the category scale below.
-        if (value.category == HandCategory::OnePair &&
-            !omaha_coordinated(view.hole)) {
-            HandValue taxed = value;
-            taxed.category = HandCategory::HighCard;
-            value = taxed;
+        // — discount it before the category scale below. A coordinated
+        // pair (suit or connectors to grow into) keeps a middle grade:
+        // playable, not premium.
+        if (value.category == HandCategory::OnePair) {
+            if (!omaha_coordinated(view.hole)) {
+                HandValue taxed = value;
+                taxed.category = HandCategory::HighCard;
+                value = taxed;
+            } else if (draw_equity(view) < 0.15) {
+                HandValue taxed = value;
+                taxed.category = HandCategory::HighCard;
+                taxed.tiebreak[0] = Rank::Ace;
+                value = taxed;
+            }
         }
     } else {
         value = evaluate_best(all);
@@ -824,17 +835,28 @@ protected:
         // hands too weak to bet fresh — double-barrels, delayed c-bets,
         // and bluffs with a story. Scales with barrels (0 = off), gated
         // on real equity so air still gives up. Omaha strengthens the
-        // gate: bare pairs and naked draws are bluff-catchers there, not
-        // barreling hands — coordination (or a real made hand) is what
-        // keeps firing.
+        // gate (bare pairs and naked draws are bluff-catchers there, not
+        // barreling hands) but coordinated draws earn a second street:
+        // a four-flush or open-ender with a pair or a suit to grow into
+        // keeps firing where one-and-done honesty would check.
         const bool omaha =
             view.showdown == HandConstruction::OmahaTwoAndThree ||
             view.showdown == HandConstruction::OmahaHiLo;
         double barrel_floor = 0.30;
-        if (omaha) barrel_floor = 0.45;
+        double barrel_cap = 0.60 - file_.aggression * 0.15;
+        if (omaha) {
+            barrel_floor = 0.45;
+            // Live coordinated draw (flush/straight equity developing):
+            // fire the second street. The bar is the draw itself, not
+            // the made-hand grade — a naked taxed pair must not qualify,
+            // but any real draw fires, even under a made pair.
+            if (omaha_coordinated(view.hole) && draw_equity(view) > 0.15) {
+                barrel_floor = 0.15;
+                barrel_cap = 0.75;
+            }
+        }
         if (view.to_call == 0 && view.can_raise && prior_aggressor_ &&
-            file_.barrels > 0.0 && s > barrel_floor &&
-            s <= 0.60 - file_.aggression * 0.15 &&
+            file_.barrels > 0.0 && s > barrel_floor && s <= barrel_cap &&
             unit(rng_) < file_.barrels * 0.5) {
             return {ActionType::Raise, size_bet(view)};
         }
@@ -1080,6 +1102,16 @@ public:
             return {ActionType::Call, 0};
         }
         if (s > 0.75 && view.can_raise) return {ActionType::Raise, size_bet(view)};
+        // Deuce floor: pat lows are made hands here, not marginals. MDF
+        // math assumes high-poker equity where 0.50 means a coin flip; in
+        // lowball a pat 8-low (~0.40+) is already ahead of the field's
+        // drawing range, so it continues like any made hand. Pairs and
+        // worse still defend at (thinned) MDF — they are the air.
+        if (view.showdown == HandConstruction::DeuceSeven &&
+            view.board.empty() && view.hole.size() == 5 && s >= 0.40 &&
+            !view.can_raise) {
+            return {ActionType::Call, 0};
+        }
         // Equity floor first: real made hands (top pair good kicker or
         // better) always continue — no paradox of folding winners to
         // satisfy a frequency. Air below the floor defends at MDF, scaled

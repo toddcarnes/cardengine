@@ -5,6 +5,10 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Bots: Omaha second street (coordinated draws with live equity keep
+  barreling as the prior aggressor; naked pairs still check) plus a
+  middle grade for coordinated one-pair hands (playable, not premium).
+  GTO deuce floor keeps pat 8-lows or better through capped bets.
 - Stress: `cardengine_stress` hardening — per-hand `clear_events()` (limit
   tables play ~10k hands; the append-only log cost ~1GB per worker),
   unquoted CSV lineups with validated bot names (a broken quote escape
