@@ -607,6 +607,10 @@ OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
         }
     }
     if (distinct < 3) return out;  // No low possible yet.
+    // Sort once: the loop below only reads. (Sorting inside the hole-pair
+    // loop tripped GCC 13's -Werror=array-bounds: it cannot prove
+    // `distinct` stays constant across sort calls on the same array.)
+    std::sort(low_ranks, low_ranks + distinct, std::greater<int>());
     bool low_set = false;
     for (std::size_t a = 0; a < hole.size(); ++a) {
         for (std::size_t b = a + 1; b < hole.size(); ++b) {
@@ -616,7 +620,6 @@ OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
             if (hb == 14) hb = 1;
             if (ha > 8 || hb > 8 || ha == hb) continue;
             // Best 3 board lows to pair with these two hole lows.
-            std::sort(low_ranks, low_ranks + distinct, std::greater<int>());
             for (int c = 0; c < distinct; ++c) {
                 for (int d = c + 1; d < distinct; ++d) {
                     for (int e = d + 1; e < distinct; ++e) {
