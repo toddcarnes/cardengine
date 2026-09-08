@@ -1,0 +1,18 @@
+# Scoreboard variants: NAME GAME DEPTH [TABLES]
+# NAME becomes ratings/<name>.json. GAME is relative to the repo root.
+# DEPTH is the championship bracket depth (tables per run =
+# (seats^(depth+1)-1)/(seats-1): 1555 for 6-max depth 4, 8191 for HU
+# depth 12, 4681 for stud-8max depth 4).
+# TABLES is optional: without it the budget is computed as
+# 100k * bots / seats, so every bot averages 100k seat appearances.
+# Heads-up therefore plays ~3x the tables of 6-max automatically.
+nlhe-6max games/holdem-6max.txt 4
+limit-6max games/holdem-limit-6max.txt 4
+twice-6max games/holdem-twice-6max.txt 4
+live-6max games/holdem-live-cash.txt 4
+plo-6max games/omaha-plo-6max.txt 4
+hilo-6max games/omaha-hilo-6max.txt 4
+draw-6max games/draw-6max.txt 4
+deuce-6max games/deuce-6max.txt 4
+hu games/holdem-headsup.txt 12
+stud-8max games/stud-8max.txt 3

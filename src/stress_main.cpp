@@ -7,6 +7,7 @@
 // 3 estimate gate (re-run with --yes).
 #include <algorithm>
 #include <cstdint>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -19,6 +20,7 @@
 
 #include "cardengine/bot.h"
 #include "cardengine/championship.h"
+#include "cardengine/types.h"
 
 namespace {
 
@@ -30,17 +32,6 @@ void usage() {
            "Bots rotate across every seat in bracket order (fair by design).\n"
            "Large brackets need --yes; --max-hands aborts cleanly instead\n"
            "of running forever.\n";
-}
-
-// Minimal CSV escaping: quote fields containing , " or newline.
-std::string csv_field(const std::string& text) {
-    if (text.find_first_of(",\"\n") == std::string::npos) return text;
-    std::string out = "\"";
-    for (char c : text) {
-        if (c == '"') out += '"';
-        out += c;
-    }
-    return out + '"';
 }
 
 struct Args {
@@ -167,11 +158,13 @@ int main(int argc, char** argv) {
             std::mt19937_64 seating(table_seed ^ 0x9E3779B97F4A7C15ULL);
             std::shuffle(order.begin(), order.end(), seating);
             auto file_for = [&](int s) {
-                return order[static_cast<std::size_t>(
-                    s % static_cast<int>(order.size()))];
+                const std::size_t n = order.size();
+                const int wrapped = s % static_cast<int>(n);
+                return order[static_cast<std::size_t>(wrapped)];
             };
             // Fresh bot per seat: adaptive personalities learn within each
-            // table without leaking reads across unrelated tables.
+            // table without leaking reads across unrelated tables. Seats
+            // wrap the shuffled files (a 1-file roster fills every seat).
             std::vector<std::unique_ptr<Bot>> table_bots;
             for (int s = 0; s < seats; ++s) {
                 table_bots.push_back(make_bot(bot_files[static_cast<std::size_t>(
@@ -187,22 +180,88 @@ int main(int argc, char** argv) {
                 }
                 const std::size_t baseline =
                     event.table().events().size();
-                event.begin_hand(table_seed + hands);
-                Table& felt = event.table();
-                while (!felt.hand_complete()) {
-                    if (felt.acting() != -1) {
-                        const int seat = felt.acting();
-                        felt.act(seat,
-                                 table_bots[static_cast<std::size_t>(seat)]
-                                     ->decide(make_view(felt, seat)));
+                try {
+                    event.begin_hand(table_seed + hands);
+                    Table& hand = event.table();
+                    while (!hand.hand_complete()) {
+                        const std::vector<int> pending =
+                            hand.draws_pending();
+                        if (!pending.empty()) {
+                            // Draw exchange: in turn order from the button,
+                            // exactly like protocol.cpp's step path.
+                            const int drawer = pending[0];
+                            hand.discard(
+                                drawer,
+                                table_bots[static_cast<std::size_t>(drawer)]
+                                    ->choose_discards(
+                                        make_view(hand, drawer)));
+                        } else if (hand.acting() != -1) {
+                            const int seat = hand.acting();
+                            hand.act(seat,
+                                     table_bots[static_cast<std::size_t>(seat)]
+                                         ->decide(make_view(hand, seat)));
+                        } else {
+                            hand.deal_next_street();
+                        }
+                    }
+                    hand.settle();
+                } catch (const std::exception& e) {
+                    // A bad engine hand (bot or table bug) must not kill a
+                    // 150k-hand bracket: fold the table's current hand into
+                    // a walkover for the next live seat and keep going.
+                    // The stderr line names the seed for repro.
+                    std::cerr << "hand " << hands << " table " << table
+                              << " seed " << (table_seed + hands)
+                              << " aborted: " << e.what() << "\n";
+                    Table& hand = event.table();
+                    while (!hand.hand_complete()) {
+                        if (hand.acting() != -1) {
+                            try {
+                                hand.act(hand.acting(),
+                                         {ActionType::Fold, 0});
+                            } catch (const std::exception&) {
+                                break;  // Fold illegal: frozen, skip below.
+                            }
+                        } else if (!hand.draws_pending().empty()) {
+                            try {
+                                hand.discard(hand.draws_pending()[0], {});
+                            } catch (const std::exception&) {
+                                break;  // Exchange stuck: frozen, skip below.
+                            }
+                        } else {
+                            try {
+                                hand.deal_next_street();
+                            } catch (const std::exception&) {
+                                break;  // Street stuck: frozen, skip below.
+                            }
+                        }
+                    }
+                    if (hand.hand_complete()) {
+                        try {
+                            hand.settle();
+                        } catch (const std::exception&) {
+                            // Settle itself failed: skip the hand.
+                            ++hands;
+                            ++hands_total;
+                            continue;
+                        }
                     } else {
-                        felt.deal_next_street();
+                        // Unfinishable (frozen street): skip the hand by
+                        // dealing the next one; the walkover stands.
+                        ++hands;
+                        ++hands_total;
+                        continue;
                     }
                 }
-                felt.settle();
                 event.finish_hand();
+                Table& felt = event.table();
                 const HandSummary summary = summarize_hand(
                     felt.events(), baseline, felt.events().size());
+                // Bound memory: the event log is append-only, and limit
+                // tables play ~10k hands before busting. Only the current
+                // hand's slice is ever read (via baseline above), so drop
+                // history after each hand. (protocol.cpp does the same.)
+                felt.clear_events();
                 for (int s = 0; s < seats; ++s) {
                     if (summary.seats[static_cast<std::size_t>(s)].played) {
                         table_bots[static_cast<std::size_t>(s)]->observe(
@@ -215,6 +274,9 @@ int main(int argc, char** argv) {
             const int winner = event.winner();
             const std::string& winner_bot =
                 bot_names[static_cast<std::size_t>(file_for(winner))];
+            // Bot display names are safe: printable ASCII with no CSV
+            // separators (load_bot_file rejects anything else), so the
+            // lineup needs no quoting and no parser can split it wrong.
             std::string lineup;
             for (int s = 0; s < seats; ++s) {
                 if (s > 0) lineup += ";";
@@ -226,9 +288,9 @@ int main(int argc, char** argv) {
                 if (!placements.empty()) placements += ";";
                 placements += std::to_string(seat);
             }
-            csv << stage << "," << table << "," << table_seed << "," << hands
-                << "," << winner << "," << csv_field(winner_bot) << ","
-                << csv_field(lineup) << "," << placements << "\n";
+    csv << stage << "," << table << "," << table_seed << "," << hands
+        << "," << winner << "," << winner_bot << "," << lineup << ","
+        << placements << "\n";
             ++wins[winner_bot];
         }
     }

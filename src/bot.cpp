@@ -21,6 +21,17 @@ void validate_bot(const BotFile& file) {
     if (file.format_version != 1) {
         throw std::invalid_argument("unsupported bot format_version");
     }
+    // Bot names land in CSV lineups/placements unquoted, so a present
+    // name must be plain printable text with no field or name
+    // separators. Empty stays legal (nameless test/default bots).
+    for (char c : file.name) {
+        const unsigned char u = static_cast<unsigned char>(c);
+        if (u < 0x20 || u > 0x7E || c == ',' || c == '"' || c == ';' ||
+            c == '\'') {
+            throw std::invalid_argument(
+                "name must be printable ASCII without , \" ; or '");
+        }
+    }
     if (file.mistake_rate < 0.0 || file.mistake_rate > 1.0) {
         throw std::invalid_argument("mistake_rate must be 0..1");
     }
@@ -238,6 +249,10 @@ std::vector<std::string> draw_keep(const std::vector<Card>& hole,
 // Trim a wish list to the house cap (keep order: first cards matter most).
 std::vector<std::string> cap_discards(std::vector<std::string> want,
                                       int max_draw);
+// Discard contract guard (defined after the bot classes): every entry must
+// name a hole card, no duplicates. Filters instead of throwing.
+std::vector<std::string> checked_discards(std::vector<std::string> want,
+                                          const SeatView& view);
 
 // Uniform random legal action. The baseline every real bot must beat.
 class RandomBot : public Bot {
@@ -266,7 +281,7 @@ public:
     std::vector<std::string> choose_discards(
         const SeatView& view) override {
         const bool deuce = view.showdown == HandConstruction::DeuceSeven;
-        return cap_discards(draw_keep(view.hole, deuce), view.max_draw);
+        return checked_discards(draw_keep(view.hole, deuce), view);
     }
 
 private:
@@ -759,7 +774,7 @@ protected:
                 0, view.max_draw);
             want.resize(static_cast<std::size_t>(count(rng_)));
         }
-        return cap_discards(want, view.max_draw);
+        return checked_discards(want, view);
     }
 
     void observe(int, const HandSummary&) override {
@@ -1017,7 +1032,7 @@ public:
         // GTO lite: play the same sound discards as everyone else (there
         // is no balance edge in a 5-card exchange), capped at the house max.
         const bool deuce = view.showdown == HandConstruction::DeuceSeven;
-        return cap_discards(draw_keep(view.hole, deuce), view.max_draw);
+        return checked_discards(draw_keep(view.hole, deuce), view);
     }
 
 private:
@@ -1140,6 +1155,34 @@ std::vector<std::string> cap_discards(std::vector<std::string> want,
         want.resize(static_cast<std::size_t>(max_draw));
     }
     return want;
+}
+
+// Discard contract guard: every entry must name a card currently in the
+// hole (no duplicates). A bot bug here throws inside the engine's discard
+// path — which once killed whole stress brackets (0xC0000409) — so filter
+// before returning: keep hole cards in order, drop anything else. A short
+// list just stands pat on the difference, never an exception.
+std::vector<std::string> checked_discards(std::vector<std::string> want,
+                                          const SeatView& view) {
+    want = cap_discards(std::move(want), view.max_draw);
+    std::vector<std::string> safe;
+    std::vector<bool> used(view.hole.size(), false);
+    for (const std::string& text : want) {
+        Card card;
+        try {
+            card = parse_card(text);
+        } catch (const std::exception&) {
+            continue;
+        }
+        for (std::size_t k = 0; k < view.hole.size(); ++k) {
+            if (!used[k] && view.hole[k] == card) {
+                used[k] = true;
+                safe.push_back(text);
+                break;
+            }
+        }
+    }
+    return safe;
 }
 
 }  // namespace

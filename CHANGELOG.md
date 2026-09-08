@@ -5,6 +5,23 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Stress: `cardengine_stress` hardening — per-hand `clear_events()` (limit
+  tables play ~10k hands; the append-only log cost ~1GB per worker),
+  unquoted CSV lineups with validated bot names (a broken quote escape
+  used to glue rows together and corrupt ratings), in-process draw
+  exchanges (draw championships previously crashed: the loop never
+  serviced `draws_pending`), and a per-hand abort guard (a bad hand folds
+  to a walkover with its seed logged instead of killing the bracket).
+  Bot names rejecting `, " ; '` (they land in CSVs unquoted), discard
+  lists validated against the hole (`checked_discards`: truncate-mistakes
+  can name cards the seat doesn't hold, which threw inside `discard`).
+- Scripts: `scripts/scoreboard.py` 100K+ campaign (config-driven:
+  `variants.txt` + `bots.txt`, budgets computed as 100k appearances ×
+  bots ÷ seats, per-variant BT boards plus an equal-weight overall board
+  into `ratings/`; CSVs/championships land in `.scratch/`). Verified the
+  BT fit is order-independent (forward vs reversed fit: bit-identical)
+  and Condorcet-clean. Fresh 10-variant boards in `ratings/`.
+
 ## 0.5.0 — Wave 3: variants
 
 - Variants: seven-card stud with real rules (`showdown = stud`,

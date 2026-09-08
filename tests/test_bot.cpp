@@ -82,6 +82,17 @@ int main() {
             ranged = contains(e.what(), "invalid bot");
         }
         check(ranged, "mistake rate range");
+        // Bot names land in CSV lineups unquoted: no separators allowed.
+        expect_throws<std::invalid_argument>(
+            [] {
+                parse_text("format_version = 1\nname = A;B\n");
+            },
+            "semicolon name");
+        expect_throws<std::invalid_argument>(
+            [] {
+                parse_text("format_version = 1\nname = A,B\n");
+            },
+            "comma name");
         expect_throws<std::invalid_argument>([] { load_bot_file("tmp_missing_bot_xyz.txt"); },
                      "missing file");
 

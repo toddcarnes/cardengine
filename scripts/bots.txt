@@ -1,0 +1,14 @@
+# Scoreboard bots: one bot file per line (relative to the repo root).
+bots/adaptive.txt
+bots/apex.txt
+bots/fitfold.txt
+bots/gto.txt
+bots/lag.txt
+bots/loose.txt
+bots/nit.txt
+bots/random.txt
+bots/station.txt
+bots/survivor.txt
+bots/tag.txt
+bots/tight.txt
+bots/vanguard.txt
