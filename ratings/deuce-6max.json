@@ -567,32 +567,32 @@
       31035
     ],
     "Adapter\u0001Fit-or-Fold Fred": [
-      16896,
-      23803
+      17036,
+      23663
     ],
     "Adapter\u0001GTO": [
-      20480,
-      17093
+      20760,
+      16813
     ],
     "Adapter\u0001LAG": [
-      21990,
-      19667
+      22130,
+      19527
     ],
     "Adapter\u0001Loose Lucy": [
       18058,
       22910
     ],
     "Adapter\u0001Nit": [
-      16232,
-      25594
+      16145,
+      25681
     ],
     "Adapter\u0001Randy": [
-      18161,
-      22236
+      18301,
+      22096
     ],
     "Adapter\u0001Station Sal": [
-      22945,
-      18231
+      23085,
+      18091
     ],
     "Adapter\u0001Survivor": [
       11138,
@@ -607,64 +607,64 @@
       23231
     ],
     "Adapter\u0001Vanguard": [
-      10282,
-      30004
+      10422,
+      29864
     ],
     "Apex\u0001Fit-or-Fold Fred": [
-      24005,
-      16645
+      23865,
+      16785
     ],
     "Apex\u0001GTO": [
-      30476,
-      8282
+      30482,
+      8276
     ],
     "Apex\u0001LAG": [
-      26964,
-      9034
+      26824,
+      9174
     ],
     "Apex\u0001Loose Lucy": [
       27738,
       11430
     ],
     "Apex\u0001Nit": [
-      24572,
-      16352
+      24852,
+      16072
     ],
     "Apex\u0001Randy": [
-      33202,
-      7122
+      33062,
+      7262
     ],
     "Apex\u0001Station Sal": [
-      34246,
-      9336
+      34386,
+      9196
     ],
     "Apex\u0001Survivor": [
-      22454,
-      18809
+      22314,
+      18949
     ],
     "Apex\u0001TAG": [
       25418,
       15701
     ],
     "Apex\u0001Tight Ted": [
-      25654,
-      17440
+      25794,
+      17300
     ],
     "Apex\u0001Vanguard": [
-      17424,
-      24178
+      17564,
+      24038
     ],
     "Fit-or-Fold Fred\u0001GTO": [
-      28314,
-      14889
+      28407,
+      14796
     ],
     "Fit-or-Fold Fred\u0001LAG": [
       28476,
       14935
     ],
     "Fit-or-Fold Fred\u0001Loose Lucy": [
-      25489,
-      16194
+      25629,
+      16054
     ],
     "Fit-or-Fold Fred\u0001Nit": [
       19994,
@@ -679,8 +679,8 @@
       14546
     ],
     "Fit-or-Fold Fred\u0001Survivor": [
-      19082,
-      25402
+      18942,
+      25542
     ],
     "Fit-or-Fold Fred\u0001TAG": [
       23962,
@@ -699,28 +699,28 @@
       20266
     ],
     "GTO\u0001Loose Lucy": [
-      13979,
-      26347
+      14119,
+      26207
     ],
     "GTO\u0001Nit": [
       12850,
       26677
     ],
     "GTO\u0001Randy": [
-      15193,
-      25237
+      15093,
+      25337
     ],
     "GTO\u0001Station Sal": [
-      18864,
-      22038
+      18724,
+      22178
     ],
     "GTO\u0001Survivor": [
-      8405,
-      33307
+      8445,
+      33267
     ],
     "GTO\u0001TAG": [
-      13825,
-      26990
+      13685,
+      27130
     ],
     "GTO\u0001Tight Ted": [
       12603,
@@ -735,64 +735,64 @@
       23985
     ],
     "LAG\u0001Nit": [
-      13115,
-      28014
+      13168,
+      27961
     ],
     "LAG\u0001Randy": [
-      16986,
-      23936
+      16846,
+      24076
     ],
     "LAG\u0001Station Sal": [
-      21873,
-      20790
+      22013,
+      20650
     ],
     "LAG\u0001Survivor": [
       8583,
       33159
     ],
     "LAG\u0001TAG": [
-      17507,
-      25262
+      17647,
+      25122
     ],
     "LAG\u0001Tight Ted": [
       15350,
       24351
     ],
     "LAG\u0001Vanguard": [
-      9472,
-      34273
+      9525,
+      34220
     ],
     "Loose Lucy\u0001Nit": [
       16666,
       25793
     ],
     "Loose Lucy\u0001Randy": [
-      24043,
-      19404
+      23903,
+      19544
     ],
     "Loose Lucy\u0001Station Sal": [
       25436,
       15789
     ],
     "Loose Lucy\u0001Survivor": [
-      12734,
-      30742
+      12454,
+      31022
     ],
     "Loose Lucy\u0001TAG": [
       18469,
       24723
     ],
     "Loose Lucy\u0001Tight Ted": [
-      18278,
-      23204
+      18138,
+      23344
     ],
     "Loose Lucy\u0001Vanguard": [
-      11722,
-      32496
+      11442,
+      32776
     ],
     "Nit\u0001Randy": [
-      25984,
-      15222
+      25844,
+      15362
     ],
     "Nit\u0001Station Sal": [
       30048,
@@ -815,12 +815,12 @@
       25648
     ],
     "Randy\u0001Station Sal": [
-      27093,
-      14601
+      27373,
+      14321
     ],
     "Randy\u0001Survivor": [
-      5125,
-      36775
+      5104,
+      36796
     ],
     "Randy\u0001TAG": [
       16678,
@@ -839,16 +839,16 @@
       33253
     ],
     "Station Sal\u0001TAG": [
-      15523,
-      26126
+      15383,
+      26266
     ],
     "Station Sal\u0001Tight Ted": [
       14737,
       30255
     ],
     "Station Sal\u0001Vanguard": [
-      6781,
-      33808
+      6641,
+      33948
     ],
     "Survivor\u0001TAG": [
       25976,
@@ -859,61 +859,61 @@
       18057
     ],
     "Survivor\u0001Vanguard": [
-      19554,
-      24395
+      19694,
+      24255
     ],
     "TAG\u0001Tight Ted": [
       22590,
       22306
     ],
     "TAG\u0001Vanguard": [
-      15322,
-      25359
+      15182,
+      25499
     ],
     "Tight Ted\u0001Vanguard": [
-      14564,
-      28106
+      14704,
+      27966
     ]
   },
   "players": {
     "Adapter": {
-      "rating": 1137.93,
+      "rating": 1139.18,
       "tables": 98176
     },
     "Apex": {
-      "rating": 1315.09,
+      "rating": 1315.34,
       "tables": 97389
     },
     "Fit-or-Fold Fred": {
-      "rating": 1227.95,
+      "rating": 1228.07,
       "tables": 103215
     },
     "GTO": {
-      "rating": 1090.71,
+      "rating": 1089.8,
       "tables": 97006
     },
     "LAG": {
-      "rating": 1111.44,
+      "rating": 1111.77,
       "tables": 98621
     },
     "Loose Lucy": {
-      "rating": 1169.65,
+      "rating": 1168.13,
       "tables": 100447
     },
     "Nit": {
-      "rating": 1234.18,
+      "rating": 1233.66,
       "tables": 101684
     },
     "Randy": {
-      "rating": 1135.28,
+      "rating": 1136.35,
       "tables": 98677
     },
     "Station Sal": {
-      "rating": 1095.69,
+      "rating": 1094.47,
       "tables": 102848
     },
     "Survivor": {
-      "rating": 1311.61,
+      "rating": 1312.61,
       "tables": 102361
     },
     "TAG": {
@@ -921,14 +921,14 @@
       "tables": 101933
     },
     "Tight Ted": {
-      "rating": 1218.66,
+      "rating": 1218.85,
       "tables": 101410
     },
     "Vanguard": {
-      "rating": 1338.66,
+      "rating": 1338.61,
       "tables": 102433
     }
   },
   "rejected_rows": 0,
-  "updated": "2026-09-08T03:40:11+00:00"
+  "updated": "2026-09-08T07:30:30+00:00"
 }

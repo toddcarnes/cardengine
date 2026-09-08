@@ -1,59 +1,59 @@
 {
   "players": {
     "Adapter": {
-      "rating": 1197.86,
+      "rating": 1198.51,
       "tables": 996370
     },
     "Apex": {
-      "rating": 1208.68,
+      "rating": 1208.33,
       "tables": 1004507
     },
     "Fit-or-Fold Fred": {
-      "rating": 1203.12,
+      "rating": 1204.09,
       "tables": 1006681
     },
     "GTO": {
-      "rating": 1192.78,
+      "rating": 1192.29,
       "tables": 998033
     },
     "LAG": {
-      "rating": 1195.99,
+      "rating": 1196.03,
       "tables": 1013324
     },
     "Loose Lucy": {
-      "rating": 1196.65,
+      "rating": 1196.86,
       "tables": 1000417
     },
     "Nit": {
-      "rating": 1202.77,
+      "rating": 1203.58,
       "tables": 1017606
     },
     "Randy": {
-      "rating": 1188.12,
+      "rating": 1185.38,
       "tables": 1010573
     },
     "Station Sal": {
-      "rating": 1193.68,
+      "rating": 1194.05,
       "tables": 1011388
     },
     "Survivor": {
-      "rating": 1207.65,
+      "rating": 1207.55,
       "tables": 992124
     },
     "TAG": {
-      "rating": 1201.77,
+      "rating": 1202.26,
       "tables": 1001720
     },
     "Tight Ted": {
-      "rating": 1201.58,
+      "rating": 1202.07,
       "tables": 1003151
     },
     "Vanguard": {
-      "rating": 1209.33,
+      "rating": 1208.98,
       "tables": 1005306
     }
   },
-  "updated": "2026-09-08T03:45:52+00:00",
+  "updated": "2026-09-08T07:35:55+00:00",
   "variants": [
     {
       "duels": 3265500,
