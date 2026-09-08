@@ -79,6 +79,10 @@ struct SeatView {
     // best seat). Heuristics use it to tighten early and loosen late.
     // (Stud opens by hand strength, so position matters less there.)
     int position = -1;
+    // Live table size (seats dealt this hand). Short tables play looser
+    // poker than full rings: survival pressure, planning depth, and PLO
+    // honesty all scale with this, not the config max.
+    int table_size = 0;
     int num_seats = 0;
     // Draw games: most cards this seat may exchange (GameConfig max_draw).
     int max_draw = 5;

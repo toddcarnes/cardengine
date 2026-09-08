@@ -220,9 +220,13 @@ SeatView make_view(const Table& table, int seat) {
     view.can_raise = opts.can_raise;
     view.min_raise_to = opts.min_raise_to;
     view.max_raise_to = opts.max_raise_to;
-    view.num_seats = table.num_seats();
     view.position = (seat - table.button() + table.num_seats()) %
                     table.num_seats();
+    view.table_size = 0;
+    for (int i = 0; i < table.num_seats(); ++i) {
+        if (table.in_hand(i)) ++view.table_size;
+    }
+    view.num_seats = view.table_size;
     view.showdown = table.config().showdown;
     view.max_draw = table.config().max_draw;
     view.drew = table.drew(seat);
@@ -304,7 +308,26 @@ double card_points(Rank r) {
 // Rough 0..1 made-hand strength: Chen-style points preflop,
 // category-based after.
 HandValue omaha_current(const std::vector<Card>& hole,
-                        const std::vector<Card>& board);
+                         const std::vector<Card>& board);
+
+// Omaha coordination: suited together or connected. Bare high cards with
+// neither are PLO trash postflop too — a lone pair without a draw or a
+// suit to grow into is a bluff-catcher in a game where everyone makes
+// hands. (Mirrors the preflop trash gate in made_strength.)
+bool omaha_coordinated(const std::vector<Card>& hole) {
+    int suits[4] = {};
+    int low = 15, high = 0;
+    for (const Card& c : hole) {
+        ++suits[static_cast<int>(c.suit)];
+        const int v = static_cast<int>(c.rank);
+        if (v < low) low = v;
+        if (v > high) high = v;
+    }
+    for (int s = 0; s < 4; ++s) {
+        if (suits[s] >= 2) return true;
+    }
+    return high - low <= 5;
+}
 HandValue stud_current(const std::vector<Card>& hole,
                        const std::vector<Card>& up,
                        const std::vector<Card>& community);
@@ -496,6 +519,16 @@ double made_strength(const SeatView& view) {
                 if (value.category >= HandCategory::TwoPair) total = 0.85;
                 return total > 1.0 ? 1.0 : total;
             }
+        }
+        // Omaha honesty tax: bare overpairs and naked draws read weaker
+        // than their holdem twins. Everyone makes hands here, so a lone
+        // pair without coordination is a bluff-catcher, not a value hand
+        // — discount it before the category scale below.
+        if (value.category == HandCategory::OnePair &&
+            !omaha_coordinated(view.hole)) {
+            HandValue taxed = value;
+            taxed.category = HandCategory::HighCard;
+            value = taxed;
         }
     } else {
         value = evaluate_best(all);
@@ -790,9 +823,17 @@ protected:
         // Continuation: the prior street's aggressor keeps firing with
         // hands too weak to bet fresh — double-barrels, delayed c-bets,
         // and bluffs with a story. Scales with barrels (0 = off), gated
-        // on real equity so air still gives up.
+        // on real equity so air still gives up. Omaha strengthens the
+        // gate: bare pairs and naked draws are bluff-catchers there, not
+        // barreling hands — coordination (or a real made hand) is what
+        // keeps firing.
+        const bool omaha =
+            view.showdown == HandConstruction::OmahaTwoAndThree ||
+            view.showdown == HandConstruction::OmahaHiLo;
+        double barrel_floor = 0.30;
+        if (omaha) barrel_floor = 0.45;
         if (view.to_call == 0 && view.can_raise && prior_aggressor_ &&
-            file_.barrels > 0.0 && s > 0.30 &&
+            file_.barrels > 0.0 && s > barrel_floor &&
             s <= 0.60 - file_.aggression * 0.15 &&
             unit(rng_) < file_.barrels * 0.5) {
             return {ActionType::Raise, size_bet(view)};
@@ -848,8 +889,10 @@ private:
     // draw trajectory. Draw-heavy hands gain (outs realize next street);
     // made hands with no redraws decay slightly (the board can only get
     // scarier). planning = 1 blends half, 2 blends three-quarters.
-    // Pure arithmetic over the existing evaluators: no search tree, no
-    // opponent model — microseconds, not milliseconds.
+    // Short-handed the lookahead thins out: heads-up every hand is a
+    // duel, so future-street geometry carries less weight than current
+    // cards. Pure arithmetic over the existing evaluators: no search
+    // tree, no opponent model — microseconds, not milliseconds.
     double planned_equity(const SeatView& view, double now) const {
         const double draw = draw_equity(view);
         const double made = made_strength(view);
@@ -865,17 +908,27 @@ private:
         }
         const double blend =
             file_.planning >= 2 ? 0.75 : 0.5;
-        double equity = now + (next - now) * blend;
+        double table_blend = blend;
+        if (view.table_size >= 2 && view.table_size < 6) {
+            // Short tables thin the lookahead toward current strength.
+            table_blend = blend * static_cast<double>(view.table_size - 2) /
+                          4.0;
+        }
+        double equity = now + (next - now) * table_blend;
         if (equity < 0.0) equity = 0.0;
         if (equity > 1.0) equity = 1.0;
         return equity;
     }
 
-    // Fraction of the stack at risk, scaled by shortness: deep stacks risk
-    // little per call, short stacks risk everything. Premium peaks when a
-    // call costs a large share of a below-starting stack. The 2x weight on
-    // shortness keeps deep-stack premiums negligible (a 1% call must not
-    // fold) while letting half-stack calls demand real hands.
+    // Fraction of the stack at risk, scaled by shortness and table size:
+    // deep stacks risk little per call, short stacks risk everything, and
+    // full rings punish busts harder than short tables (more players share
+    // the dead money, so survival matters more). Premium peaks when a call
+    // costs a large share of a below-starting stack at a full table. The
+    // 2x weight on shortness keeps deep-stack premiums negligible (a 1%
+    // call must not fold) while letting half-stack calls demand real
+    // hands. Heads-up (table_size 2) plays nearly survival-free: every
+    // duel risks elimination, so there is no premium left to charge.
     double risk_premium(const SeatView& view) const {
         if (file_.survival <= 0.0 || view.stack <= 0 || view.to_call <= 0) {
             return 0.0;
@@ -886,7 +939,15 @@ private:
         const double shortness =
             static_cast<double>(view.to_call) /
             static_cast<double>(view.stack + view.to_call);
-        return file_.survival * at_risk * (2.0 * shortness + at_risk);
+        double table_scale = 1.0;
+        if (view.table_size >= 2) {
+            // 0 at heads-up, ramping to full weight at 6-max.
+            table_scale = static_cast<double>(view.table_size - 2) / 4.0;
+            if (table_scale < 0.0) table_scale = 0.0;
+            if (table_scale > 1.0) table_scale = 1.0;
+        }
+        return file_.survival * table_scale * at_risk *
+               (2.0 * shortness + at_risk);
     }
 
     int size_bet(const SeatView& view) const {
@@ -995,6 +1056,10 @@ private:
 
 // Balanced-lite: fixed pot-fraction sizing, minimum-defense-frequency
 // calls, value-heavy raises plus occasional bluffs at the same size.
+// Defense scales with table size: short-handed every duel is a flip, so
+// the bot leans on its made-hand edge (equity floor) instead of MDF's
+// break-even math, which assumes opponents bluff at equilibrium rates
+// this field never reaches.
 class GtoBot : public Bot {
 public:
     explicit GtoBot(const BotFile& file)
@@ -1015,13 +1080,19 @@ public:
             return {ActionType::Call, 0};
         }
         if (s > 0.75 && view.can_raise) return {ActionType::Raise, size_bet(view)};
-        // Minimum defense frequency, scaled by defense: call often enough
-        // that bluffs break even at 1.0; under-defend below, over-defend
-        // above. (An equity floor lost ~50 Elo here: this field bets
-        // value-heavy, so MDF already over-defends.)
+        // Equity floor first: real made hands (top pair good kicker or
+        // better) always continue — no paradox of folding winners to
+        // satisfy a frequency. Air below the floor defends at MDF, scaled
+        // by defense and thinned short-handed (heads-up MDF over-defends
+        // against a value-heavy field; the floor carries the weight).
+        if (s >= 0.50) return {ActionType::Call, 0};
+        double defend_scale = file_.defense;
+        if (view.table_size >= 2 && view.table_size < 6) {
+            defend_scale *= static_cast<double>(view.table_size - 2) / 4.0;
+        }
         const double mdf = static_cast<double>(view.pot) /
                            static_cast<double>(view.pot + view.to_call);
-        if (unit(rng_) < mdf * file_.defense) return {ActionType::Call, 0};
+        if (unit(rng_) < mdf * defend_scale) return {ActionType::Call, 0};
         return {ActionType::Fold, 0};
     }
 

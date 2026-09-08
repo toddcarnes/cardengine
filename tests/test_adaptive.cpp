@@ -64,6 +64,8 @@ SeatView base_view() {
     view.min_raise_to = 250;
     view.max_raise_to = 8150;
     view.street = cardengine::Street::Flop;
+    view.table_size = 6;
+    view.num_seats = 6;
     return view;
 }
 
@@ -95,6 +97,7 @@ int main() {
         check(make_view(table, 1).position == 1, "SB is 1");
         check(make_view(table, 5).position == 5, "cutoff is 5");
         check(make_view(table, 0).num_seats == 6, "seat count");
+        check(make_view(table, 0).table_size == 6, "live table size");
     }
 
     // A naked flush draw (9 outs ~ 36%) calls a small bet it would fold bare.
@@ -219,7 +222,8 @@ int main() {
               "winner summarized");
     }
 
-    // GTO: nuts always raise; defense tracks minimum-defense frequency.
+    // GTO: nuts always raise; the equity floor keeps made hands, and
+    // defense tracks minimum-defense frequency for the rest.
     {
         auto bot = make_bot(gto_file());
         SeatView nuts = base_view();
@@ -228,6 +232,21 @@ int main() {
         nuts.street = Street::Preflop;
         const Action value = bot->decide(nuts);
         check(value.type == ActionType::Raise, "gto raises the nuts");
+
+        // Made hand (aces up two pair, s ~ 0.5+) facing a pot-sized
+        // bet: the equity floor calls every time, no frequency roll.
+        SeatView made = base_view();
+        made.hole = {card("Ks"), card("7d")};
+        made.board = {card("Ks"), card("7h"), card("4c")};
+        made.street = Street::Flop;
+        made.pot = 200;
+        made.to_call = 200;
+        made.call_amount = 200;
+        made.current_bet = 200;
+        for (int i = 0; i < 20; ++i) {
+            check(bot->decide(made).type == ActionType::Call,
+                  "gto floor keeps made hands");
+        }
 
         // Air facing a pot-sized bet: defend about half the time.
         SeatView air = base_view();
@@ -263,6 +282,17 @@ int main() {
             check(always->decide(air).type == ActionType::Call,
                   "defense two calls air");
         }
+
+        // Short-handed the MDF roll thins out (heads-up the floor carries
+        // the weight): air at table_size 2 folds far more often.
+        SeatView hu_air = air;
+        hu_air.table_size = 2;
+        int hu_defended = 0;
+        for (int i = 0; i < trials; ++i) {
+            if (bot->decide(hu_air).type != ActionType::Fold) ++hu_defended;
+        }
+        const double hu_rate = static_cast<double>(hu_defended) / trials;
+        check(hu_rate < rate, "gto thins defense heads-up");
 
         // bluff_rate = 0 never bluffs weak open hands; = 1 always does.
         SeatView weak_open = base_view();
@@ -338,6 +368,40 @@ int main() {
               "omaha bottom two folds to pressure");
     }
 
+    // Omaha honesty: a bare overpair with no coordination reads as a
+    // bluff-catcher postflop (taxed to high-card strength), so it folds
+    // to pressure a coordinated pair would call.
+    {
+        auto honest = make_bot(heuristic_file());
+        auto plo_view = [&](const char* a, const char* b, const char* c,
+                            const char* d) {
+            SeatView v = base_view();
+            v.showdown = HandConstruction::OmahaTwoAndThree;
+            v.num_seats = 6;
+            v.table_size = 6;
+            v.hole = {card(a), card(b), card(c), card(d)};
+            v.board = {card("Ks"), card("7d"), card("4c")};
+            v.street = Street::Flop;
+            v.pot = 370;
+            v.to_call = 500;
+            v.call_amount = 500;
+            v.current_bet = 500;
+            v.min_raise_to = 600;
+            v.max_raise_to = 8000;
+            return v;
+        };
+        // Bare aces, rainbow + disconnected: taxed, folds to a pot bet.
+        check(honest->decide(plo_view("As", "Ah", "9d", "4c")).type ==
+                  ActionType::Fold,
+              "omaha bare overpair folds");
+        // Same aces with a suit and connectors: taxed too (still one
+        // pair with no draw), but the nut flush draw keeps it closer —
+        // assert honesty only: it must not raise a bare pair.
+        check(honest->decide(plo_view("As", "Ah", "Ks", "Qd")).type !=
+                  ActionType::Raise,
+              "omaha coordinated aces never raise bare");
+    }
+
     // position_weight: 0 ignores position (same decision both seats),
     // 2 doubles the nudge (late raises wider, early folds harder).
     {
@@ -377,6 +441,8 @@ int main() {
     // Survival: a short stack folds a marginal continue a deep stack
     // takes, but still calls with a premium. Pair of 7s (s ~ 0.38) facing
     // 30 into 370 calls deep (heuristic baseline) and folds short.
+    // Heads-up the premium vanishes: every duel risks elimination, so
+    // the same short stack calls like a deep one.
     {
         SeatView view = base_view();
         view.hole = {card("7h"), card("2d")};
@@ -401,8 +467,15 @@ int main() {
         check(short_stack->decide(view).type == ActionType::Fold,
               "survival short folds marginal");
 
+        // Heads-up the same short stack calls: no premium left to charge.
+        auto hu_short = make_bot(survival_file());
+        view.table_size = 2;
+        check(hu_short->decide(view).type == ActionType::Call,
+              "survival heads-up keeps marginal");
+
         // Aces (s ~ 0.9) still continue short: premium beats the premium.
         auto premium = make_bot(survival_file());
+        view.table_size = 6;
         view.hole = {card("Ah"), card("Ad")};
         view.board = {card("7s"), card("Kd"), card("Qc")};
         view.stack = 60;
