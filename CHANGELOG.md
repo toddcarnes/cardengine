@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Bots: PLO call discount for coordinated hands with live draws
+  (bar_scale 0.6 postflop, gated on draw equity so naked pairs still pay
+  full price) plus a draw-gated honesty tax (bare pairs without draws
+  read as bluff-catchers; coordinated pairs keep a middle grade). GTO
+  deuce value raises pat 7-lows and keeps lesser pat lows through caps.
 - Bots: Omaha second street (coordinated draws with live equity keep
   barreling as the prior aggressor; naked pairs still check) plus a
   middle grade for coordinated one-pair hands (playable, not premium).

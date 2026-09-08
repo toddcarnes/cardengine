@@ -336,6 +336,7 @@ OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
 // Draw equity (flush/straight outs) — declared early: the Omaha honesty
 // tax in made_strength keys off live draws, not just coordination.
 double draw_equity(const SeatView& view);
+double strength(const SeatView& view, double position_weight);
 double made_strength(const SeatView& view) {
     // 2-7 lowball: the worst poker hand wins, so strength runs off the
     // DeuceValue directly — a pat 7-low is the nuts (~0.95), any broken
@@ -525,21 +526,16 @@ double made_strength(const SeatView& view) {
         }
         // Omaha honesty tax: bare overpairs and naked draws read weaker
         // than their holdem twins. Everyone makes hands here, so a lone
-        // pair without coordination is a bluff-catcher, not a value hand
-        // — discount it before the category scale below. A coordinated
-        // pair (suit or connectors to grow into) keeps a middle grade:
-        // playable, not premium.
-        if (value.category == HandCategory::OnePair) {
-            if (!omaha_coordinated(view.hole)) {
-                HandValue taxed = value;
-                taxed.category = HandCategory::HighCard;
-                value = taxed;
-            } else if (draw_equity(view) < 0.15) {
-                HandValue taxed = value;
-                taxed.category = HandCategory::HighCard;
-                taxed.tiebreak[0] = Rank::Ace;
-                value = taxed;
-            }
+        // pair without coordination or draws is a bluff-catcher, not a
+        // value hand — discount it before the category scale below. A
+        // coordinated pair with live equity keeps a middle grade (the
+        // discount below, not the tax, decides those hands).
+        if (value.category == HandCategory::OnePair &&
+            draw_equity(view) <= 0.05) {
+            HandValue taxed = value;
+            taxed.category = HandCategory::HighCard;
+            if (omaha_coordinated(view.hole)) taxed.tiebreak[0] = Rank::Ace;
+            value = taxed;
         }
     } else {
         value = evaluate_best(all);
@@ -883,14 +879,44 @@ protected:
         }
         // Hi-Lo low discount: with two wheel cards the call contests half
         // the pot on its own, so the pot-odds bar halves (a low draw at
-        // 2x pot odds plays like a high draw at even money).
+        // 2x pot odds plays like a high draw at even money). PLO gets a
+        // milder sibling: coordinated hands (suit + connectors) realize
+        // equity multi-way far better than bare pairs, so they call one
+        // bet at a discount. Naked pairs pay full price — they are the
+        // leak the honesty tax prices, and no discount should smuggle
+        // them back in.
         double bar_scale = 1.0;
         if (view.showdown == HandConstruction::OmahaHiLo &&
             view.board.empty() && wheel_draw(view.hole)) {
             bar_scale = 0.45;
+        } else if (view.showdown == HandConstruction::OmahaTwoAndThree &&
+                   view.board.size() >= 3 && omaha_coordinated(view.hole)) {
+            // Coordinated hands with any live draw get the discount
+            // (coordination realizes equity multi-way) — but a bare made
+            // pair must never ride along: the draw gate (not just
+            // coordination) separates them. 0.05 admits backdoors.
+            if (draw_equity(view) > 0.05) bar_scale = 0.6;
         }
         if (equity >= 0.62 + premium && view.can_raise) {
             return {ActionType::Raise, size_bet(view)};
+        }
+        // Omaha coordinated hands facing a capped bet (no raise left):
+        // the discount calls rather than folds — but the value line
+        // above already raised the premiums, so this only rescues draws
+        // and middle grades that priced out at full odds. (The rescue
+        // sits BEFORE the generic capped-bet call below so the discount,
+        // not full price, decides these hands.)
+        if (!view.can_raise &&
+            view.showdown == HandConstruction::OmahaTwoAndThree &&
+            view.board.size() >= 3 && omaha_coordinated(view.hole) &&
+            draw_equity(view) > 0.05) {
+            const double discounted =
+                static_cast<double>(view.to_call) /
+                static_cast<double>(view.pot + view.to_call) * 0.6;
+            if (equity + file_.looseness * 0.25 >= discounted + premium) {
+                return {ActionType::Call, 0};
+            }
+            return {ActionType::Fold, 0};
         }
         const double pot_odds =
             static_cast<double>(view.to_call) /
@@ -1102,15 +1128,19 @@ public:
             return {ActionType::Call, 0};
         }
         if (s > 0.75 && view.can_raise) return {ActionType::Raise, size_bet(view)};
-        // Deuce floor: pat lows are made hands here, not marginals. MDF
-        // math assumes high-poker equity where 0.50 means a coin flip; in
-        // lowball a pat 8-low (~0.40+) is already ahead of the field's
-        // drawing range, so it continues like any made hand. Pairs and
-        // worse still defend at (thinned) MDF — they are the air.
+        // Deuce value + floor: pat lows are the made hands here. A pat
+        // 7-low (s ~ 0.80+) raises for value like any nuts; lesser pat
+        // lows (8-low and up, s ~ 0.40+) always continue through capped
+        // bets instead of folding to MDF math built for high poker.
+        // Pairs and worse still defend at (thinned) MDF — they are air.
         if (view.showdown == HandConstruction::DeuceSeven &&
-            view.board.empty() && view.hole.size() == 5 && s >= 0.40 &&
-            !view.can_raise) {
-            return {ActionType::Call, 0};
+            view.board.empty() && view.hole.size() == 5) {
+            if (s >= 0.80 && view.can_raise) {
+                return {ActionType::Raise, size_bet(view)};
+            }
+            if (s >= 0.40 && !view.can_raise) {
+                return {ActionType::Call, 0};
+            }
         }
         // Equity floor first: real made hands (top pair good kicker or
         // better) always continue — no paradox of folding winners to

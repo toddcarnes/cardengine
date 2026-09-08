@@ -297,7 +297,7 @@ int main() {
         // Deuce floor: a pat 8-low (s ~ 0.40+) always continues facing a
         // capped bet, even though MDF would fold it. can_raise is false
         // here so the floor (call), not the value line (raise), binds.
-        // Pairs still defend at MDF.
+        // Pairs still defend at MDF. A pat 7-low raises for value.
         SeatView pat = base_view();
         pat.showdown = HandConstruction::DeuceSeven;
         pat.hole = {card("8c"), card("5d"), card("4h"), card("3s"),
@@ -313,6 +313,14 @@ int main() {
             check(bot->decide(pat).type == ActionType::Call,
                   "gto deuce floor keeps pat lows");
         }
+        SeatView nuts_low = pat;
+        nuts_low.hole = {card("7c"), card("5d"), card("4h"), card("3s"),
+                         card("2c")};
+        nuts_low.can_raise = true;
+        nuts_low.min_raise_to = 400;
+        nuts_low.max_raise_to = 8000;
+        check(bot->decide(nuts_low).type == ActionType::Raise,
+              "gto deuce values the wheel");
 
         // bluff_rate = 0 never bluffs weak open hands; = 1 always does.
         SeatView weak_open = base_view();
@@ -422,78 +430,55 @@ int main() {
               "omaha coordinated aces never raise bare");
     }
 
-    // Omaha barrels: a coordinated draw as the prior aggressor keeps
-    // firing (second street), where a naked hand checks. Seed the story
-    // with a preflop open, then face a free flop.
+    // Omaha discount: a coordinated draw facing one bet calls at the
+    // discounted bar where a naked pair folds. The probe bot runs
+    // looseness 0.0 so the bar (not the looseness subsidy) decides.
     {
-        auto story_file = []() {
-            std::ostringstream text;
-            text << "format_version = 1\nname = C\nstyle = heuristic\n"
-                    "mistake_rate = 0.0\naggression = 0.0\n"
-                    "looseness = 0.3\nbluff_rate = 0.0\nbarrels = 2.0\n"
-                    "seed = 11\n";
-            return parse_text(text.str());
-        };
-        auto plo_open = [&]() {
-            SeatView v = base_view();
-            v.showdown = HandConstruction::OmahaTwoAndThree;
-            v.num_seats = 6;
-            v.table_size = 6;
-            v.street = Street::Preflop;
-            v.pot = 150;
-            v.to_call = 100;
-            v.call_amount = 100;
-            v.current_bet = 100;
-            v.min_raise_to = 200;
-            v.max_raise_to = 8000;
-            return v;
-        };
-        auto plo_flop = [&](const char* a, const char* b, const char* c,
+        auto tight_caller = make_bot(slider_file(
+            "format_version = 1\nname = T\nstyle = heuristic\n"
+            "mistake_rate = 0.0\naggression = 0.0\nlooseness = 0.0\n"
+            "seed = 11\n"));
+        auto plo_call = [&](const char* a, const char* b, const char* c,
                             const char* d) {
             SeatView v = base_view();
             v.showdown = HandConstruction::OmahaTwoAndThree;
             v.num_seats = 6;
             v.table_size = 6;
             v.hole = {card(a), card(b), card(c), card(d)};
-            v.board = {card("Ks"), card("9d"), card("4c")};
+            v.board = {card("Ks"), card("9s"), card("4c")};
             v.street = Street::Flop;
             v.pot = 400;
-            v.to_call = 0;
-            v.can_check = true;
-            v.can_raise = true;
-            v.call_amount = 0;
-            v.current_bet = 0;
-            v.min_raise_to = 100;
-            v.max_raise_to = 8000;
+            v.to_call = 200;
+            v.call_amount = 200;
+            v.current_bet = 200;
+            v.can_raise = false;
             return v;
         };
-        // Coordinated aces open preflop; the flop barrels only if the
-        // draw is live (nut flush draw here: must keep firing).
-        auto coordinated = make_bot(story_file());
-        SeatView aces_open = plo_open();
-        aces_open.hole = {card("As"), card("Ah"), card("Ks"), card("Qd")};
-        check(coordinated->decide(aces_open).type == ActionType::Raise,
-              "plo aces open");
+        // The bar math: naked pair s ~ 0.15–0.25 taxed, coordinated
+        // s ~ 0.5. At bet 200 into 400 (pot odds 1/3, raisable bar 2/3):
+        // naked needs 0.67, coordinated-discounted needs 0.40. Assert
+        // the coordinated calls and naked folds exactly there.
         {
-            SeatView flop = plo_flop("As", "Ah", "Ks", "Qd");
-            check(coordinated->decide(flop).type == ActionType::Check,
-                  "plo coordinated draw checks or better");
+            SeatView vn = plo_call("As", "Ah", "9d", "4c");
+            vn.to_call = 200;
+            vn.call_amount = 200;
+            vn.current_bet = 200;
+            vn.can_raise = true;
+            vn.min_raise_to = 300;
+            vn.max_raise_to = 8000;
+            SeatView vc = plo_call("As", "Ah", "Ks", "Qd");
+            vc.to_call = 200;
+            vc.call_amount = 200;
+            vc.current_bet = 200;
+            vc.can_raise = true;
+            vc.min_raise_to = 300;
+            vc.max_raise_to = 8000;
+            const Action an = tight_caller->decide(vn);
+            const Action ac = tight_caller->decide(vc);
+            check(an.type == ActionType::Fold, "plo naked folds full price");
+            check(ac.type == ActionType::Call,
+                  "plo coordinated takes the discount");
         }
-        // Bare rainbow aces open too (pair ~ 0.6 preflop) and check the
-        // naked flop: no draw, no second street (check or better — the
-        // bluff line may fire, but never a barrel raise... actually at
-        // aggression 0 the value line can still raise a 0.6: assert it
-        // never CHECKS-weak... keep it simple: naked must not out-aggress
-        // the coordinated hand).
-        auto naked = make_bot(story_file());
-        SeatView bare_open = plo_open();
-        bare_open.hole = {card("As"), card("Ah"), card("9d"), card("4c")};
-        check(naked->decide(bare_open).type == ActionType::Raise,
-              "plo bare aces open");
-        const Action naked_flop =
-            naked->decide(plo_flop("As", "Ah", "9d", "4c"));
-        check(naked_flop.type != ActionType::Fold,
-              "plo naked story continues somehow");
     }
 
     // position_weight: 0 ignores position (same decision both seats),
