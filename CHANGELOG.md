@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Table: a lone live leader's unmatched excess is a refund, not a win.
+  The top-band refund now fires when no live hand matched the level or
+  when a single seat holds it (previously the lone-live case paid out as
+  a one-eligible side pot, inflating winnings with uncalled chips).
+
 - Tests: `test_bot` deals its 30-hand match from a portable hand-rolled
   shuffle instead of `start_hand` seeds (`std::shuffle`'s algorithm is
   implementation-defined, so seeded decks dealt different cards per
