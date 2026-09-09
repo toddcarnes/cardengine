@@ -1,10 +1,8 @@
 // Bots: file parsing, decision sanity, and heuristic-vs-random edge.
 #include <cstdint>
 #include <iostream>
-#include <random>
 #include <sstream>
 #include <stdexcept>
-#include <vector>
 
 #include "cardengine/bot.h"
 #include "helpers.h"
@@ -16,6 +14,7 @@ using testutil::cards;
 using testutil::check;
 using testutil::contains;
 using testutil::expect_throws;
+using testutil::shuffled_deck;
 
 cardengine::BotFile parse_text(const std::string& text) {
     std::istringstream in(text);
@@ -31,29 +30,6 @@ cardengine::BotFile heuristic_file() {
 cardengine::BotFile random_file() {
     return parse_text(
         "format_version = 1\nname = R\nstyle = random\nseed = 5\n");
-}
-
-// Portable deal: Fisher-Yates over mt19937_64. std::shuffle's algorithm
-// is implementation-defined, so seeded decks would deal different cards
-// per stdlib and the profit below would wobble by platform.
-std::vector<cardengine::Card> dealt_deck(std::uint64_t seed) {
-    std::vector<cardengine::Card> deck;
-    for (int s = 0; s < 4; ++s) {
-        for (int r = 2; r <= 14; ++r) {
-            deck.push_back(cardengine::Card{
-                static_cast<cardengine::Rank>(r),
-                static_cast<cardengine::Suit>(s)});
-        }
-    }
-    std::mt19937_64 rng(seed);
-    for (std::size_t i = deck.size() - 1; i > 0; --i) {
-        std::uniform_int_distribution<std::size_t> pick(0, i);
-        const std::size_t j = pick(rng);
-        const cardengine::Card tmp = deck[i];
-        deck[i] = deck[j];
-        deck[j] = tmp;
-    }
-    return deck;
 }
 
 void check_legal(const cardengine::Table& table, int seat,
@@ -174,7 +150,7 @@ int main() {
                 GameConfig config;
                 config.num_players = 2;
                 Table table(config);
-                table.start_hand_from_deck(dealt_deck(
+                table.start_hand_from_deck(shuffled_deck(
                     static_cast<std::uint64_t>(hand)));
                 while (!table.hand_complete()) {
                     if (table.acting() != -1) {
