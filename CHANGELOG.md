@@ -9,6 +9,8 @@ minor bumps add features, patches fix bugs.
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
 
+- Table: `restore` clears a pending kill (a snapshot taken after a
+  10xBB-pot hand no longer deals the next hand at double blinds).
 - Table: deduplicate pot-payout merging behind one helper (single
   `merge_payout` for all five award sites, one `refund_unmatched_top` for
   both uncalled-excess refunds, one `high_half` encoding odd-chip-to-high;

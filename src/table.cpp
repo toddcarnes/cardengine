@@ -1031,6 +1031,7 @@ void Table::restore(const Snapshot& saved) {
     }
     button_ = saved.button;
     street_ = Street::None;
+    kill_live_ = false;
     board_.clear();
     community_.clear();
     shoe_.clear();

@@ -443,6 +443,28 @@ int main() {
         check(total_chips(t) == 30000, "hilo odd chips conserved");
     }
 
+    // A snapshot taken with a pending kill restores without the kill.
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.kill = true;
+        Table t(c);
+        // Hand 1: shove preflop so the pot clears 1000 (10x 100).
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d"}));
+        raise_to(t, 0, 5000);
+        call(t, 1);
+        check_down_streets(t);
+        t.settle();
+        const auto snap = t.snapshot();
+        t.restore(snap);
+        // Next hand plays normal blinds: SB 50, BB 100.
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d"}));
+        check(t.committed(0) + t.committed(1) == 150, "restore clears kill");
+        check(t.current_bet() == 100, "restored BB is 100");
+    }
+
     std::cout << "test_table ok\n";
     return 0;
 }
