@@ -719,10 +719,11 @@ std::vector<Payout> Table::settle() {
     return payouts;
 }
 
-// Unmatched top band returns to its lone owner before the award math
-// runs (it was never called, so no winner may take it). Returns the
-// excess to refund (0 when the top band is contested); the caller applies
-// it to the owner's stack and merges the levels.
+// Unmatched top band returns to its lone non-folded owner before the
+// award math runs (it was never called, so no winner may take it).
+// Returns the excess to refund (0 when the top band is contested);
+// refund_unmatched_top applies it to the owner's stack and merges
+// the levels.
 int Table::unmatched_top_excess(const std::vector<int>& levels) const {
     if (levels.size() <= 1) return 0;
     const int top = levels.back();
@@ -730,7 +731,7 @@ int Table::unmatched_top_excess(const std::vector<int>& levels) const {
     int leader = -1;
     for (int i = 0; i < num_seats(); ++i) {
         const Seat& s = seats_[static_cast<std::size_t>(i)];
-        if (s.in_hand && s.committed == top) {
+        if (s.in_hand && !s.folded && s.committed == top) {
             ++leaders;
             leader = i;
         }
@@ -745,7 +746,7 @@ void Table::refund_unmatched_top(std::vector<int>& levels) {
     if (excess <= 0) return;
     for (int i = 0; i < num_seats(); ++i) {
         Seat& s = seats_[static_cast<std::size_t>(i)];
-        if (s.in_hand && s.committed == levels.back()) {
+        if (s.in_hand && !s.folded && s.committed == levels.back()) {
             s.stack += excess;
             s.committed -= excess;
             break;

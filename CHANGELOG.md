@@ -9,6 +9,10 @@ minor bumps add features, patches fix bugs.
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
 
+- Table: unmatched-top refund ignores folded seats (defensive hardening;
+  unreachable today — a sole top-band leader never holds the action, so it
+  can never fold while sole-top — but a folded seat must never receive an
+  uncalled-excess refund).
 - Table: `restore` clears a pending kill (a snapshot taken after a
   10xBB-pot hand no longer deals the next hand at double blinds).
 - Table: deduplicate pot-payout merging behind one helper (single
