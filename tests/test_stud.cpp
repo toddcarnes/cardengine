@@ -49,18 +49,6 @@ void drive_betting(Table& t) {
     check(t.acting() == -1, "betting round completes");
 }
 
-void drive_to_showdown(Table& t) {
-    int guards = 0;
-    while (!t.hand_complete() && guards++ < 100) {
-        if (t.acting() != -1) {
-            t.act(t.acting(), {ActionType::Call, 0});
-        } else {
-            t.deal_next_street();
-        }
-    }
-    check(t.hand_complete(), "hand completes");
-}
-
 }  // namespace
 
 int main() {
