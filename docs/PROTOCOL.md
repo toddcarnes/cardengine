@@ -82,7 +82,8 @@ seventh adds one down card (or a single shared `community` up card when
 the shoe runs dry 8-handed). `hole` carries down cards (owner-only), `up`
 carries face-up cards (public — every live seat's shown, like the board).
 `deal` advances street by street; the log records each round as
-`stud <street> <seat:up ...>` (e.g. `stud fourth 1:Kd 0:Qs` —
+`stud <street> <seat:up ...>` — third street's door cards first
+(e.g. `stud third 1:2c 0:Ah`), then e.g. `stud fourth 1:Kd 0:Qs` —
 per-seat tags, since only live seats are dealt;
 `stud seventh community Qh` for the shared river, bare `stud seventh`
 for down cards). Older bare-cards lines (`stud fourth Kd Qs`) still
@@ -221,7 +222,7 @@ settle showdown yes payouts 0:300 committed 200,100
 - `begin_hand`: pre-hand stacks, the seed (`-` for from-deck testing deals),
   and dealt hole cards per seat (`|`-separated, positionally).
 - `action`: seat, action, and pot after the action.
-- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards; stud games log each round as `stud <street> <seat:up ...>`, with `stud seventh community Qh` for the shared river and bare `stud seventh` for down cards; pre-tag bare-cards lines still parse).
+- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards; stud games log each round as `stud <street> <seat:up ...>` — third street's door cards included — with `stud seventh community Qh` for the shared river and bare `stud seventh` for down cards; pre-tag bare-cards lines still parse).
 - `draw`: one seat's exchange as counts, never cards (`draw 1 drew 3`, `draw 0 drew 0` for pat) — discards stay private like folded hands.
 - `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
   (pot accounting for analysis and learning bots). Never contains hole cards —

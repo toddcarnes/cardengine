@@ -83,6 +83,69 @@ int main() {
         check(t3a.acting() == -1, "third round closes");
     }
 
+    // Third street emits a tagged StudDealtEvent in deal order, after
+    // begin_hand: door cards are public at deal time in real stud.
+    {
+        Table t3b(stud_config(3));
+        t3b.start_hand_from_deck(cards(
+            {"Ac", "Qh", "9s", "Kd", "Jc", "8d", "2c", "Kh", "Ah",
+             "2d", "3d", "4d", "5d", "6d", "7d", "8c", "9d", "Td",
+             "Jd", "Qd", "Kd", "Ad", "2s", "3s", "4s", "5s", "6s"}));
+        check(!t3b.events().empty() &&
+                  std::holds_alternative<HandStartedEvent>(t3b.events()[0]),
+              "begin_hand stays first");
+        const StudDealtEvent* third = nullptr;
+        for (const Event& e : t3b.events()) {
+            const auto* s = std::get_if<StudDealtEvent>(&e);
+            if (s != nullptr && s->street == Street::Third) third = s;
+        }
+        check(third != nullptr, "third street logged");
+        check(third->face_up && !third->community, "third is face-up");
+        // Deal order is button-out from button 0: seats 1, 2, 0.
+        check(third->per_seat.size() == 3, "three door cards");
+        check(third->per_seat[0].seat == 1 &&
+                  to_string(third->per_seat[0].card) == "2c" &&
+                  third->per_seat[1].seat == 2 &&
+                  to_string(third->per_seat[1].card) == "Kh" &&
+                  third->per_seat[2].seat == 0 &&
+                  to_string(third->per_seat[2].card) == "Ah",
+              "per-seat mapping matches the door cards");
+        for (const auto& sc : third->per_seat) {
+            check(t3b.up_cards(sc.seat).size() == 1 &&
+                      to_string(t3b.up_cards(sc.seat)[0]) ==
+                          to_string(sc.card),
+                  "logged card equals the seat's upcard");
+        }
+        check(format_event(*third) == "stud third 1:2c 2:Kh 0:Ah",
+              "third street tagged line");
+        const Event back = parse_event(format_event(*third), t3b.config());
+        check(format_event(back) == "stud third 1:2c 2:Kh 0:Ah",
+              "third street line round-trips");
+    }
+
+    // The shuffled-deck path emits the same third-street event.
+    {
+        Table t3c(stud_config(3));
+        t3c.start_hand(7);
+        const StudDealtEvent* third = nullptr;
+        for (const Event& e : t3c.events()) {
+            const auto* s = std::get_if<StudDealtEvent>(&e);
+            if (s != nullptr && s->street == Street::Third) third = s;
+        }
+        check(third != nullptr, "shuffled third street logged");
+        check(third->face_up && !third->community, "shuffled third face-up");
+        check(third->per_seat.size() == 3, "shuffled three door cards");
+        for (const auto& sc : third->per_seat) {
+            check(t3c.up_cards(sc.seat).size() == 1 &&
+                      to_string(t3c.up_cards(sc.seat)[0]) ==
+                          to_string(sc.card),
+                  "shuffled logged card equals the seat's upcard");
+        }
+        const Event back = parse_event(format_event(*third), t3c.config());
+        check(format_event(back) == format_event(*third),
+              "shuffled third line round-trips");
+    }
+
     // Later streets open on the best visible hand; upcards are public.
     {
         Table t4(stud_config(2));

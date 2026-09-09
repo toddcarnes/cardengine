@@ -5,6 +5,12 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Events: stud third street now emits a tagged `StudDealtEvent` (`stud
+  third <seat:card ...>` in button-out deal order) right after
+  `begin_hand`. Door cards are public at deal time, so nothing leaks;
+  the parser already accepted tagged lines for any street and is
+  unchanged.
+
 - Table: a pending full kill survives snapshot/restore and session files.
   `Table::Snapshot` and `Tournament::Snapshot` carry `kill_pending`, and
   the session format bumps to version 2 (`kill_pending = 0|1`, always

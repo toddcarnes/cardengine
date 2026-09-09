@@ -28,6 +28,25 @@ void merge_payout(std::vector<Payout>& out, int seat, int amount) {
 // High half of a hi-lo split: the odd chip goes high first.
 int high_half(int amount) { return amount - amount / 2; }
 
+// Third-street door cards are public at deal time, so they log tagged in
+// button-out deal order, mirroring deal_stud_round's construction. Reads
+// the dealt upcards (each participant holds exactly its door card when
+// this runs) so both third-street paths emit identically.
+StudDealtEvent stud_third_dealt(const Table& table) {
+    StudDealtEvent dealt;
+    dealt.street = Street::Third;
+    dealt.face_up = true;
+    for (int k = 1; k <= table.num_seats(); ++k) {
+        const int seat = (table.button() + k) % table.num_seats();
+        const std::vector<Card>& up = table.up_cards(seat);
+        if (!up.empty()) {
+            dealt.per_seat.push_back({seat, up.front()});
+            dealt.cards.push_back(up.front());
+        }
+    }
+    return dealt;
+}
+
 }  // namespace
 
 Table::Table(const GameConfig& config) : config_(config) {
@@ -222,6 +241,11 @@ void Table::start_hand(std::uint64_t seed) {
         while (!deck.empty()) shoe_.push_back(deck.deal());
     }
     record_hand_started(seed, true);
+    if (config_.showdown == HandConstruction::StudSeven) {
+        // Door cards log after begin_hand (record runs after the deal, so
+        // deal_stud_third itself cannot push without jumping the queue).
+        events_.push_back(stud_third_dealt(*this));
+    }
 }
 
 void Table::start_hand_from_deck(std::vector<Card> top_first) {
@@ -272,6 +296,10 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
         }
     }
     record_hand_started(0, false);
+    if (config_.showdown == HandConstruction::StudSeven) {
+        // Same tagged door-card line as the shuffled path, after begin_hand.
+        events_.push_back(stud_third_dealt(*this));
+    }
 }
 
 void Table::act(int seat, const Action& action) {

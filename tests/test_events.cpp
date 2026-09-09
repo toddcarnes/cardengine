@@ -358,6 +358,20 @@ int main() {
                   s->per_seat[1].seat == 4 &&
                   to_string(s->per_seat[1].card) == "Ts",
               "per-seat mapping survives");
+        // Tagged third-street lines (the engine's door-card emission) parse
+        // and round-trip like every later street; the parser needs no
+        // change for them.
+        const Event third = parse_event("stud third 1:2c 0:Ah", c);
+        const auto* t = std::get_if<StudDealtEvent>(&third);
+        check(t != nullptr && t->street == Street::Third && t->face_up &&
+                  !t->community && t->per_seat.size() == 2 &&
+                  t->per_seat[0].seat == 1 &&
+                  to_string(t->per_seat[0].card) == "2c" &&
+                  t->per_seat[1].seat == 0 &&
+                  to_string(t->per_seat[1].card) == "Ah",
+              "third street tagged parses");
+        check(format_event(third) == "stud third 1:2c 0:Ah",
+              "third street tagged round-trips");
         // Old bare-cards lines (no seat tags) still parse, seat order.
         const Event old = parse_event("stud fourth Kd Qs", c);
         const auto* o = std::get_if<StudDealtEvent>(&old);
