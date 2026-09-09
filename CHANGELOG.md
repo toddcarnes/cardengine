@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Tests: `test_bot` deals its 30-hand match from a portable hand-rolled
+  shuffle instead of `start_hand` seeds (`std::shuffle`'s algorithm is
+  implementation-defined, so seeded decks dealt different cards per
+  stdlib and the profit assertion wobbled by platform).
+
 - Table: refund every uncontested top band at settle, not just a lone one.
   Several seats can tie above the live cap (folders matching a bet that
   only short all-ins called); that excess used to vanish when no live
