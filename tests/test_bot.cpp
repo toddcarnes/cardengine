@@ -169,9 +169,10 @@ int main() {
         const int profit = vair(30);
         std::cout << "  (heuristic profit over 30 hands: " << profit << ")\n";
         check(profit > 0, "heuristic beats random");
-        // Pinned value: the decks above are portable, so this exact profit
-        // must reproduce on every stdlib — a drift means nondeterminism.
-        check(profit == 2322, "bot match is bit-identical everywhere");
+        // No exact-value pin here: the decks above are portable, but bot
+        // decisions go through standard distributions whose mapping is
+        // implementation-defined, so each stdlib plays a different (still
+        // profitable) match. Deterministic doubles as the tripwire below.
         // Deterministic: the same match twice, same result.
         check(vair(30) == profit, "bot match deterministic");
     }

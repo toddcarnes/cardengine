@@ -64,10 +64,11 @@ inline std::vector<cardengine::Card> cards(
     return out;
 }
 
-// Portable full-deck deal: Fisher-Yates over mt19937_64.
-// std::shuffle's algorithm is implementation-defined, so seeded decks
-// would deal different cards per stdlib and any test asserting outcomes
-// over dealt hands would wobble by platform.
+// Portable full-deck deal: Fisher-Yates driven by raw mt19937_64 output.
+// Only the engine itself is exactly specified; the standard
+// distributions may map it differently per stdlib, so portable test code
+// must never go through them (use rng() % bound; modulo bias is
+// irrelevant for fixed regression decks).
 inline std::vector<cardengine::Card> shuffled_deck(std::uint64_t seed) {
     std::vector<cardengine::Card> deck;
     for (int s = 0; s < 4; ++s) {
@@ -79,8 +80,8 @@ inline std::vector<cardengine::Card> shuffled_deck(std::uint64_t seed) {
     }
     std::mt19937_64 rng(seed);
     for (std::size_t i = deck.size() - 1; i > 0; --i) {
-        std::uniform_int_distribution<std::size_t> pick(0, i);
-        const std::size_t j = pick(rng);
+        const std::size_t j =
+            static_cast<std::size_t>(rng() % (i + 1));
         const cardengine::Card tmp = deck[i];
         deck[i] = deck[j];
         deck[j] = tmp;
@@ -91,8 +92,7 @@ inline std::vector<cardengine::Card> shuffled_deck(std::uint64_t seed) {
 // Portable index shuffle with the same construction (for draw discards).
 inline void shuffle_indices(std::vector<int>& idx, std::mt19937_64& rng) {
     for (std::size_t i = idx.size(); i > 1; --i) {
-        std::uniform_int_distribution<std::size_t> pick(0, i - 1);
-        const std::size_t j = pick(rng);
+        const std::size_t j = static_cast<std::size_t>(rng() % i);
         const int tmp = idx[i - 1];
         idx[i - 1] = idx[j];
         idx[j] = tmp;
