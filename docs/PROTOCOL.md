@@ -247,6 +247,8 @@ bots are deliberately not saved — `addbot` them again after a restore
 observed). Session files are plain `key = value` text like game files
 (full key reference in `docs/CONFIG_FILES.md`); a hand-edited file that
 fails validation errors with a line number and changes nothing.
+A pending full kill rides along: `save` writes it as `kill_pending`
+(format version 2), and the restored session deals double blinds next hand.
 
 ## Tournaments
 

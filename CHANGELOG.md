@@ -5,6 +5,12 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Table: a pending full kill survives snapshot/restore and session files.
+  `Table::Snapshot` and `Tournament::Snapshot` carry `kill_pending`, and
+  the session format bumps to version 2 (`kill_pending = 0|1`, always
+  written; version 1 still reads with no kill). A restored table deals
+  double blinds next hand as if the trigger hand had never been saved.
+
 - Table: a lone live leader's unmatched excess is a refund, not a win.
   The top-band refund now fires when no live hand matched the level or
   when a single seat holds it (previously the lone-live case paid out as

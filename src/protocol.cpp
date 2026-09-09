@@ -126,12 +126,14 @@ std::string Session::execute(const std::string& raw_line) {
                 file.stacks = books.stacks;
                 file.sitting_out = books.sitting_out;
                 file.button = books.button;
+                file.kill_pending = books.kill_pending;
             } else {
                 const Table::Snapshot felt = table_.snapshot();
                 file.game = felt.config;
                 file.stacks = felt.stacks;
                 file.sitting_out = felt.sitting_out;
                 file.button = felt.button;
+                file.kill_pending = felt.kill_pending;
             }
             for (const Event& e : active_table().events()) {
                 file.events.push_back(e);
@@ -173,6 +175,7 @@ std::string Session::execute(const std::string& raw_line) {
                 books.stacks = file.stacks;
                 books.sitting_out = file.sitting_out;
                 books.button = file.button;
+                books.kill_pending = file.kill_pending;
                 auto fresh = std::make_unique<Tournament>(books.config);
                 fresh->restore(books);
                 tournament_ = std::move(fresh);
@@ -182,6 +185,7 @@ std::string Session::execute(const std::string& raw_line) {
                 felt.stacks = file.stacks;
                 felt.sitting_out = file.sitting_out;
                 felt.button = file.button;
+                felt.kill_pending = file.kill_pending;
                 table_ = Table(file.game);
                 table_.restore(felt);
                 tournament_.reset();

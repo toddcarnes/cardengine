@@ -19,6 +19,7 @@ using cardengine::Table;
 using cardengine::Tournament;
 using cardengine::TournamentConfig;
 using testutil::check;
+using testutil::cards;
 using testutil::contains;
 using testutil::expect_throws;
 
@@ -328,6 +329,189 @@ int main() {
             [] { load_session_file("tmp_missing_session_xyz.txt"); },
             "missing session file");
         std::remove("tmp_session_file.txt");
+    }
+
+    // A pending kill survives the session file: snapshot -> text -> restore
+    // deals double blinds, and writers emit format 2.
+    {
+        GameConfig kill_game;
+        kill_game.num_players = 2;
+        kill_game.kill = true;
+        Table::Snapshot armed;
+        {
+            Table t(kill_game);
+            // Shove preflop so the pot clears 1000 (10x 100).
+            t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                         "Jh", "9c", "3d"}));
+            t.act(0, {ActionType::Raise, 5000});
+            t.act(1, {ActionType::Call, 0});
+            while (!t.hand_complete()) {
+                if (t.acting() != -1) {
+                    t.act(t.acting(), {ActionType::Check, 0});
+                } else {
+                    t.deal_next_street();
+                }
+            }
+            t.settle();
+            armed = t.snapshot();
+            check(armed.kill_pending, "kill armed in snapshot");
+        }
+        SessionFile file;
+        file.game = armed.config;
+        file.stacks = armed.stacks;
+        file.sitting_out = armed.sitting_out;
+        file.button = armed.button;
+        file.kill_pending = armed.kill_pending;
+        std::ostringstream out;
+        save_session_file(file, out);
+        check(contains(out.str(), "format_version = 2"), "writers emit version 2");
+        check(contains(out.str(), "kill_pending = 1"), "kill written to file");
+        SessionFile back;
+        {
+            std::istringstream in(out.str());
+            back = parse_session(in);
+        }
+        check(back.kill_pending, "kill survives the file");
+        {
+            Table dealt(kill_game);
+            Table::Snapshot felt;
+            felt.config = back.game;
+            felt.stacks = back.stacks;
+            felt.sitting_out = back.sitting_out;
+            felt.button = back.button;
+            felt.kill_pending = back.kill_pending;
+            dealt.restore(felt);
+            dealt.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks",
+                                             "Qh", "Jh", "9c", "3d"}));
+            check(dealt.committed(0) + dealt.committed(1) == 300,
+                  "file kill doubles blinds");
+        }
+    }
+
+    // Version-1 files load with no kill; unknown versions are rejected, and
+    // a v1 file carrying the v2 kill key is rejected (no silent extension).
+    {
+        SessionFile old;
+        {
+            std::istringstream v1(
+                "format_version = 1\nmode = cash\nnum_players = 2\n"
+                "stacks = 10000,10000\nbutton = 0\nevents = 0\n");
+            old = parse_session(v1);
+        }
+        check(!old.kill_pending, "v1 defaults to no kill");
+        {
+            GameConfig plain;
+            plain.num_players = 2;
+            Table t(plain);
+            Table::Snapshot felt;
+            felt.config = old.game;
+            felt.stacks = old.stacks;
+            felt.sitting_out = old.sitting_out;
+            felt.button = old.button;
+            felt.kill_pending = old.kill_pending;
+            t.restore(felt);
+            t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                         "Jh", "9c", "3d"}));
+            check(t.committed(0) + t.committed(1) == 150,
+                  "v1 deals normal blinds");
+        }
+        expect_throws<std::invalid_argument>(
+            [] {
+                std::istringstream bad(
+                    "format_version = 3\nmode = cash\nnum_players = 2\n"
+                    "stacks = 10000,10000\nbutton = 0\nevents = 0\n");
+                parse_session(bad);
+            },
+            "version 3 rejected");
+        expect_throws<std::invalid_argument>(
+            [] {
+                std::istringstream bad(
+                    "format_version = 1\nmode = cash\nnum_players = 2\n"
+                    "stacks = 10000,10000\nbutton = 0\nkill_pending = 1\n"
+                    "events = 0\n");
+                parse_session(bad);
+            },
+            "v1 with kill key rejected");
+    }
+
+    // Tournament snapshots carry a pending kill across restore.
+    {
+        Tournament::Snapshot armed;
+        {
+            TournamentConfig config;
+            config.game.num_players = 2;
+            config.game.starting_stack = 10000;
+            config.game.kill = true;
+            Tournament tournament(config);
+            // Shove preflop so the pot clears 1000 (10x 100).
+            tournament.begin_hand_from_deck(cards(
+                {"7c", "As", "2d", "Ad", "Ks", "Qh", "Jh", "9c", "3d"}));
+            tournament.table().act(0, {ActionType::Raise, 5000});
+            tournament.table().act(1, {ActionType::Call, 0});
+            play_out_table(tournament.table());
+            tournament.finish_hand();
+            armed = tournament.snapshot();
+            check(armed.kill_pending, "tournament kill armed");
+        }
+        {
+            TournamentConfig plain;
+            plain.game.num_players = 2;
+            Tournament fresh(plain);
+            fresh.restore(armed);
+            fresh.begin_hand_from_deck(cards(
+                {"7c", "As", "2d", "Ad", "Ks", "Qh", "Jh", "9c", "3d"}));
+        check(fresh.table().committed(0) + fresh.table().committed(1) ==
+                  300,
+              "tournament kill doubles blinds");
+        }
+    }
+
+    // End to end over the protocol: an armed kill survives save/restore,
+    // and the next dealt hand plays double blinds.
+    {
+        const char* game_path = "tmp_session_kill_game.txt";
+        {
+            std::ofstream game(game_path);
+            game << "format_version = 1\nname = K\nnum_players = 2\nkill = 1\n";
+        }
+        Session session;
+        check(session.execute(std::string("load ") + game_path) == "ok",
+              "kill game loads");
+        check(session.execute("start 1") == "ok", "kill hand starts");
+        // Shove preflop so the pot clears 1000 (10x 100), then fold out.
+        check(session.execute("act raise 5000") == "ok", "shove lands");
+        check(session.execute("act call") == "ok", "shove called");
+        while (true) {
+            const std::string state = session.execute("state");
+            if (contains(state, "acting -1")) {
+                if (session.execute("deal") == "ok") continue;
+                break;
+            }
+            check(session.execute("act fold") == "ok", "fold out");
+        }
+        check(contains(session.execute("settle"), "ok"), "kill hand settles");
+        check(session.execute("save tmp_session_kill.txt") == "ok",
+              "kill session saves");
+        check(load_session_file("tmp_session_kill.txt").kill_pending,
+              "save carries the kill");
+        Session reboot;
+        check(reboot.execute("restore tmp_session_kill.txt") == "ok",
+              "kill session restores");
+        check(reboot.execute("start 2") == "ok", "deals after kill restore");
+        int committed = 0;
+        {
+            std::istringstream dealt(reboot.execute("state"));
+            std::string line;
+            while (std::getline(dealt, line)) {
+                const std::size_t at = line.find("committed ");
+                if (line.rfind("seat ", 0) == 0 && at != std::string::npos) {
+                    committed += std::stoi(line.substr(at + 10));
+                }
+            }
+        }
+        check(committed == 300, "restored kill doubles blinds");
+        std::remove("tmp_session_kill.txt");
+        std::remove(game_path);
     }
 
     std::cout << "test_session ok\n";

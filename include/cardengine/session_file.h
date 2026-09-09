@@ -5,7 +5,7 @@
 // files: `#` comments, blank lines ignored, every failure names its line),
 // followed by the raw event-log lines they describe:
 //
-//   format_version = 1
+//   format_version = 2
 //   mode = tournament            # cash | tournament
 //   num_players = 6              # any game-file key overrides defaults
 //   starting_stack = 10000
@@ -13,6 +13,7 @@
 //   stacks = 10000,9500,...      # per seat, in order
 //   sitting_out = 0,1,0,...      # optional, defaults to all seated
 //   button = 2
+//   kill_pending = 0             # full kill armed for the next hand (v2+)
 //   buy_in = 10000               # tournament books below (tournament only)
 //   prizes = 50, 30, 20
 //   level = 50, 100, 0, 10       # repeatable (or 5 numbers with minutes)
@@ -63,6 +64,7 @@ struct SessionFile {
     std::vector<int> stacks;
     std::vector<bool> sitting_out;
     int button = 0;
+    bool kill_pending = false;  // Full kill armed for the next hand.
     // Audit trail: raw log lines, oldest first.
     std::vector<Event> events;
 };

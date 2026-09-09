@@ -59,6 +59,7 @@ SessionFile parse_session(std::istream& in) {
     bool saw_button = false;
     bool saw_events = false;
     int want_events = -1;
+    int kill_line = 0;  // Source line of kill_pending (0 when absent).
     std::vector<std::string> log_lines;
     session.levels.clear();  // Levels come only from `level` lines.
     std::string line;
@@ -86,10 +87,10 @@ SessionFile parse_session(std::istream& in) {
         }
         if (key == "format_version") {
             session.format_version = parse_int(value, lineno);
-            if (session.format_version != 1) {
+            if (session.format_version != 1 && session.format_version != 2) {
                 throw std::invalid_argument(
                     "line " + std::to_string(lineno) +
-                    ": unsupported format_version (want 1)");
+                    ": unsupported format_version (want 1 or 2)");
             }
             saw_version = true;
         } else if (key == "mode") {
@@ -113,6 +114,14 @@ SessionFile parse_session(std::istream& in) {
         } else if (key == "button") {
             session.button = parse_int(value, lineno);
             saw_button = true;
+        } else if (key == "kill_pending") {
+            const int flag = parse_int(value, lineno);
+            if (flag != 0 && flag != 1) {
+                throw std::invalid_argument("line " + std::to_string(lineno) +
+                                            ": kill_pending must be 0 or 1");
+            }
+            session.kill_pending = (flag == 1);
+            kill_line = lineno;
         } else if (key == "buy_in") {
             session.buy_in = parse_int(value, lineno);
         } else if (key == "prizes") {
@@ -177,6 +186,12 @@ SessionFile parse_session(std::istream& in) {
     }
     if (!saw_events) {
         throw std::invalid_argument("missing required key 'events'");
+    }
+    // Version 1 predates the kill key: it defaults to no kill, and a v1
+    // file carrying it is rejected rather than silently extended.
+    if (session.format_version == 1 && kill_line > 0) {
+        throw std::invalid_argument("line " + std::to_string(kill_line) +
+                                    ": kill_pending needs format_version 2");
     }
     // Seat-count cross-checks (line-numbered where the count is known).
     const std::size_t n = static_cast<std::size_t>(session.game.num_players);
@@ -268,9 +283,9 @@ SessionFile load_session_file(const std::string& path) {
 }
 
 void save_session_file(const SessionFile& session, std::ostream& out) {
-    out << "# CardEngine session file (format " << session.format_version
-        << ")\n";
-    out << "format_version = " << session.format_version << "\n";
+    // Writers always emit the current version, upgrading v1 reads.
+    out << "# CardEngine session file (format 2)\n";
+    out << "format_version = 2\n";
     out << "mode = " << (session.tournament ? "tournament" : "cash") << "\n";
     write_game_config(session.game, out);
     out << "stacks = ";
@@ -278,6 +293,7 @@ void save_session_file(const SessionFile& session, std::ostream& out) {
     out << "sitting_out = ";
     write_flags(out, session.sitting_out);
     out << "button = " << session.button << "\n";
+    out << "kill_pending = " << (session.kill_pending ? 1 : 0) << "\n";
     if (session.tournament) {
         out << "buy_in = " << session.buy_in << "\n";
         out << "prizes = ";

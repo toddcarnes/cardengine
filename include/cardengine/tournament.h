@@ -92,6 +92,7 @@ public:
         std::vector<int> stacks;
         std::vector<bool> sitting_out;
         int button = 0;
+        bool kill_pending = false;
         int level_index = 0;
         int hands_into_level = 0;
         std::int64_t level_elapsed = 0;  // Seconds banked in this level.

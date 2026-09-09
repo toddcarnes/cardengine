@@ -140,6 +140,7 @@ public:
         std::vector<int> stacks;
         std::vector<bool> sitting_out;
         int button = 0;
+        bool kill_pending = false;
     };
     // Between-hands state: stacks, sit-out flags, button. Throws
     // std::logic_error when a hand is running.

@@ -994,6 +994,7 @@ Table::Snapshot Table::snapshot() const {
         saved.sitting_out.push_back(s.sitting_out);
     }
     saved.button = button_;
+    saved.kill_pending = kill_live_;
     return saved;
 }
 
@@ -1029,7 +1030,7 @@ void Table::restore(const Snapshot& saved) {
     }
     button_ = saved.button;
     street_ = Street::None;
-    kill_live_ = false;
+    kill_live_ = saved.kill_pending;
     board_.clear();
     community_.clear();
     shoe_.clear();
