@@ -409,6 +409,40 @@ int main() {
         check(t.committed(0) == 0, "sitter posts nothing");
     }
 
+    // HiLo odd pot: the high half takes the extra chip.
+    {
+        GameConfig c = three_max();
+        c.small_blind = 25;
+        c.big_blind = 25;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // 75 pot, all three call: seat1 Ah 2c 7s 8d (A-2-3-4-6 low),
+        // seat2 9d Tc Jh Qc (junk: Q-high, no low), seat0 Ks Kd Qs Qd
+        // (trip kings high, no low). Board 3h 4d 6s 9c Kh.
+        // High takes 38, low takes 37.
+        t.start_hand_from_deck(cards({"Ah", "9d", "Ks", "2c", "Tc", "Kd",
+                                     "7s", "Jh", "Qs", "8d", "Qc", "Qd",
+                                     "3h", "4d", "6s", "9c", "Kh"}));
+        call(t, 0);
+        chk(t, 1);
+        chk(t, 2);
+        check_down_streets(t);
+        auto payouts = t.settle();
+        check(t.went_to_showdown(), "hilo split is a showdown");
+        int p0 = -1, p1 = -1;
+        for (const auto& p : payouts) {
+            if (p.seat == 0) p0 = p.amount;
+            if (p.seat == 1) p1 = p.amount;
+        }
+        check(p0 == 38 && p1 == 37, "odd chip to high");
+        check(t.stack(0) == 10013 && t.stack(1) == 10012 &&
+                  t.stack(2) == 9975,
+              "hilo odd stacks");
+        check(total_chips(t) == 30000, "hilo odd chips conserved");
+    }
+
     std::cout << "test_table ok\n";
     return 0;
 }

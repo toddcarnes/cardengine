@@ -11,6 +11,25 @@
 
 namespace cardengine {
 
+namespace {
+
+// Merges one award into the payout list (one entry per seat).
+void merge_payout(std::vector<Payout>& out, int seat, int amount) {
+    const auto it = std::find_if(out.begin(), out.end(), [&](const Payout& p) {
+        return p.seat == seat;
+    });
+    if (it == out.end()) {
+        out.push_back({seat, amount});
+    } else {
+        it->amount += amount;
+    }
+}
+
+// High half of a hi-lo split: the odd chip goes high first.
+int high_half(int amount) { return amount - amount / 2; }
+
+}  // namespace
+
 Table::Table(const GameConfig& config) : config_(config) {
     validate(config_);
     seats_.resize(static_cast<std::size_t>(config_.num_players));
@@ -552,22 +571,8 @@ std::vector<Payout> Table::settle() {
         }
         std::sort(levels.begin(), levels.end());
         levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
-        if (const int excess = unmatched_top_excess(levels); excess > 0) {
-            for (int i = 0; i < num_seats(); ++i) {
-                Seat& s = seats_[static_cast<std::size_t>(i)];
-                if (s.in_hand && s.committed == levels.back()) {
-                    s.stack += excess;
-                    s.committed -= excess;
-                    break;
-                }
-            }
-            levels.back() -= excess;
-            if (levels.size() > 1 &&
-                levels.back() == levels[levels.size() - 2]) {
-                levels.pop_back();
-            }
-        }
-        award_multi_board(payouts, alive, levels, boards);
+        refund_unmatched_top(levels);
+        award_multi_board(payouts, levels, boards);
     } else {
         showdown_ = true;
         // Contribution levels, low to high; each band forms one pot.
@@ -582,21 +587,7 @@ std::vector<Payout> Table::settle() {
         levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
         // A lone unmatched top band was never called: refund it first so
         // winners only split what was actually contested.
-        if (const int excess = unmatched_top_excess(levels); excess > 0) {
-            for (int i = 0; i < num_seats(); ++i) {
-                Seat& s = seats_[static_cast<std::size_t>(i)];
-                if (s.in_hand && s.committed == levels.back()) {
-                    s.stack += excess;
-                    s.committed -= excess;
-                    break;
-                }
-            }
-            levels.back() -= excess;
-            if (levels.size() > 1 &&
-                levels.back() == levels[levels.size() - 2]) {
-                levels.pop_back();
-            }
-        }
+        refund_unmatched_top(levels);
 
         int prev = 0;
         for (int level : levels) {
@@ -646,16 +637,9 @@ std::vector<Payout> Table::settle() {
                 const int remainder =
                     amount % static_cast<int>(winners.size());
                 for (std::size_t w = 0; w < winners.size(); ++w) {
-                    int award = share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-                    auto it = std::find_if(payouts.begin(), payouts.end(),
-                                           [&](const Payout& p) {
-                                               return p.seat == winners[w];
-                                           });
-                    if (it == payouts.end()) {
-                        payouts.push_back({winners[w], award});
-                    } else {
-                        it->amount += award;
-                    }
+                    const int award =
+                        share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+                    merge_payout(payouts, winners[w], award);
                 }
                 continue;
             }
@@ -692,16 +676,9 @@ std::vector<Payout> Table::settle() {
             const int remainder =
                 amount % static_cast<int>(winners.size());
             for (std::size_t w = 0; w < winners.size(); ++w) {
-                int award = share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-                auto it = std::find_if(payouts.begin(), payouts.end(),
-                                       [&](const Payout& p) {
-                                           return p.seat == winners[w];
-                                       });
-                if (it == payouts.end()) {
-                    payouts.push_back({winners[w], award});
-                } else {
-                    it->amount += award;
-                }
+                const int award =
+                    share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+                merge_payout(payouts, winners[w], award);
             }
         }
     }
@@ -761,6 +738,23 @@ int Table::unmatched_top_excess(const std::vector<int>& levels) const {
     if (leaders != 1) return 0;
     (void)leader;
     return top - levels[levels.size() - 2];
+}
+
+void Table::refund_unmatched_top(std::vector<int>& levels) {
+    const int excess = unmatched_top_excess(levels);
+    if (excess <= 0) return;
+    for (int i = 0; i < num_seats(); ++i) {
+        Seat& s = seats_[static_cast<std::size_t>(i)];
+        if (s.in_hand && s.committed == levels.back()) {
+            s.stack += excess;
+            s.committed -= excess;
+            break;
+        }
+    }
+    levels.back() -= excess;
+    if (levels.size() > 1 && levels.back() == levels[levels.size() - 2]) {
+        levels.pop_back();
+    }
 }
 
 HandValue Table::showdown_value(const std::vector<Card>& hole,
@@ -837,24 +831,16 @@ void Table::award_board_share(std::vector<Payout>& payouts,
             for (std::size_t w = 0; w < ordered.size(); ++w) {
                 const int award =
                     each + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-                auto it = std::find_if(payouts.begin(), payouts.end(),
-                                       [&](const Payout& p) {
-                                           return p.seat == ordered[w];
-                                       });
-                if (it == payouts.end()) {
-                    payouts.push_back({ordered[w], award});
-                } else {
-                    it->amount += award;
-                }
+                merge_payout(payouts, ordered[w], award);
             }
         };
         if (low_winners.empty()) {
             pay_share(high_winners, amount);
             return;
         }
-        const int low_half = amount / 2;
-        pay_share(high_winners, amount - low_half);
-        pay_share(low_winners, low_half);
+        const int high = high_half(amount);  // Odd chip goes high.
+        pay_share(high_winners, high);
+        pay_share(low_winners, amount - high);
         return;
     }
     std::vector<HandValue> values;
@@ -880,15 +866,7 @@ void Table::award_board_share(std::vector<Payout>& payouts,
     for (std::size_t w = 0; w < winners.size(); ++w) {
         const int award =
             share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-        auto it = std::find_if(payouts.begin(), payouts.end(),
-                               [&](const Payout& p) {
-                                   return p.seat == winners[w];
-                               });
-        if (it == payouts.end()) {
-            payouts.push_back({winners[w], award});
-        } else {
-            it->amount += award;
-        }
+        merge_payout(payouts, winners[w], award);
     }
 }
 
@@ -898,8 +876,7 @@ void Table::award_board_share(std::vector<Payout>& payouts,
 // refunded levels (settle() returns the unmatched top band first, since
 // a const method cannot touch stacks).
 void Table::award_multi_board(
-    std::vector<Payout>& payouts, const std::vector<int>& alive,
-    const std::vector<int>& levels,
+    std::vector<Payout>& payouts, const std::vector<int>& levels,
     const std::vector<std::vector<Card>>& boards) const {
     int prev = 0;
     for (int level : levels) {
@@ -923,7 +900,7 @@ void Table::award_multi_board(
                               each + (b < extra ? 1 : 0));
         }
     }
-    (void)alive;  // Eligibility comes from the bands, as in settle().
+    // Eligibility comes from the contribution bands, as in settle().
 }
 
 // Splits one side pot's worth of chips between the best high hand(s) and
@@ -977,25 +954,16 @@ void Table::award_hilo_pot(std::vector<Payout>& payouts,
         for (std::size_t w = 0; w < ordered.size(); ++w) {
             const int award =
                 each + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-            auto it = std::find_if(payouts.begin(), payouts.end(),
-                                   [&](const Payout& p) {
-                                       return p.seat == ordered[w];
-                                   });
-            if (it == payouts.end()) {
-                payouts.push_back({ordered[w], award});
-            } else {
-                it->amount += award;
-            }
+            merge_payout(payouts, ordered[w], award);
         }
     };
     if (low_winners.empty()) {
         pay_share(high_winners, amount);  // No low: high scoops.
         return;
     }
-    const int low_half = amount / 2;
-    const int high_half = amount - low_half;  // Odd chip goes high.
-    pay_share(high_winners, high_half);
-    pay_share(low_winners, low_half);
+    const int high = high_half(amount);  // Odd chip goes high.
+    pay_share(high_winners, high);
+    pay_share(low_winners, amount - high);
 }
 
 void Table::record_hand_started(std::uint64_t seed, bool seeded) {

@@ -237,6 +237,9 @@ private:
     // excess to refund (0 when the top band is contested); the caller
     // applies it to the owner's stack and merges the levels.
     int unmatched_top_excess(const std::vector<int>& levels) const;
+    // Applies the unmatched-top refund in place: returns the excess to its
+    // lone owner and folds the levels down. No-op when contested.
+    void refund_unmatched_top(std::vector<int>& levels);
     // Hi-Lo side-pot split: half to the best high hand(s), half to the best
     // qualifying low hand(s) (high scoops when no low qualifies).
     void award_hilo_pot(std::vector<Payout>& payouts,
@@ -246,7 +249,6 @@ private:
     // halves apply per board, not on the total). Levels arrive pre-
     // refunded (settle() returns the unmatched top band first).
     void award_multi_board(std::vector<Payout>& payouts,
-                           const std::vector<int>& alive,
                            const std::vector<int>& levels,
                            const std::vector<std::vector<Card>>& boards) const;
     // One board's share of one contribution band to its winners.

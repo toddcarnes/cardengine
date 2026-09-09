@@ -9,6 +9,11 @@ minor bumps add features, patches fix bugs.
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
 
+- Table: deduplicate pot-payout merging behind one helper (single
+  `merge_payout` for all five award sites, one `refund_unmatched_top` for
+  both uncalled-excess refunds, one `high_half` encoding odd-chip-to-high;
+  no behavior change; drop the now-unused `alive` parameter from
+  `award_multi_board`.
 - Bots: PLO trash gate (zero-leg coordination unplayable, one leg calls
   but never opens, two legs play; double-suited + tight adds a kicker)
   replacing the failed call discount (it fed Randy multi-way pots).
