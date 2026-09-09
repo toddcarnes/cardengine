@@ -36,7 +36,6 @@ minor bumps add features, patches fix bugs.
 - Table: deal shoe via an index cursor instead of erasing from the front
   (same deal order, no behavior change); dropped the dead `leader` local
   from `unmatched_top_excess`; `timeout_at`'s unused stamp stays in the
-  `unmatched_top_excess`; `timeout_at`'s unused stamp stays in the
   signature (callers pass the clock reading) with its name commented
   out, since the stamp lives in event order rather than the event.
 - Examples: `cli.py` `Engine.send` frames replies on terminators instead

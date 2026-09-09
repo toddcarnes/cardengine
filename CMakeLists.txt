@@ -78,7 +78,7 @@ endif()
 include(CTest)
 if(BUILD_TESTING)
     add_subdirectory(tests)
-    # Lets test_version assert agreement with project() VERSION directly.
+    # Let test_version assert agreement with project() VERSION directly.
     # Numeric macros only (avoids string-macro quoting across generators).
     if(TARGET test_version)
         target_compile_definitions(test_version PRIVATE

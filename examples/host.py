@@ -437,6 +437,8 @@ class Host:
                     elif any("need at least 2 players" in line
                              for line in self.start_refusal):
                         print("host: game over, one player holds all the chips")
+                        if self.args.save:
+                            self.engine.send(f"save {self.args.save}")
                         break
                     return 1
         finally:
