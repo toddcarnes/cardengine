@@ -5,6 +5,10 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Host: `host.py` treats a refused `start` as a clean game-over when the
+  table has busted to one player (`need at least 2 players`) instead of
+  exiting nonzero; `--save` still runs and the process exits 0.
+
 - Bots: PLO trash gate (zero-leg coordination unplayable, one leg calls
   but never opens, two legs play; double-suited + tight adds a kicker)
   replacing the failed call discount (it fed Randy multi-way pots).

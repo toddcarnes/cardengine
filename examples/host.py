@@ -131,6 +131,7 @@ class Host:
         self.sock.setblocking(False)
         self.clients = {}  # seat -> Client (humans over TCP)
         self.pending = []  # unseated connections awaiting hello
+        self.start_refusal = []  # engine reply when the last start failed
         print(f"host: listening on 127.0.0.1:{args.port} "
               f"({seats} seats, action clock {args.action_seconds}s)")
 
@@ -316,10 +317,13 @@ class Host:
         # Drain the listen queue before dealing: players connect any time,
         # and the first hand should seat whoever is already waiting.
         self._drain_listen(timeout=2.0)
-        if self.engine.send(f"start {seed}") != ["ok"]:
-            status = self.engine.send("tstatus") if self.tournament else ["no tournament"]
+        reply = self.engine.send(f"start {seed}")
+        if reply != ["ok"]:
+            self.start_refusal = reply
+            status = self.engine.send("tstatus") if self.tournament else reply
             print(f"host: start refused: {status}")
             return False
+        self.start_refusal = []
         while True:
             # Seat newcomers every decision (humans connect any time).
             self._drain_listen(timeout=0.0)
@@ -430,6 +434,10 @@ class Host:
                         if alive <= 1:
                             print("host: champion crowned")
                             break
+                    elif any("need at least 2 players" in line
+                             for line in self.start_refusal):
+                        print("host: game over, one player holds all the chips")
+                        break
                     return 1
         finally:
             pass
