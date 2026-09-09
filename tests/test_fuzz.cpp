@@ -14,6 +14,7 @@
 #include "cardengine/card.h"
 #include "cardengine/config.h"
 #include "cardengine/table.h"
+#include "helpers.h"
 
 namespace {
 
@@ -23,6 +24,8 @@ using cardengine::BettingStructure;
 using cardengine::GameConfig;
 using cardengine::HandConstruction;
 using cardengine::Table;
+using testutil::shuffled_deck;
+using testutil::shuffle_indices;
 
 int total_chips(const Table& table) {
     int sum = 0;
@@ -61,7 +64,7 @@ void check(bool condition, const std::string& message) {
 void fuzz_hand(Table& table, std::uint64_t seed, std::mt19937_64& rng,
                const std::string& tag) {
     const int before = total_chips(table);
-    table.start_hand(seed);
+    table.start_hand_from_deck(shuffled_deck(seed));
     // Deck integrity: no duplicated cards across hole + board.
     {
         std::set<std::string> seen;
@@ -112,7 +115,7 @@ void fuzz_hand(Table& table, std::uint64_t seed, std::mt19937_64& rng,
             for (std::size_t i = 0; i < idx.size(); ++i) {
                 idx[i] = static_cast<int>(i);
             }
-            std::shuffle(idx.begin(), idx.end(), rng);
+            shuffle_indices(idx, rng);
             std::vector<std::string> discards;
             for (int k = 0; k < n && k < static_cast<int>(idx.size()); ++k) {
                 discards.push_back(cardengine::to_string(
@@ -169,7 +172,7 @@ void fuzz_config(GameConfig config, const std::string& tag, int hands) {
     Table replay(config);
     Table replay2(config);
     auto play = [&](Table& table) {
-        table.start_hand(4242);
+        table.start_hand_from_deck(shuffled_deck(4242));
         std::mt19937_64 inner{99};
         int guards = 0;
         while (!table.hand_complete() && guards++ < 10000) {
