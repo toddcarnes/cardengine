@@ -507,6 +507,39 @@ int main() {
               "each top owner gets 50 back");
     }
 
+    // A lone live leader's excess is a refund, not a win: A puts in 300
+    // alone (B folds preflop at 50, C calls 50 short all-in at 150), so
+    // the top 150 was never matched by anyone. Payouts must total the
+    // contested 350, never the full 500 pot.
+    {
+        GameConfig c;
+        c.num_players = 3;
+        Table t(c);
+        t.set_stack(0, 10000);
+        t.set_stack(1, 10000);
+        t.set_stack(2, 150);
+        // 11 cards: 3x2 hole + 5 board. Winners don't matter here.
+        t.start_hand_from_deck(cards({"As", "Ks", "Qh", "Qd", "Jc", "Jd",
+                                      "Tc", "9c", "7c", "7d", "7h"}));
+        raise_to(t, 0, 300);  // A raises to 300 total.
+        fold(t, 1);           // B folds the SB (50 committed).
+        call(t, 2);           // C calls 50 short, all-in at 150.
+        check(t.acting() == -1, "short all-in closes the round");
+        check(t.committed(0) == 300 && t.committed(1) == 50 &&
+                  t.committed(2) == 150,
+              "lone leader above the live cap");
+        check_down_streets(t);
+        const int pot = t.pot_total();
+        check(pot == 500, "pot is 500 pre-settle");
+        const auto payouts = t.settle();
+        check(t.went_to_showdown(), "A and C reach showdown");
+        int paid = 0;
+        for (const auto& p : payouts) paid += p.amount;
+        check(paid == 350, "uncalled 150 is refunded, not awarded");
+        check(total_chips(t) == 10000 + 10000 + 150,
+              "chips conserved with lone-leader refund");
+    }
+
     std::cout << "test_table ok\n";
     return 0;
 }

@@ -722,25 +722,27 @@ std::vector<Payout> Table::settle() {
 
 // Every uncontested band at the top returns to its owners before the
 // award math runs: no live (unfolded) seat matched that level, so no
-// winner may take it. Each top contributor gets back exactly what it put
-// above the next level down, then that level drops away; repeat while the
-// new top is still uncontested. (One tied band is the common case —
-// several seats matching a bet that only short all-ins called — but
-// stacked bands can all sit above the live cap, and every one of them
-// must come back for chips to conserve.)
+// winner may take it. A lone top owner is likewise uncalled even when
+// live (nobody matched it either). Each top contributor gets back exactly
+// what it put above the next level down, then that level drops away;
+// repeat while the new top is still uncontested. (One tied band is the
+// common case — several seats matching a bet that only short all-ins
+// called — but stacked bands can all sit above the live cap, and every
+// one of them must come back for chips to conserve.)
 void Table::refund_unmatched_top(std::vector<int>& levels) {
     while (!levels.empty()) {
         const int top = levels.back();
         const int prev = levels.size() > 1 ? levels[levels.size() - 2] : 0;
+        int owners = 0;
         bool contested = false;
         for (int i = 0; i < num_seats(); ++i) {
             const Seat& s = seats_[static_cast<std::size_t>(i)];
-            if (s.in_hand && !s.folded && s.committed >= top) {
-                contested = true;
-                break;
+            if (s.in_hand && s.committed == top) {
+                ++owners;
+                if (!s.folded) contested = true;
             }
         }
-        if (contested) return;
+        if (contested && owners > 1) return;
         const int excess = top - prev;
         for (int i = 0; i < num_seats(); ++i) {
             Seat& s = seats_[static_cast<std::size_t>(i)];
