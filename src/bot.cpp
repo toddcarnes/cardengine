@@ -607,10 +607,12 @@ OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
         }
     }
     if (distinct < 3) return out;  // No low possible yet.
-    // Sort once: the loop below only reads. (Sorting inside the hole-pair
-    // loop tripped GCC 13's -Werror=array-bounds: it cannot prove
-    // `distinct` stays constant across sort calls on the same array.)
-    std::sort(low_ranks, low_ranks + distinct, std::greater<int>());
+    // Sort once into a vector: the loop below only reads. (Sorting a
+    // partially-filled C array tripped GCC 13's -Werror=array-bounds:
+    // it cannot prove `distinct` stays in range. A vector with exactly
+    // `distinct` elements gives the bound checker what it needs.)
+    std::vector<int> ordered(low_ranks, low_ranks + distinct);
+    std::sort(ordered.begin(), ordered.end(), std::greater<int>());
     bool low_set = false;
     for (std::size_t a = 0; a < hole.size(); ++a) {
         for (std::size_t b = a + 1; b < hole.size(); ++b) {
@@ -623,8 +625,9 @@ OmahaHiLoValue evaluate_partial_hilo(const std::vector<Card>& hole,
             for (int c = 0; c < distinct; ++c) {
                 for (int d = c + 1; d < distinct; ++d) {
                     for (int e = d + 1; e < distinct; ++e) {
-                        const int combo[5] = {ha, hb, low_ranks[c],
-                                              low_ranks[d], low_ranks[e]};
+                        const int combo[5] = {ha, hb, ordered[static_cast<std::size_t>(c)],
+                                              ordered[static_cast<std::size_t>(d)],
+                                              ordered[static_cast<std::size_t>(e)]};
                         bool paired = false;
                         for (int i = 0; i < 5 && !paired; ++i) {
                             for (int k = i + 1; k < 5; ++k) {
