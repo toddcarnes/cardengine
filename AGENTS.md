@@ -54,4 +54,5 @@ ctest --test-dir build --output-on-failure -C Release
 - Minimal dependencies, stdlib-only default. Any new third-party lib must be MIT-compatible; record its license in `README.md`.
 - Single-threaded engine: no `std::thread`/mutexes/atomics in core (determinism is the feature). Concurrency is processes — bots, gateway, GUI — never engine threads.
 - Tests deterministic: seed RNG, no network. New behavior needs a test under `tests/`.
+- Persistence isn't done until the protocol `save`/`restore` path carries the new state end-to-end, with a Session-level round-trip test.
 - Keep header/`.cpp` separation so the engine stays testable without UI.
