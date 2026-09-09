@@ -9,6 +9,10 @@ minor bumps add features, patches fix bugs.
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
 
+- Events: `stud` log lines carry per-seat tags (`stud fourth 1:Kd 0:Qs`)
+  so the upcard-to-seat mapping round-trips through `parse_event`;
+  old bare-cards lines still parse. Down seventh streets still log bare
+  (down cards stay private).
 - Table: unmatched-top refund ignores folded seats (defensive hardening;
   unreachable today — a sole top-band leader never holds the action, so it
   can never fold while sole-top — but a folded seat must never receive an

@@ -141,7 +141,7 @@ int main() {
         check(format_event(StudDealtEvent{Street::Fourth, true, false,
                                          {parse_card("Kd")},
                                          {{1, parse_card("Kd")}}}) ==
-                  "stud fourth Kd",
+                  "stud fourth 1:Kd",
               "stud text");
         expect_throws<std::invalid_argument>(
             [&] { parse_event("stud", tlog.config()); }, "short stud line");
