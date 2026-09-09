@@ -142,7 +142,7 @@ int main() {
                     check(s->cards.empty(), "draw street deals no board");
                 }
             }
-            if (const auto* d = std::get_if<DrawEvent>(&e)) {
+            if (std::get_if<DrawEvent>(&e) != nullptr) {
                 ++draws;
                 const std::string text = format_event(e);
                 const Event back = parse_event(text, c);

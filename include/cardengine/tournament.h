@@ -141,6 +141,7 @@ private:
     int level_index_ = 0;
     int hands_into_level_ = 0;
     std::int64_t level_started_at_ = 0;  // Stamp of the current level's start.
+    bool clock_live_ = false;  // True once the first hand sets the stamp.
     std::int64_t level_elapsed_ = 0;     // Banked seconds (across save/load).
     int prize_pool_ = 0;
     int prize_awarded_ = 0;
