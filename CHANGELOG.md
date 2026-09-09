@@ -9,6 +9,14 @@ minor bumps add features, patches fix bugs.
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
 
+- Examples: `cli.py` `parse_state` keeps the stud/draw lines it used to
+  drop (`showdown`, `button`, `max_draw`, `draws`, `community`, per-seat
+  `up`, the sitting-out `out` marker) instead of folding stud upcards
+  into `hole`; the human prompt shows own upcards, rival ups, and the
+  community card, and the draw prompt shows the `max_draw` cap.
+  `match.py` extracts `max_draw` next to `draws` for its manual prompt.
+  No engine behavior change.
+
 - Events: `stud` log lines carry per-seat tags (`stud fourth 1:Kd 0:Qs`)
   so the upcard-to-seat mapping round-trips through `parse_event`;
   old bare-cards lines still parse. Down seventh streets still log bare

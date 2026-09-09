@@ -98,14 +98,25 @@ class Engine:
 
 
 def parse_state(lines):
-    """Fold a `state` block into a dict."""
-    state = {"seats": {}}
+    """Fold a `state` block into a dict.
+
+    Keeps `street`, `showdown`, `button`, `acting`, `acting_since`, `pot`,
+    `board`, `draws`, `max_draw` (draw games only), `community` (stud
+    only), and per-seat `hole` plus `up` cards (stud face-up cards are
+    public, like the board) plus the sitting-out `out` marker. Seats
+    without an `up` section get `up: []`. (`current` is ignored.)
+    """
+    state = {"seats": {}, "draws": [], "community": []}
     for line in lines:
         parts = line.split()
         if not parts:
             continue
         if parts[0] == "street":
             state["street"] = parts[1]
+        elif parts[0] == "showdown":
+            state["showdown"] = parts[1]
+        elif parts[0] == "button":
+            state["button"] = int(parts[1])
         elif parts[0] == "acting":
             state["acting"] = int(parts[1])
         elif parts[0] == "acting_since":
@@ -114,17 +125,31 @@ def parse_state(lines):
             state["pot"] = int(parts[1])
         elif parts[0] == "board":
             state["board"] = [] if parts[1] == "-" else parts[1:]
+        elif parts[0] == "max_draw":
+            state["max_draw"] = int(parts[1])
+        elif parts[0] == "draws":
+            state["draws"] = [] if parts[1] == "-" else [int(s) for s in parts[1:]]
+        elif parts[0] == "community":
+            state["community"] = [] if parts[1] == "-" else parts[1:]
         elif parts[0] == "seat":
             # seat I stack S bet B committed C in|out live|folded [out] hole ...
+            # [up ...] (stud only; `out` marks a sitting-out seat)
             seat = int(parts[1])
             hole_at = parts.index("hole")
+            if "up" in parts[hole_at:]:
+                up_at = parts.index("up", hole_at)
+                hole_toks, up_toks = parts[hole_at + 1:up_at], parts[up_at + 1:]
+            else:
+                hole_toks, up_toks = parts[hole_at + 1:], []
             state["seats"][seat] = {
                 "stack": int(parts[3]),
                 "bet": int(parts[5]),
                 "committed": int(parts[7]),
                 "in": parts[8] == "in",
                 "live": parts[9] == "live",
-                "hole": [] if parts[hole_at + 1] == "--" else parts[hole_at + 1:],
+                "sitting_out": "out" in parts[10:hole_at],
+                "hole": [] if hole_toks == ["--"] else hole_toks,
+                "up": [] if up_toks in ([], ["--"]) else up_toks,
             }
     return state
 
@@ -199,20 +224,22 @@ def play_hand(engine, seed, auto, botted):
             if engine.send("deal") == ["ok"]:
                 continue
             raw = engine.send("state")
-            draws = [line for line in raw if line.startswith("draws")]
-            if draws and draws[0] != "draws -":
-                pending = [int(s) for s in draws[0].split()[1:]]
+            fresh = parse_state(raw)
+            pending = fresh["draws"]
+            if pending:
                 drawer = pending[0]
                 if drawer in botted:
                     print(f"  bot seat {drawer}: {engine.send('step')}")
                     continue
-                hole = state["seats"][drawer]["hole"]
+                hole = fresh["seats"][drawer]["hole"]
+                cap = fresh.get("max_draw")
                 if auto:
                     reply = engine.send("discard")
                 else:
+                    cap_note = f" (max {cap})" if cap is not None else ""
                     print(f"street=draw pot={state['pot']} "
                           f"seat {drawer} {' '.join(hole)}")
-                    raw = input(f"seat {drawer} discards "
+                    raw = input(f"seat {drawer} discards{cap_note} "
                                 f"(e.g. `As Td`, empty stands pat) > ").strip()
                     reply = engine.send(f"discard {raw}".strip())
                 if reply != ["ok"]:
@@ -232,8 +259,21 @@ def play_hand(engine, seed, auto, botted):
         if auto:
             action = choose_auto(opts)
         else:
-            print(f"street={state['street']} pot={state['pot']} "
-                  f"board={' '.join(state['board'])}")
+            board = " ".join(state.get("board", [])) or "-"
+            prompt = (f"street={state['street']} pot={state['pot']} "
+                      f"board={board}")
+            if state.get("showdown") == "stud":
+                own_up = " ".join(seat["up"]) or "--"
+                rivals = " ".join(
+                    f"{s}:{' '.join(v['up']) or '--'}"
+                    for s, v in sorted(state["seats"].items())
+                    if s != acting)
+                prompt += f" up={own_up}"
+                if rivals:
+                    prompt += f" rivals={rivals}"
+                if state.get("community"):
+                    prompt += f" community={' '.join(state['community'])}"
+            print(prompt)
             action = choose_human(acting, seat["hole"], opts)
         reply = engine.send(f"act {action}")
         if reply != ["ok"]:
