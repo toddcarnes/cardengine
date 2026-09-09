@@ -73,15 +73,19 @@ class Engine:
         literally `showdown`, `payout`, `tournament`, or `standing`,
         so any unlisted prelude was misrouted as a complete reply.
         """
-        self.proc.stdin.write(command + "\n")
-        self.proc.stdin.flush()
-        first = command.split()[0]
-
         def read_line():
             line = self.proc.stdout.readline()
             if not line:
                 raise RuntimeError("engine closed the pipe")
             return line.rstrip("\n")
+
+        self.proc.stdin.write(command + "\n")
+        self.proc.stdin.flush()
+        if not command.split():
+            # A blank line still gets the engine's single-line reply
+            # (`error empty command`); consume it so framing stays aligned.
+            return [read_line()]
+        first = command.split()[0]
 
         if first in ("state", "log"):
             lines = []

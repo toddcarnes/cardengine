@@ -254,6 +254,7 @@ Tournament::Snapshot Tournament::snapshot() const {
     saved.stacks = felt.stacks;
     saved.sitting_out = felt.sitting_out;
     saved.button = felt.button;
+    saved.kill_pending = felt.kill_pending;
     saved.level_index = level_index_;
     saved.hands_into_level = hands_into_level_;
     saved.level_elapsed = level_elapsed_;
@@ -292,6 +293,7 @@ void Tournament::restore(const Snapshot& saved) {
     felt.stacks = saved.stacks;
     felt.sitting_out = saved.sitting_out;
     felt.button = saved.button;
+    felt.kill_pending = saved.kill_pending;
     table_.restore(felt);
     // Blinds track the level: restore what begin_hand would have set.
     const BlindLevel current = level();

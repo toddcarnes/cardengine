@@ -5,6 +5,30 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Cleanup: `Table::take_card` drops its dead `Deck*` parameter (every
+  caller passed `nullptr`); the short-shoe error is now the generic
+  `"shoe exhausted"`. `examples/cli.py` no longer crashes on empty
+  input, `docs/PROTOCOL.md` notes stud seat tags list button-out deal
+  order rather than seat order, and `examples/host.py` shows the
+  `max_draw` cap in its draw prompt like `match.py`.
+
+- Events: `parse_event` rejects corrupt stud seat tags — duplicate seats,
+  seats outside the table size, and tag/card count mismatches throw
+  `std::invalid_argument` (bare-cards lines and engine-emitted tagged
+  lines parse exactly as before).
+
+- Events: stud third street now emits a tagged `StudDealtEvent` (`stud
+  third <seat:card ...>` in button-out deal order) right after
+  `begin_hand`. Door cards are public at deal time, so nothing leaks;
+  the parser already accepted tagged lines for any street and is
+  unchanged.
+
+- Table: a pending full kill survives snapshot/restore and session files.
+  `Table::Snapshot` and `Tournament::Snapshot` carry `kill_pending`, and
+  the session format bumps to version 2 (`kill_pending = 0|1`, always
+  written; version 1 still reads with no kill). A restored table deals
+  double blinds next hand as if the trigger hand had never been saved.
+
 - Table: a lone live leader's unmatched excess is a refund, not a win.
   The top-band refund now fires when no live hand matched the level or
   when a single seat holds it (previously the lone-live case paid out as

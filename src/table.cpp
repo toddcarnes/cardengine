@@ -28,6 +28,25 @@ void merge_payout(std::vector<Payout>& out, int seat, int amount) {
 // High half of a hi-lo split: the odd chip goes high first.
 int high_half(int amount) { return amount - amount / 2; }
 
+// Third-street door cards are public at deal time, so they log tagged in
+// button-out deal order, mirroring deal_stud_round's construction. Reads
+// the dealt upcards (each participant holds exactly its door card when
+// this runs) so both third-street paths emit identically.
+StudDealtEvent stud_third_dealt(const Table& table) {
+    StudDealtEvent dealt;
+    dealt.street = Street::Third;
+    dealt.face_up = true;
+    for (int k = 1; k <= table.num_seats(); ++k) {
+        const int seat = (table.button() + k) % table.num_seats();
+        const std::vector<Card>& up = table.up_cards(seat);
+        if (!up.empty()) {
+            dealt.per_seat.push_back({seat, up.front()});
+            dealt.cards.push_back(up.front());
+        }
+    }
+    return dealt;
+}
+
 }  // namespace
 
 Table::Table(const GameConfig& config) : config_(config) {
@@ -222,6 +241,11 @@ void Table::start_hand(std::uint64_t seed) {
         while (!deck.empty()) shoe_.push_back(deck.deal());
     }
     record_hand_started(seed, true);
+    if (config_.showdown == HandConstruction::StudSeven) {
+        // Door cards log after begin_hand (record runs after the deal, so
+        // deal_stud_third itself cannot push without jumping the queue).
+        events_.push_back(stud_third_dealt(*this));
+    }
 }
 
 void Table::start_hand_from_deck(std::vector<Card> top_first) {
@@ -267,11 +291,15 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
             for (int k = 0; k < participants; ++k) {
                 s = next_in_hand(s + 1);
                 Seat& seat = seats_[static_cast<std::size_t>(s)];
-                seat.hole.push_back(take_card(nullptr));
+                seat.hole.push_back(take_card());
             }
         }
     }
     record_hand_started(0, false);
+    if (config_.showdown == HandConstruction::StudSeven) {
+        // Same tagged door-card line as the shuffled path, after begin_hand.
+        events_.push_back(stud_third_dealt(*this));
+    }
 }
 
 void Table::act(int seat, const Action& action) {
@@ -436,7 +464,7 @@ void Table::deal_next_street() {
     StreetDealtEvent dealt;
     dealt.street = street_;
     for (int i = 0; i < deal_now; ++i) {
-        const Card c = take_card(nullptr);
+        const Card c = take_card();
         dealt.cards.push_back(c);
         board_.push_back(c);
     }
@@ -503,7 +531,7 @@ void Table::discard(int seat, const std::vector<std::string>& discards) {
         s.hole.erase(s.hole.begin() + static_cast<std::ptrdiff_t>(k));
     }
     for (std::size_t k = 0; k < drop.size(); ++k) {
-        s.hole.push_back(take_card(nullptr));
+        s.hole.push_back(take_card());
     }
     s.drew = true;
     DrawEvent drew;
@@ -558,7 +586,7 @@ std::vector<Payout> Table::settle() {
                 RunoutDealtEvent runout;
                 runout.board = b;
                 for (int k = 0; k < config_.board_cards; ++k) {
-                    runout.cards.push_back(take_card(nullptr));
+                    runout.cards.push_back(take_card());
                 }
                 boards.push_back(runout.cards);
                 events_.push_back(runout);
@@ -994,6 +1022,7 @@ Table::Snapshot Table::snapshot() const {
         saved.sitting_out.push_back(s.sitting_out);
     }
     saved.button = button_;
+    saved.kill_pending = kill_live_;
     return saved;
 }
 
@@ -1029,7 +1058,7 @@ void Table::restore(const Snapshot& saved) {
     }
     button_ = saved.button;
     street_ = Street::None;
-    kill_live_ = false;
+    kill_live_ = saved.kill_pending;
     board_.clear();
     community_.clear();
     shoe_.clear();
@@ -1154,10 +1183,9 @@ int Table::stud_opener() const {
     return best_seat;
 }
 
-Card Table::take_card(Deck* deck) {
-    if (deck != nullptr) return deck->deal();
+Card Table::take_card() {
     if (shoe_pos_ >= shoe_.size()) {
-        throw std::logic_error("shoe too short for stud");
+        throw std::logic_error("shoe exhausted");
     }
     return shoe_[shoe_pos_++];
 }
@@ -1192,12 +1220,12 @@ void Table::deal_stud_third_from_shoe() {
         for (int k = 0; k < participants; ++k) {
             cur = next_in_hand(cur + 1);
             seats_[static_cast<std::size_t>(cur)].hole.push_back(
-                take_card(nullptr));
+                take_card());
         }
     }
     for (int k = 0; k < participants; ++k) {
         cur = next_in_hand(cur + 1);
-        seats_[static_cast<std::size_t>(cur)].up.push_back(take_card(nullptr));
+        seats_[static_cast<std::size_t>(cur)].up.push_back(take_card());
     }
     post_stud_bring_in();
 }
@@ -1272,13 +1300,13 @@ void Table::deal_stud_round(bool face_up, Street street) {
     dealt.street = street;
     dealt.face_up = face_up;
     if (!face_up && street == Street::Seventh && shoe_remaining() < live.size()) {
-        community_.push_back(take_card(nullptr));
+        community_.push_back(take_card());
         dealt.community = true;
         dealt.face_up = true;  // The shared river card is face-up.
         dealt.cards = community_;
     } else {
         for (int live_seat : live) {
-            Card c = take_card(nullptr);
+            Card c = take_card();
             if (face_up) {
                 seats_[static_cast<std::size_t>(live_seat)].up.push_back(c);
             } else {

@@ -443,7 +443,9 @@ int main() {
         check(total_chips(t) == 30000, "hilo odd chips conserved");
     }
 
-    // A snapshot taken with a pending kill restores without the kill.
+    // A snapshot taken with a pending kill restores it: the next hand
+    // plays double blinds even on a fresh table.
+    Table::Snapshot kill_snap;
     {
         GameConfig c;
         c.num_players = 2;
@@ -456,13 +458,21 @@ int main() {
         call(t, 1);
         check_down_streets(t);
         t.settle();
-        const auto snap = t.snapshot();
-        t.restore(snap);
-        // Next hand plays normal blinds: SB 50, BB 100.
+        kill_snap = t.snapshot();
+        check(kill_snap.kill_pending, "kill armed after 10xBB pot");
+    }
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.kill = true;
+        Table t(c);
+        t.restore(kill_snap);
+        // Next hand plays double blinds: SB 100, BB 200.
         t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
                                      "Jh", "9c", "3d"}));
-        check(t.committed(0) + t.committed(1) == 150, "restore clears kill");
-        check(t.current_bet() == 100, "restored BB is 100");
+        check(t.committed(0) + t.committed(1) == 300,
+              "restored kill doubles blinds");
+        check(t.current_bet() == 200, "restored kill BB is 200");
     }
 
     // Uncontested top band with tied contributors refunds every owner:

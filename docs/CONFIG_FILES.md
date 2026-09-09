@@ -223,12 +223,13 @@ log for audit and bot training.
 
 | Key | Default | Effect |
 |---|---|---|
-| `format_version` | **required** | Must be `1`. |
+| `format_version` | **required** | Must be `1` or `2` (writers emit `2`). |
 | `mode` | **required** | `cash` or `tournament`. Tournament mode additionally requires `eliminated`, `places`, and `prizes_earned`. |
 | Any game-file key | (game/defaults) | Rules in force: `num_players`, `starting_stack`, blinds, `ante`, `betting`, `showdown`, etc. `stacks` must carry one entry per seat. |
 | `stacks` | **required** | Per-seat chips, in order: `10000,9500,...`. |
 | `sitting_out` | all `0` | Per-seat flags (`1` = sitting out): `0,1,0,...`. One entry per seat. |
 | `button` | **required** | Seat holding the dealer button. |
+| `kill_pending` | `0` | Full kill armed for the next hand (`1` = deal double blinds). Version 2 only: a version-1 file carrying it is rejected, and a version-1 file without it loads with no kill. |
 | `buy_in` / `prizes` / `level` | (tournament) | Tournament schedule and money, same shapes as tournament files (`level` repeatable, with optional minutes). |
 | `level_index` / `hands_into_level` | `0` | Where the blind clock stands (hands count plus banked wall time below). |
 | `level_elapsed` | `0` | Seconds already banked in the current level (timed levels) — written by `save`, resumed by `restore`. |
