@@ -234,13 +234,9 @@ private:
         for (std::size_t k = 0; k < 5; ++k) five[k] = hole[k];
         return evaluate_deuce(five);
     }
-    // Unmatched top band returns to its lone owner before the award math
-    // runs (it was never called, so no winner may take it). Returns the
-    // excess to refund (0 when the top band is contested); the caller
-    // applies it to the owner's stack and merges the levels.
-    int unmatched_top_excess(const std::vector<int>& levels) const;
-    // Applies the unmatched-top refund in place: returns the excess to its
-    // lone owner and folds the levels down. No-op when contested.
+    // Applies the unmatched-top refund in place: every band no live seat
+    // matched returns to its contributors and folds the levels down.
+    // No-op when the top is contested.
     void refund_unmatched_top(std::vector<int>& levels);
     // Hi-Lo side-pot split: half to the best high hand(s), half to the best
     // qualifying low hand(s) (high scoops when no low qualifies).

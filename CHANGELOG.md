@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Table: refund every uncontested top band at settle, not just a lone one.
+  Several seats can tie above the live cap (folders matching a bet that
+  only short all-ins called); that excess used to vanish when no live
+  hand had matched it instead of returning to its owners.
+
 - Host: `host.py` treats a refused `start` as a clean game-over when the
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
