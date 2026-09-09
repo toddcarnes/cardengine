@@ -334,6 +334,7 @@ Event parse_event(const std::string& line, const GameConfig& config) {
         }
         bool tagged = false;
         bool bare = false;
+        std::vector<int> seen_seats;
         for (std::size_t i = rest; i < toks.size(); ++i) {
             const std::string& tok = toks[i];
             const std::size_t colon = tok.find(':');
@@ -350,6 +351,16 @@ Event parse_event(const std::string& line, const GameConfig& config) {
             tagged = true;
             const int seat =
                 parse_count(tok.substr(0, colon), "stud seat");
+            if (seat >= config.num_players) {
+                throw std::invalid_argument("bad stud seat '" + tok + "'");
+            }
+            for (const int seen : seen_seats) {
+                if (seen == seat) {
+                    throw std::invalid_argument("bad stud seat '" + tok +
+                                                "'");
+                }
+            }
+            seen_seats.push_back(seat);
             try {
                 const Card c = parse_card(tok.substr(colon + 1));
                 e.per_seat.push_back({seat, c});
@@ -361,6 +372,10 @@ Event parse_event(const std::string& line, const GameConfig& config) {
         }
         if (tagged && bare) {
             throw std::invalid_argument("mixed stud cards in '" + line + "'");
+        }
+        if (tagged && e.cards.size() != e.per_seat.size()) {
+            throw std::invalid_argument("stud seats and cards disagree in '" +
+                                        line + "'");
         }
         e.face_up = !e.cards.empty() || e.community;
         return e;

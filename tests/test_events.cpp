@@ -405,6 +405,16 @@ int main() {
             parse_event("stud seventh community 2:Qh", c);
         check(format_event(tagged_comm) == "stud seventh community 2:Qh",
               "tagged community round-trips");
+        // Corrupt seat tags are rejected, not mapped.
+        expect_throws<std::invalid_argument>(
+            [&] { parse_event("stud fourth 1:Kd 1:Qs", c); },
+            "dup seat tag");
+        expect_throws<std::invalid_argument>(
+            [&] { parse_event("stud fourth 9:Kd", c); },
+            "seat out of range");
+        expect_throws<std::invalid_argument>(
+            [&] { parse_event("stud fourth 1:Kd Qs", c); },
+            "mixed tagged and bare");
     }
 
     std::cout << "test_events ok\n";

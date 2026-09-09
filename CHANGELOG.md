@@ -5,6 +5,11 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Events: `parse_event` rejects corrupt stud seat tags — duplicate seats,
+  seats outside the table size, and tag/card count mismatches throw
+  `std::invalid_argument` (bare-cards lines and engine-emitted tagged
+  lines parse exactly as before).
+
 - Events: stud third street now emits a tagged `StudDealtEvent` (`stud
   third <seat:card ...>` in button-out deal order) right after
   `begin_hand`. Door cards are public at deal time, so nothing leaks;
