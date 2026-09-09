@@ -56,6 +56,9 @@ tmp_*.txt
 # Local scratch space for throwaway scripts, logs, probes. Never committed.
 .scratch/
 
+# Agent working state (per-plan ledgers, briefs, review packages).
+.superpowers/
+
 # Editors and OS junk (open source, cross-platform contributors)
 .vscode/
 .idea/
