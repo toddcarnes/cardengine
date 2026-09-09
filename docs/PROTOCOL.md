@@ -3,7 +3,7 @@
 How outside programs talk to the engine. The engine runs as its own program
 in the background; a user interface (or a bot, or a script) starts it, sends
 it one text line per command, and reads back replies. This works the same
-from any programming language — see `examples/cli.py` (about 150 lines of
+from any programming language — see `examples/cli.py` (about 340 lines of
 Python, using nothing but typed and printed lines) for the reference example.
 (The design follows the same idea as chess engines, which is part of why
 this project is called CardEngine.)
@@ -11,7 +11,7 @@ this project is called CardEngine.)
 ## Framing rules (clients must follow these)
 
 - One command per line, one reply per command.
-- Most replies are a single line (`ok ...` / `error ...` / `bye`). Three
+- Most replies are a single line (`ok ...` / `error ...` / `bye`). Four
   commands reply multi-line: `state` and `log` send a block terminated by
   an `end` line; `settle` and `tstatus` send prelude lines and a final `ok`.
 - The engine flushes after every reply, so piped clients never deadlock.
@@ -295,7 +295,7 @@ further `start` hands are refused.
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act timeout deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act discard draws timeout deal settle log addbot bots step quit
 > start 7
 ok
 > options

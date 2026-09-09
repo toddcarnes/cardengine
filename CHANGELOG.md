@@ -9,6 +9,14 @@ minor bumps add features, patches fix bugs.
   table has busted to one player (`need at least 2 players`) instead of
   exiting nonzero; `--save` still runs and the process exits 0.
 
+- Examples: `cli.py` `Engine.send` frames replies on terminators instead
+  of prelude content (`state`/`log` run to `end`, `settle`/`tstatus` run
+  to `ok`/`error`, everything else is one line), so a future prelude line
+  the client never listed no longer misroutes as a complete reply; a bare
+  `error` to `state <seat>` returns instead of hanging on a missing `end`.
+  Protocol doc's `help` transcript lists the missing `discard`/`draws`
+  commands. No engine behavior change.
+
 - Examples: `cli.py` `parse_state` keeps the stud/draw lines it used to
   drop (`showdown`, `button`, `max_draw`, `draws`, `community`, per-seat
   `up`, the sitting-out `out` marker) instead of folding stud upcards

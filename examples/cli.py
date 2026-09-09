@@ -63,32 +63,46 @@ class Engine:
     def send(self, command):
         """Send one command, return the reply lines (without `end`).
 
-        Framing follows docs/PROTOCOL.md: `state` and `log` reply with
-        blocks terminated by `end`; `settle` and `tstatus` reply with
-        prelude lines and a final `ok`; everything else is one line.
+        Framing follows docs/PROTOCOL.md and routes purely on
+        terminators, never on prelude content: `state` and `log`
+        reply with blocks terminated by `end`; `settle` and `tstatus`
+        reply with prelude lines and a final `ok`; everything else is
+        exactly one line. A new prelude line under `settle`/`tstatus`
+        (e.g. a future `runout`/`jackpot` line) needs no client
+        change — the old code only kept reading while the line was
+        literally `showdown`, `payout`, `tournament`, or `standing`,
+        so any unlisted prelude was misrouted as a complete reply.
         """
         self.proc.stdin.write(command + "\n")
         self.proc.stdin.flush()
-        lines = []
         first = command.split()[0]
-        block = first in ("state", "log")
-        while True:
+
+        def read_line():
             line = self.proc.stdout.readline()
             if not line:
                 raise RuntimeError("engine closed the pipe")
-            line = line.rstrip("\n")
-            if block:
+            return line.rstrip("\n")
+
+        if first in ("state", "log"):
+            lines = []
+            while True:
+                line = read_line()
                 if line == "end":
                     return lines
+                # `state <bad-seat>` answers a bare `error` with no
+                # `end`; return it instead of waiting forever.
+                if not lines and line.startswith("error"):
+                    return [line]
                 lines.append(line)
-                continue
-            lines.append(line)
-            if line in ("ok", "bye") or line.startswith("error"):
-                return lines
-            if line.split()[0] in ("showdown", "payout", "tournament",
-                                   "standing"):
-                continue
-            return lines
+        if first in ("settle", "tstatus"):
+            lines = []
+            while True:
+                line = read_line()
+                lines.append(line)
+                if (line in ("ok", "bye") or line.startswith("ok ")
+                        or line.startswith("error")):
+                    return lines
+        return [read_line()]
 
     def close(self):
         try:
