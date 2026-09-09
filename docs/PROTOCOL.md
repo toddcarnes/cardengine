@@ -84,7 +84,8 @@ carries face-up cards (public — every live seat's shown, like the board).
 `deal` advances street by street; the log records each round as
 `stud <street> <seat:up ...>` — third street's door cards first
 (e.g. `stud third 1:2c 0:Ah`), then e.g. `stud fourth 1:Kd 0:Qs` —
-per-seat tags, since only live seats are dealt;
+per-seat tags, since only live seats are dealt; tags are listed in
+button-out deal order, not seat order;
 `stud seventh community Qh` for the shared river, bare `stud seventh`
 for down cards). Older bare-cards lines (`stud fourth Kd Qs`) still
 parse.

@@ -194,7 +194,7 @@ private:
     // Seventh street goes community when the shoe would run dry: a single
     // shared up card on community_ instead of one per seat.
     void deal_stud_round(bool face_up, Street street);
-    Card take_card(Deck* deck);
+    Card take_card();
     // Cards left below the cursor.
     std::size_t shoe_remaining() const { return shoe_.size() - shoe_pos_; }
     // Forced bets for the new hand: antes, blinds, straddle. Returns the

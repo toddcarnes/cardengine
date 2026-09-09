@@ -340,6 +340,14 @@ class Host:
                         move = self._bot_discard(drawer, pending[0])
                         print(f"  bot seat {drawer}: {move}")
                     elif drawer in self.clients:
+                        cap = next(
+                            (line.split()[1] for line in full
+                             if line.startswith("max_draw")),
+                            None,
+                        )
+                        cap_note = f" (max {cap})" if cap is not None else ""
+                        print(f"  seat {drawer} must discard{cap_note} "
+                              f"(e.g. `discard As Td`, bare `discard` stands pat)")
                         deadline = now_seconds() + self.args.action_seconds
                         move = self._await_human(drawer, pending[0], deadline)
                         if move is None or not move.startswith("discard"):

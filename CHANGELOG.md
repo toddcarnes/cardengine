@@ -5,6 +5,13 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Cleanup: `Table::take_card` drops its dead `Deck*` parameter (every
+  caller passed `nullptr`); the short-shoe error is now the generic
+  `"shoe exhausted"`. `examples/cli.py` no longer crashes on empty
+  input, `docs/PROTOCOL.md` notes stud seat tags list button-out deal
+  order rather than seat order, and `examples/host.py` shows the
+  `max_draw` cap in its draw prompt like `match.py`.
+
 - Events: `parse_event` rejects corrupt stud seat tags — duplicate seats,
   seats outside the table size, and tag/card count mismatches throw
   `std::invalid_argument` (bare-cards lines and engine-emitted tagged

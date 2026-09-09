@@ -291,7 +291,7 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
             for (int k = 0; k < participants; ++k) {
                 s = next_in_hand(s + 1);
                 Seat& seat = seats_[static_cast<std::size_t>(s)];
-                seat.hole.push_back(take_card(nullptr));
+                seat.hole.push_back(take_card());
             }
         }
     }
@@ -464,7 +464,7 @@ void Table::deal_next_street() {
     StreetDealtEvent dealt;
     dealt.street = street_;
     for (int i = 0; i < deal_now; ++i) {
-        const Card c = take_card(nullptr);
+        const Card c = take_card();
         dealt.cards.push_back(c);
         board_.push_back(c);
     }
@@ -531,7 +531,7 @@ void Table::discard(int seat, const std::vector<std::string>& discards) {
         s.hole.erase(s.hole.begin() + static_cast<std::ptrdiff_t>(k));
     }
     for (std::size_t k = 0; k < drop.size(); ++k) {
-        s.hole.push_back(take_card(nullptr));
+        s.hole.push_back(take_card());
     }
     s.drew = true;
     DrawEvent drew;
@@ -586,7 +586,7 @@ std::vector<Payout> Table::settle() {
                 RunoutDealtEvent runout;
                 runout.board = b;
                 for (int k = 0; k < config_.board_cards; ++k) {
-                    runout.cards.push_back(take_card(nullptr));
+                    runout.cards.push_back(take_card());
                 }
                 boards.push_back(runout.cards);
                 events_.push_back(runout);
@@ -1183,10 +1183,9 @@ int Table::stud_opener() const {
     return best_seat;
 }
 
-Card Table::take_card(Deck* deck) {
-    if (deck != nullptr) return deck->deal();
+Card Table::take_card() {
     if (shoe_pos_ >= shoe_.size()) {
-        throw std::logic_error("shoe too short for stud");
+        throw std::logic_error("shoe exhausted");
     }
     return shoe_[shoe_pos_++];
 }
@@ -1221,12 +1220,12 @@ void Table::deal_stud_third_from_shoe() {
         for (int k = 0; k < participants; ++k) {
             cur = next_in_hand(cur + 1);
             seats_[static_cast<std::size_t>(cur)].hole.push_back(
-                take_card(nullptr));
+                take_card());
         }
     }
     for (int k = 0; k < participants; ++k) {
         cur = next_in_hand(cur + 1);
-        seats_[static_cast<std::size_t>(cur)].up.push_back(take_card(nullptr));
+        seats_[static_cast<std::size_t>(cur)].up.push_back(take_card());
     }
     post_stud_bring_in();
 }
@@ -1301,13 +1300,13 @@ void Table::deal_stud_round(bool face_up, Street street) {
     dealt.street = street;
     dealt.face_up = face_up;
     if (!face_up && street == Street::Seventh && shoe_remaining() < live.size()) {
-        community_.push_back(take_card(nullptr));
+        community_.push_back(take_card());
         dealt.community = true;
         dealt.face_up = true;  // The shared river card is face-up.
         dealt.cards = community_;
     } else {
         for (int live_seat : live) {
-            Card c = take_card(nullptr);
+            Card c = take_card();
             if (face_up) {
                 seats_[static_cast<std::size_t>(live_seat)].up.push_back(c);
             } else {
