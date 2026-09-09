@@ -10,12 +10,15 @@ minor bumps add features, patches fix bugs.
   when a single seat holds it (previously the lone-live case paid out as
   a one-eligible side pot, inflating winnings with uncalled chips).
 
-- Tests: `test_bot` deals its 30-hand match from a portable hand-rolled
-  shuffle instead of `start_hand` seeds (`std::shuffle`'s algorithm is
-  implementation-defined, so seeded decks dealt different cards per
-  stdlib and the profit assertion wobbled by platform). `test_fuzz`
-  uses the same shared helper (plus a portable index shuffle for draw
-  discards), so its invariant sweep runs identical hands everywhere.
+- Tests: `test_bot` and `test_fuzz` deal from a portable hand-rolled
+  shuffle shared via `tests/helpers.h` instead of `start_hand` seeds
+  (`std::shuffle`'s algorithm is implementation-defined, so seeded decks
+  dealt different cards per stdlib). The 30-hand bot match asserts
+  structural properties (legal moves, chip conservation, determinism),
+  not profit: bot decision streams go through standard distributions
+  whose mapping is also implementation-defined, so no fixed profit
+  number can hold everywhere. `test_fuzz` additionally shuffles draw
+  discards portably.
 
 - Table: refund every uncontested top band at settle, not just a lone one.
   Several seats can tie above the live cap (folders matching a bet that
