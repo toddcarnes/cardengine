@@ -254,9 +254,11 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
         // Stud streets need the whole shoe (not a fixed prefix): deal
         // third street off the front into the shoe-backed helper below.
         shoe_ = std::move(top_first);
+        shoe_pos_ = 0;
         deal_stud_third_from_shoe();
     } else {
         shoe_ = std::move(top_first);
+        shoe_pos_ = 0;
         const int participants = static_cast<int>(
             std::count_if(seats_.begin(), seats_.end(),
                           [](const Seat& s) { return s.in_hand; }));
@@ -265,8 +267,7 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
             for (int k = 0; k < participants; ++k) {
                 s = next_in_hand(s + 1);
                 Seat& seat = seats_[static_cast<std::size_t>(s)];
-                seat.hole.push_back(shoe_.front());
-                shoe_.erase(shoe_.begin());
+                seat.hole.push_back(take_card(nullptr));
             }
         }
     }
@@ -352,7 +353,7 @@ void Table::act(int seat, const Action& action) {
 
 void Table::timeout(int seat) { timeout_at(seat, now_seconds()); }
 
-void Table::timeout_at(int seat, std::int64_t at) {
+void Table::timeout_at(int seat, std::int64_t /*at*/) {
     check_seat(seat);
     if (street_ == Street::None || street_ == Street::Complete) {
         throw std::logic_error("no hand running");
@@ -363,7 +364,9 @@ void Table::timeout_at(int seat, std::int64_t at) {
     timed.folded = true;
     timed.acted = true;
     timed.seen_seq = round_seq_;
-    (void)at;  // The stamp lives in the order of events, not the event.
+    // The stamp lives in the order of events, not the event: `at` is kept
+    // in the signature (callers pass the clock reading) but intentionally
+    // unused — no TimeoutEvent field carries it.
     advance_acting(seat + 1);
     acting_since_ = now_seconds();
     events_.push_back(TimeoutEvent{seat, pot_total()});
@@ -433,9 +436,9 @@ void Table::deal_next_street() {
     StreetDealtEvent dealt;
     dealt.street = street_;
     for (int i = 0; i < deal_now; ++i) {
-        dealt.cards.push_back(shoe_.front());
-        board_.push_back(shoe_.front());
-        shoe_.erase(shoe_.begin());
+        const Card c = take_card(nullptr);
+        dealt.cards.push_back(c);
+        board_.push_back(c);
     }
     events_.push_back(dealt);
     begin_round();
@@ -468,7 +471,7 @@ void Table::discard(int seat, const std::vector<std::string>& discards) {
     if (discards.size() > static_cast<std::size_t>(config_.max_draw)) {
         throw std::invalid_argument("too many discards");
     }
-    if (discards.size() > shoe_.size()) {
+    if (discards.size() > shoe_remaining()) {
         // Check the shoe before touching the hole: a short shoe refuses
         // the whole exchange rather than dealing half a draw.
         throw std::logic_error("shoe too short for the draw");
@@ -500,8 +503,7 @@ void Table::discard(int seat, const std::vector<std::string>& discards) {
         s.hole.erase(s.hole.begin() + static_cast<std::ptrdiff_t>(k));
     }
     for (std::size_t k = 0; k < drop.size(); ++k) {
-        s.hole.push_back(shoe_.front());
-        shoe_.erase(shoe_.begin());
+        s.hole.push_back(take_card(nullptr));
     }
     s.drew = true;
     DrawEvent drew;
@@ -551,13 +553,12 @@ std::vector<Payout> Table::settle() {
         const std::size_t need =
             static_cast<std::size_t>(config_.board_cards) *
             static_cast<std::size_t>(config_.runouts - 1);
-        if (shoe_.size() >= need) {
+        if (shoe_remaining() >= need) {
             for (int b = 2; b <= config_.runouts; ++b) {
                 RunoutDealtEvent runout;
                 runout.board = b;
                 for (int k = 0; k < config_.board_cards; ++k) {
-                    runout.cards.push_back(shoe_.front());
-                    shoe_.erase(shoe_.begin());
+                    runout.cards.push_back(take_card(nullptr));
                 }
                 boards.push_back(runout.cards);
                 events_.push_back(runout);
@@ -728,16 +729,13 @@ int Table::unmatched_top_excess(const std::vector<int>& levels) const {
     if (levels.size() <= 1) return 0;
     const int top = levels.back();
     int leaders = 0;
-    int leader = -1;
     for (int i = 0; i < num_seats(); ++i) {
         const Seat& s = seats_[static_cast<std::size_t>(i)];
         if (s.in_hand && !s.folded && s.committed == top) {
             ++leaders;
-            leader = i;
         }
     }
     if (leaders != 1) return 0;
-    (void)leader;
     return top - levels[levels.size() - 2];
 }
 
@@ -1036,6 +1034,7 @@ void Table::restore(const Snapshot& saved) {
     board_.clear();
     community_.clear();
     shoe_.clear();
+    shoe_pos_ = 0;
     acting_ = -1;
     acting_since_ = -1;
     current_bet_ = 0;
@@ -1158,10 +1157,10 @@ int Table::stud_opener() const {
 
 Card Table::take_card(Deck* deck) {
     if (deck != nullptr) return deck->deal();
-    if (shoe_.empty()) throw std::logic_error("shoe too short for stud");
-    Card c = shoe_.front();
-    shoe_.erase(shoe_.begin());
-    return c;
+    if (shoe_pos_ >= shoe_.size()) {
+        throw std::logic_error("shoe too short for stud");
+    }
+    return shoe_[shoe_pos_++];
 }
 
 void Table::deal_stud_third(Deck& deck) {
@@ -1273,7 +1272,7 @@ void Table::deal_stud_round(bool face_up, Street street) {
     StudDealtEvent dealt;
     dealt.street = street;
     dealt.face_up = face_up;
-    if (!face_up && street == Street::Seventh && shoe_.size() < live.size()) {
+    if (!face_up && street == Street::Seventh && shoe_remaining() < live.size()) {
         community_.push_back(take_card(nullptr));
         dealt.community = true;
         dealt.face_up = true;  // The shared river card is face-up.
@@ -1407,6 +1406,7 @@ void Table::start_hand_common() {
     board_.clear();
     community_.clear();
     shoe_.clear();
+    shoe_pos_ = 0;
 
     // Stud posts no blinds: the deal below antes up and brings in.
     if (config_.showdown == HandConstruction::StudSeven) {
