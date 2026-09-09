@@ -45,7 +45,7 @@ ctest --test-dir build --output-on-failure -C Release
 - Throwaway scripts, probes, and captured logs go in `.scratch/` (git-ignored). Never commit them, and never leave temp files elsewhere in the tree.
 - DANGER (2026-09-08): bulk-deleted all of `.scratch/` with `Remove-Item` — `-LiteralPath` silently ignores `-Include`, so the intended `*.csv,*.log` filter matched everything and wiped the scoreboard scripts too. When deleting by pattern: never combine `-LiteralPath` with `-Include`/`-Exclude` (use `-Path`), list first with `Get-ChildItem` alone, then pipe to `Remove-Item`. `.scratch/` is throwaway *content*, but reusable scripts must live in `scripts/` — if it only exists in `.scratch/`, move it before any cleanup.
 - Commit policy (owner-set 2026-09-06): one commit per finished item — green only (rebuild + full `ctest` clean + docs + CHANGELOG entry). Never batch a whole wave into one diff, never commit red or intermediate edits. `git log` style is `<Area>: <description>` (e.g. `Protocol: tlevel and trebuy tournament commands`).
-- Versioning: accumulate features under CHANGELOG `Unreleased`; bump `project(... VERSION ...)` + `kVersionMajor/Minor/Patch` at wave boundaries only (e.g. 0.3.0 when Wave 1 lands), never per item. Tag every bump as annotated `vX.Y.Z` on the bump commit (`git tag -a vX.Y.Z <sha> -m "..."`); tags are part of the release, not optional.
+- Versioning: accumulate features under CHANGELOG `Unreleased`; bump `project(... VERSION ...)` + the `test_version` tripwire literals at wave boundaries only (e.g. 0.3.0 when Wave 1 lands), never per item. Tag every bump as annotated `vX.Y.Z` on the bump commit (`git tag -a vX.Y.Z <sha> -m "..."`); tags are part of the release, not optional.
 
 ## Hard constraints (owner-set)
 
