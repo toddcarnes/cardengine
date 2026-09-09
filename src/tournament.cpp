@@ -85,7 +85,9 @@ Tournament::Tournament(const TournamentConfig& config)
     places_.assign(static_cast<std::size_t>(n), 0);
     prizes_.assign(static_cast<std::size_t>(n), 0);
     prize_pool_ = config_.buy_in * n;
-    level_started_at_ = now_seconds();
+    // The level clock starts at the first deal, not here: construction must
+    // not read the wall clock, or injected test stamps in another epoch
+    // accrue phantom elapsed before any hand is played.
 }
 
 void Tournament::begin_hand(std::uint64_t seed) {
@@ -96,6 +98,7 @@ void Tournament::begin_hand_at(std::uint64_t seed, std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
     advance_level_if_due(now);
     level_started_at_ = now;
+    clock_live_ = true;
     const BlindLevel current = level();
     table_.set_blinds(current.small_blind, current.big_blind);
     table_.set_ante(current.ante);
@@ -112,6 +115,7 @@ void Tournament::begin_hand_from_deck_at(std::vector<Card> top_first,
     if (complete()) throw std::logic_error("tournament is over");
     advance_level_if_due(now);
     level_started_at_ = now;
+    clock_live_ = true;
     const BlindLevel current = level();
     table_.set_blinds(current.small_blind, current.big_blind);
     table_.set_ante(current.ante);
@@ -130,11 +134,15 @@ void Tournament::finish_hand_at(std::int64_t now) {
     }
     // Elapsed clock time counts per completed hand (banked here, so a
     // save/load between hands loses nothing). Timed expiry itself waits
-    // for the next begin (never mid-hand).
-    if (now >= level_started_at_) {
+    // for the next begin (never mid-hand). The clock_live_ gate mirrors
+    // level_seconds_left; it is always true here (every begin sets it
+    // before opening the hand, and only restore clears it, which needs
+    // no open hand) — symmetry, no behavior change.
+    if (clock_live_ && now >= level_started_at_) {
         level_elapsed_ += now - level_started_at_;
     }
     level_started_at_ = now;
+    clock_live_ = true;
     const int n = config_.game.num_players;
     for (int seat = 0; seat < n; ++seat) {
         if (eliminated_[static_cast<std::size_t>(seat)]) continue;
@@ -178,6 +186,7 @@ void Tournament::advance_level_at(std::int64_t now) {
         hands_into_level_ = 0;
         level_elapsed_ = 0;
         level_started_at_ = now;
+        clock_live_ = true;
     }
 }
 
@@ -186,7 +195,8 @@ std::int64_t Tournament::level_seconds_left(std::int64_t now) const {
     if (current.minutes <= 0) return -1;
     if (level_index_ + 1 >= static_cast<int>(config_.levels.size())) return -1;
     std::int64_t banked = level_elapsed_;
-    if (now >= level_started_at_) banked += now - level_started_at_;
+    if (clock_live_ && now >= level_started_at_)
+        banked += now - level_started_at_;
     const std::int64_t budget = static_cast<std::int64_t>(current.minutes) * 60;
     return budget > banked ? budget - banked : 0;
 }
@@ -290,7 +300,8 @@ void Tournament::restore(const Snapshot& saved) {
     level_index_ = saved.level_index;
     hands_into_level_ = saved.hands_into_level;
     level_elapsed_ = saved.level_elapsed;
-    level_started_at_ = now_seconds();  // Fresh boot: clock restarts here.
+    level_started_at_ = 0;  // Fresh boot: clock restarts at the next deal.
+    clock_live_ = false;
     prize_pool_ = saved.prize_pool;
     prize_awarded_ = saved.prize_awarded;
     eliminated_ = saved.eliminated;

@@ -42,6 +42,14 @@ def draws_line(full):
     return "draws -"
 
 
+def parse_max_draw(full):
+    """Most cards a seat may exchange (None outside draw games)."""
+    for line in full:
+        if line.startswith("max_draw"):
+            return int(line.split()[1])
+    return None
+
+
 class Runner:
     """One persistent cardengine_bot process. Strict alternation: we write
     a state block + decision line, it prints one reply line (`act ...`
@@ -101,7 +109,9 @@ def play_hand(engine, runners, seed, auto):
                 elif auto:
                     reply = engine.send("discard")
                 else:
-                    print(f"  manual seat {drawer} must discard "
+                    cap = parse_max_draw(full)
+                    cap_note = f" (max {cap})" if cap is not None else ""
+                    print(f"  manual seat {drawer} must discard{cap_note} "
                           f"(e.g. `discard As Td`, bare `discard` stands pat)")
                     return False
                 if reply != ["ok"]:

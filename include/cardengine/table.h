@@ -97,7 +97,7 @@ public:
     // Stamps `at` (seconds, see clock.h); the plain form reads the wall
     // clock. Throws std::logic_error unless that seat holds the action.
     void timeout(int seat);
-    void timeout_at(int seat, std::int64_t at);
+    void timeout_at(int seat, std::int64_t /*at*/);
     // Stamp of the last action-clock (re)start: hand deal, a taken action,
     // or a new street (-1 when no action is pending). Seconds, see clock.h.
     // Hosts poll `expired(now, acting_since(), limit)` and call timeout().
@@ -194,6 +194,8 @@ private:
     // shared up card on community_ instead of one per seat.
     void deal_stud_round(bool face_up, Street street);
     Card take_card(Deck* deck);
+    // Cards left below the cursor.
+    std::size_t shoe_remaining() const { return shoe_.size() - shoe_pos_; }
     // Forced bets for the new hand: antes, blinds, straddle. Returns the
     // straddle seat (or -1): preflop action starts after it.
     int post_forced_bets(int participants);
@@ -232,11 +234,10 @@ private:
         for (std::size_t k = 0; k < 5; ++k) five[k] = hole[k];
         return evaluate_deuce(five);
     }
-    // Unmatched top band returns to its lone owner before the award math
-    // runs (it was never called, so no winner may take it). Returns the
-    // excess to refund (0 when the top band is contested); the caller
-    // applies it to the owner's stack and merges the levels.
-    int unmatched_top_excess(const std::vector<int>& levels) const;
+    // Applies the unmatched-top refund in place: every band no live seat
+    // matched returns to its contributors and folds the levels down.
+    // No-op when the top is contested.
+    void refund_unmatched_top(std::vector<int>& levels);
     // Hi-Lo side-pot split: half to the best high hand(s), half to the best
     // qualifying low hand(s) (high scoops when no low qualifies).
     void award_hilo_pot(std::vector<Payout>& payouts,
@@ -246,7 +247,6 @@ private:
     // halves apply per board, not on the total). Levels arrive pre-
     // refunded (settle() returns the unmatched top band first).
     void award_multi_board(std::vector<Payout>& payouts,
-                           const std::vector<int>& alive,
                            const std::vector<int>& levels,
                            const std::vector<std::vector<Card>>& boards) const;
     // One board's share of one contribution band to its winners.
@@ -263,7 +263,11 @@ private:
     // Stud river overflow: the shared up card when the shoe runs dry
     // 8-handed. Empty for every other game and street.
     std::vector<Card> community_;
-    std::vector<Card> shoe_;  // Remaining undealt cards, front = top.
+    std::vector<Card> shoe_;  // Full undealt shoe in deal order.
+    // Index of the next card to deal (the top). Dealing advances the
+    // cursor instead of erasing from the front, so the shoe stays put
+    // and deal order is bit-identical to the old erase queue.
+    std::size_t shoe_pos_ = 0;
     int acting_ = -1;
     std::int64_t acting_since_ = -1;  // Action-clock start (clock.h seconds).
     int current_bet_ = 0;

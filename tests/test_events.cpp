@@ -339,6 +339,60 @@ int main() {
             "board 1 is the felt");
     }
 
+    // Stud upcards round-trip per seat (tagged form); the old bare-cards
+    // form still parses for existing saved logs.
+    {
+        GameConfig c;
+        StudDealtEvent dealt{Street::Fourth,
+                             true,
+                             false,
+                             {parse_card("Qh"), parse_card("Ts")},
+                             {{2, parse_card("Qh")}, {4, parse_card("Ts")}}};
+        const std::string text = format_event(dealt);
+        const Event back = parse_event(text, c);
+        check(format_event(back) == text, "stud line round-trips");
+        const auto* s = std::get_if<StudDealtEvent>(&back);
+        check(s != nullptr, "stud parses back");
+        check(s->per_seat.size() == 2 && s->per_seat[0].seat == 2 &&
+                  to_string(s->per_seat[0].card) == "Qh" &&
+                  s->per_seat[1].seat == 4 &&
+                  to_string(s->per_seat[1].card) == "Ts",
+              "per-seat mapping survives");
+        // Old bare-cards lines (no seat tags) still parse, seat order.
+        const Event old = parse_event("stud fourth Kd Qs", c);
+        const auto* o = std::get_if<StudDealtEvent>(&old);
+        check(o != nullptr && o->street == Street::Fourth && o->face_up &&
+                  !o->community && o->cards.size() == 2 &&
+                  o->per_seat.empty(),
+              "bare stud line parses");
+        check(format_event(old) == "stud fourth Kd Qs",
+              "bare stud line formats bare");
+        // Community river and down seventh streets round-trip as before.
+        const Event comm = parse_event("stud seventh community Qh", c);
+        check(format_event(comm) == "stud seventh community Qh",
+              "community stud round-trips");
+        const Event down = parse_event("stud seventh", c);
+        check(!std::get<StudDealtEvent>(down).face_up, "down seventh");
+        check(format_event(down) == "stud seventh", "down stud round-trips");
+        // Face-down cards never reach the log: even a seventh carrying
+        // per-seat cards formats bare (down cards stay private, like
+        // folded hands).
+        const StudDealtEvent down_face{Street::Seventh,
+                                       false,
+                                       false,
+                                       {},
+                                       {{1, parse_card("Qh")}}};
+        check(format_event(down_face) == "stud seventh",
+              "face-down seventh stays bare");
+        // Tagged community lines round-trip with their seats (the engine
+        // only emits the bare shared river — see test_stud8 — so no
+        // engine line changes shape).
+        const Event tagged_comm =
+            parse_event("stud seventh community 2:Qh", c);
+        check(format_event(tagged_comm) == "stud seventh community 2:Qh",
+              "tagged community round-trips");
+    }
+
     std::cout << "test_events ok\n";
     return 0;
 }

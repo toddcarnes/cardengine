@@ -87,10 +87,32 @@ std::string format_event(const Event& event) {
         return out.str();
     }
     if (const auto* e = std::get_if<StudDealtEvent>(&event)) {
-        // Up cards are public: seat order for face-up rounds, the shared
-        // card for a community river. Down seventh streets log no cards.
+        // Up cards are public: per-seat tags keep the seat mapping (only
+        // live seats are dealt, so bare seat order turns ambiguous after
+        // folds). The shared river logs bare; down seventh streets log no
+        // cards at all (down cards stay private, like folded hands).
         out << "stud " << street_name(e->street);
-        if (e->community) out << " community";
+        if (e->community) {
+            out << " community";
+            // Tagged community lines round-trip with their seats; the
+            // engine only ever emits the bare shared river (per_seat is
+            // empty there), so no engine line changes shape here.
+            if (!e->per_seat.empty()) {
+                for (const auto& sc : e->per_seat) {
+                    out << " " << sc.seat << ":" << to_string(sc.card);
+                }
+                return out.str();
+            }
+            for (const Card& c : e->cards) out << " " << to_string(c);
+            return out.str();
+        }
+        if (!e->face_up) return out.str();
+        if (!e->per_seat.empty()) {
+            for (const auto& sc : e->per_seat) {
+                out << " " << sc.seat << ":" << to_string(sc.card);
+            }
+            return out.str();
+        }
         for (const Card& c : e->cards) out << " " << to_string(c);
         return out.str();
     }
@@ -298,9 +320,10 @@ Event parse_event(const std::string& line, const GameConfig& config) {
         return e;
     }
     if (toks[0] == "stud") {
-        // `stud <street> [community] <cards...>`: face-up cards in seat
-        // order, or the one shared river card. Down seventh streets log
-        // bare (`stud seventh`).
+        // `stud <street> [community] <seat:card ...>`: face-up cards with
+        // their seats, or the one shared river card. Old bare-cards lines
+        // (`stud <street> <ups...>`, seat order) still parse for existing
+        // saved logs. Down seventh streets log bare (`stud seventh`).
         if (toks.size() < 2) throw std::invalid_argument("short stud event");
         StudDealtEvent e;
         std::size_t rest = 2;
@@ -309,13 +332,35 @@ Event parse_event(const std::string& line, const GameConfig& config) {
             e.community = true;
             ++rest;
         }
+        bool tagged = false;
+        bool bare = false;
         for (std::size_t i = rest; i < toks.size(); ++i) {
+            const std::string& tok = toks[i];
+            const std::size_t colon = tok.find(':');
+            if (colon == std::string::npos) {
+                bare = true;
+                try {
+                    e.cards.push_back(parse_card(tok));
+                } catch (const std::exception&) {
+                    throw std::invalid_argument(std::string("bad card '") +
+                                                tok + "'");
+                }
+                continue;
+            }
+            tagged = true;
+            const int seat =
+                parse_count(tok.substr(0, colon), "stud seat");
             try {
-                e.cards.push_back(parse_card(toks[i]));
+                const Card c = parse_card(tok.substr(colon + 1));
+                e.per_seat.push_back({seat, c});
+                e.cards.push_back(c);
             } catch (const std::exception&) {
                 throw std::invalid_argument(std::string("bad card '") +
-                                            toks[i] + "'");
+                                            tok + "'");
             }
+        }
+        if (tagged && bare) {
+            throw std::invalid_argument("mixed stud cards in '" + line + "'");
         }
         e.face_up = !e.cards.empty() || e.community;
         return e;

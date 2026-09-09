@@ -26,7 +26,6 @@ std::vector<cardengine::Card> any_shoe() {
                   "9s", "Tc", "Jd", "Qh"});
 }
 
-void fold(Table& t, int s) { t.act(s, {ActionType::Fold, 0}); }
 void chk(Table& t, int s) { t.act(s, {ActionType::Check, 0}); }
 void call(Table& t, int s) { t.act(s, {ActionType::Call, 0}); }
 void raise_to(Table& t, int s, int amount) {

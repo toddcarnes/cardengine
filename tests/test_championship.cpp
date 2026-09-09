@@ -34,12 +34,6 @@ GameConfig heads_up() {
     return game;
 }
 
-TournamentConfig heads_up_tournament() {
-    TournamentConfig config;
-    config.game = heads_up();
-    return config;
-}
-
 cardengine::BotFile heuristic_file() {
     std::istringstream in("format_version = 1\nname = H\nstyle = heuristic\n"
                           "mistake_rate = 0.0\naggression = 0.5\n"
@@ -51,37 +45,6 @@ cardengine::BotFile random_file() {
     std::istringstream in("format_version = 1\nname = R\nstyle = random\n"
                           "seed = 5\n");
     return cardengine::parse_bot(in);
-}
-
-// Plays one tournament hand with fixed bot seats; settles and books it.
-// Returns false after 500 hands without a winner (fail loudly, never hang).
-bool play_tournament_hand(Tournament& tournament, Bot& bot0, Bot& bot1,
-                          std::uint64_t seed) {
-    tournament.begin_hand(seed);
-    Table& table = tournament.table();
-    while (!table.hand_complete()) {
-        if (table.acting() != -1) {
-            const int seat = table.acting();
-            Bot& bot = (seat == 0 ? bot0 : bot1);
-            table.act(seat, bot.decide(cardengine::make_view(table, seat)));
-        } else {
-            table.deal_next_street();
-        }
-    }
-    table.settle();
-    tournament.finish_hand();
-    return true;
-}
-
-int play_tournament(Tournament& tournament, Bot& bot0, Bot& bot1,
-                    std::uint64_t first_seed) {
-    int hands = 0;
-    while (!tournament.complete()) {
-        check(hands < 500, "tournament terminates");
-        play_tournament_hand(tournament, bot0, bot1, first_seed + hands);
-        ++hands;
-    }
-    return hands;
 }
 
 }  // namespace

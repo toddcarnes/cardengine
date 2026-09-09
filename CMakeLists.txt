@@ -12,6 +12,15 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
 include(GNUInstallDirs)
 
+# Single-source version: generate cardengine/version.h from the project()
+# VERSION above so the constants cannot drift. The file lands in the build
+# tree (never committed; build/ is git-ignored) for all generators/platforms.
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/cardengine/version.h
+    @ONLY
+)
+
 add_library(cardengine STATIC
     src/cardengine.cpp
     src/card.cpp
@@ -30,6 +39,7 @@ add_library(cardengine STATIC
 )
 target_include_directories(cardengine PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -68,6 +78,15 @@ endif()
 include(CTest)
 if(BUILD_TESTING)
     add_subdirectory(tests)
+    # Lets test_version assert agreement with project() VERSION directly.
+    # Numeric macros only (avoids string-macro quoting across generators).
+    if(TARGET test_version)
+        target_compile_definitions(test_version PRIVATE
+            CARDENGINE_PROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+            CARDENGINE_PROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+            CARDENGINE_PROJECT_VERSION_PATCH=${PROJECT_VERSION_PATCH}
+        )
+    endif()
 endif()
 
 install(TARGETS cardengine cardengine_app cardengine_bot cardengine_stress
@@ -76,3 +95,8 @@ install(TARGETS cardengine cardengine_app cardengine_bot cardengine_stress
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# The generated version header is not under include/, so install it
+# explicitly — otherwise installed consumers of cardengine.h would miss it.
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/cardengine/version.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cardengine
+)

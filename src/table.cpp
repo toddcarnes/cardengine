@@ -11,6 +11,25 @@
 
 namespace cardengine {
 
+namespace {
+
+// Merges one award into the payout list (one entry per seat).
+void merge_payout(std::vector<Payout>& out, int seat, int amount) {
+    const auto it = std::find_if(out.begin(), out.end(), [&](const Payout& p) {
+        return p.seat == seat;
+    });
+    if (it == out.end()) {
+        out.push_back({seat, amount});
+    } else {
+        it->amount += amount;
+    }
+}
+
+// High half of a hi-lo split: the odd chip goes high first.
+int high_half(int amount) { return amount - amount / 2; }
+
+}  // namespace
+
 Table::Table(const GameConfig& config) : config_(config) {
     validate(config_);
     seats_.resize(static_cast<std::size_t>(config_.num_players));
@@ -235,9 +254,11 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
         // Stud streets need the whole shoe (not a fixed prefix): deal
         // third street off the front into the shoe-backed helper below.
         shoe_ = std::move(top_first);
+        shoe_pos_ = 0;
         deal_stud_third_from_shoe();
     } else {
         shoe_ = std::move(top_first);
+        shoe_pos_ = 0;
         const int participants = static_cast<int>(
             std::count_if(seats_.begin(), seats_.end(),
                           [](const Seat& s) { return s.in_hand; }));
@@ -246,8 +267,7 @@ void Table::start_hand_from_deck(std::vector<Card> top_first) {
             for (int k = 0; k < participants; ++k) {
                 s = next_in_hand(s + 1);
                 Seat& seat = seats_[static_cast<std::size_t>(s)];
-                seat.hole.push_back(shoe_.front());
-                shoe_.erase(shoe_.begin());
+                seat.hole.push_back(take_card(nullptr));
             }
         }
     }
@@ -333,7 +353,7 @@ void Table::act(int seat, const Action& action) {
 
 void Table::timeout(int seat) { timeout_at(seat, now_seconds()); }
 
-void Table::timeout_at(int seat, std::int64_t at) {
+void Table::timeout_at(int seat, std::int64_t /*at*/) {
     check_seat(seat);
     if (street_ == Street::None || street_ == Street::Complete) {
         throw std::logic_error("no hand running");
@@ -344,7 +364,9 @@ void Table::timeout_at(int seat, std::int64_t at) {
     timed.folded = true;
     timed.acted = true;
     timed.seen_seq = round_seq_;
-    (void)at;  // The stamp lives in the order of events, not the event.
+    // The stamp lives in the order of events, not the event: `at` is kept
+    // in the signature (callers pass the clock reading) but intentionally
+    // unused — no TimeoutEvent field carries it.
     advance_acting(seat + 1);
     acting_since_ = now_seconds();
     events_.push_back(TimeoutEvent{seat, pot_total()});
@@ -414,9 +436,9 @@ void Table::deal_next_street() {
     StreetDealtEvent dealt;
     dealt.street = street_;
     for (int i = 0; i < deal_now; ++i) {
-        dealt.cards.push_back(shoe_.front());
-        board_.push_back(shoe_.front());
-        shoe_.erase(shoe_.begin());
+        const Card c = take_card(nullptr);
+        dealt.cards.push_back(c);
+        board_.push_back(c);
     }
     events_.push_back(dealt);
     begin_round();
@@ -449,7 +471,7 @@ void Table::discard(int seat, const std::vector<std::string>& discards) {
     if (discards.size() > static_cast<std::size_t>(config_.max_draw)) {
         throw std::invalid_argument("too many discards");
     }
-    if (discards.size() > shoe_.size()) {
+    if (discards.size() > shoe_remaining()) {
         // Check the shoe before touching the hole: a short shoe refuses
         // the whole exchange rather than dealing half a draw.
         throw std::logic_error("shoe too short for the draw");
@@ -481,8 +503,7 @@ void Table::discard(int seat, const std::vector<std::string>& discards) {
         s.hole.erase(s.hole.begin() + static_cast<std::ptrdiff_t>(k));
     }
     for (std::size_t k = 0; k < drop.size(); ++k) {
-        s.hole.push_back(shoe_.front());
-        shoe_.erase(shoe_.begin());
+        s.hole.push_back(take_card(nullptr));
     }
     s.drew = true;
     DrawEvent drew;
@@ -532,13 +553,12 @@ std::vector<Payout> Table::settle() {
         const std::size_t need =
             static_cast<std::size_t>(config_.board_cards) *
             static_cast<std::size_t>(config_.runouts - 1);
-        if (shoe_.size() >= need) {
+        if (shoe_remaining() >= need) {
             for (int b = 2; b <= config_.runouts; ++b) {
                 RunoutDealtEvent runout;
                 runout.board = b;
                 for (int k = 0; k < config_.board_cards; ++k) {
-                    runout.cards.push_back(shoe_.front());
-                    shoe_.erase(shoe_.begin());
+                    runout.cards.push_back(take_card(nullptr));
                 }
                 boards.push_back(runout.cards);
                 events_.push_back(runout);
@@ -552,27 +572,13 @@ std::vector<Payout> Table::settle() {
         }
         std::sort(levels.begin(), levels.end());
         levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
-        if (const int excess = unmatched_top_excess(levels); excess > 0) {
-            for (int i = 0; i < num_seats(); ++i) {
-                Seat& s = seats_[static_cast<std::size_t>(i)];
-                if (s.in_hand && s.committed == levels.back()) {
-                    s.stack += excess;
-                    s.committed -= excess;
-                    break;
-                }
-            }
-            levels.back() -= excess;
-            if (levels.size() > 1 &&
-                levels.back() == levels[levels.size() - 2]) {
-                levels.pop_back();
-            }
-        }
-        award_multi_board(payouts, alive, levels, boards);
+        refund_unmatched_top(levels);
+        award_multi_board(payouts, levels, boards);
     } else {
         showdown_ = true;
         // Contribution levels, low to high; each band forms one pot.
-        // A lone unmatched top band is never contested: it returns to its
-        // owner first (so winners only ever split what was actually called).
+        // Uncontested top bands were never matched by a live hand:
+        // refund them first (so winners only ever split contested money).
         std::vector<int> levels;
         for (int i = 0; i < num_seats(); ++i) {
             const Seat& s = seats_[static_cast<std::size_t>(i)];
@@ -580,23 +586,9 @@ std::vector<Payout> Table::settle() {
         }
         std::sort(levels.begin(), levels.end());
         levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
-        // A lone unmatched top band was never called: refund it first so
+        // Uncontested top bands were never matched: refund them first so
         // winners only split what was actually contested.
-        if (const int excess = unmatched_top_excess(levels); excess > 0) {
-            for (int i = 0; i < num_seats(); ++i) {
-                Seat& s = seats_[static_cast<std::size_t>(i)];
-                if (s.in_hand && s.committed == levels.back()) {
-                    s.stack += excess;
-                    s.committed -= excess;
-                    break;
-                }
-            }
-            levels.back() -= excess;
-            if (levels.size() > 1 &&
-                levels.back() == levels[levels.size() - 2]) {
-                levels.pop_back();
-            }
-        }
+        refund_unmatched_top(levels);
 
         int prev = 0;
         for (int level : levels) {
@@ -646,16 +638,9 @@ std::vector<Payout> Table::settle() {
                 const int remainder =
                     amount % static_cast<int>(winners.size());
                 for (std::size_t w = 0; w < winners.size(); ++w) {
-                    int award = share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-                    auto it = std::find_if(payouts.begin(), payouts.end(),
-                                           [&](const Payout& p) {
-                                               return p.seat == winners[w];
-                                           });
-                    if (it == payouts.end()) {
-                        payouts.push_back({winners[w], award});
-                    } else {
-                        it->amount += award;
-                    }
+                    const int award =
+                        share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+                    merge_payout(payouts, winners[w], award);
                 }
                 continue;
             }
@@ -692,16 +677,9 @@ std::vector<Payout> Table::settle() {
             const int remainder =
                 amount % static_cast<int>(winners.size());
             for (std::size_t w = 0; w < winners.size(); ++w) {
-                int award = share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-                auto it = std::find_if(payouts.begin(), payouts.end(),
-                                       [&](const Payout& p) {
-                                           return p.seat == winners[w];
-                                       });
-                if (it == payouts.end()) {
-                    payouts.push_back({winners[w], award});
-                } else {
-                    it->amount += award;
-                }
+                const int award =
+                    share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
+                merge_payout(payouts, winners[w], award);
             }
         }
     }
@@ -742,25 +720,37 @@ std::vector<Payout> Table::settle() {
     return payouts;
 }
 
-// Unmatched top band returns to its lone owner before the award math
-// runs (it was never called, so no winner may take it). Returns the
-// excess to refund (0 when the top band is contested); the caller applies
-// it to the owner's stack and merges the levels.
-int Table::unmatched_top_excess(const std::vector<int>& levels) const {
-    if (levels.size() <= 1) return 0;
-    const int top = levels.back();
-    int leaders = 0;
-    int leader = -1;
-    for (int i = 0; i < num_seats(); ++i) {
-        const Seat& s = seats_[static_cast<std::size_t>(i)];
-        if (s.in_hand && s.committed == top) {
-            ++leaders;
-            leader = i;
+// Every uncontested band at the top returns to its owners before the
+// award math runs: no live (unfolded) seat matched that level, so no
+// winner may take it. Each top contributor gets back exactly what it put
+// above the next level down, then that level drops away; repeat while the
+// new top is still uncontested. (One tied band is the common case —
+// several seats matching a bet that only short all-ins called — but
+// stacked bands can all sit above the live cap, and every one of them
+// must come back for chips to conserve.)
+void Table::refund_unmatched_top(std::vector<int>& levels) {
+    while (!levels.empty()) {
+        const int top = levels.back();
+        const int prev = levels.size() > 1 ? levels[levels.size() - 2] : 0;
+        bool contested = false;
+        for (int i = 0; i < num_seats(); ++i) {
+            const Seat& s = seats_[static_cast<std::size_t>(i)];
+            if (s.in_hand && !s.folded && s.committed >= top) {
+                contested = true;
+                break;
+            }
         }
+        if (contested) return;
+        const int excess = top - prev;
+        for (int i = 0; i < num_seats(); ++i) {
+            Seat& s = seats_[static_cast<std::size_t>(i)];
+            if (s.in_hand && s.committed == top) {
+                s.stack += excess;
+                s.committed -= excess;
+            }
+        }
+        levels.pop_back();
     }
-    if (leaders != 1) return 0;
-    (void)leader;
-    return top - levels[levels.size() - 2];
 }
 
 HandValue Table::showdown_value(const std::vector<Card>& hole,
@@ -837,24 +827,16 @@ void Table::award_board_share(std::vector<Payout>& payouts,
             for (std::size_t w = 0; w < ordered.size(); ++w) {
                 const int award =
                     each + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-                auto it = std::find_if(payouts.begin(), payouts.end(),
-                                       [&](const Payout& p) {
-                                           return p.seat == ordered[w];
-                                       });
-                if (it == payouts.end()) {
-                    payouts.push_back({ordered[w], award});
-                } else {
-                    it->amount += award;
-                }
+                merge_payout(payouts, ordered[w], award);
             }
         };
         if (low_winners.empty()) {
             pay_share(high_winners, amount);
             return;
         }
-        const int low_half = amount / 2;
-        pay_share(high_winners, amount - low_half);
-        pay_share(low_winners, low_half);
+        const int high = high_half(amount);  // Odd chip goes high.
+        pay_share(high_winners, high);
+        pay_share(low_winners, amount - high);
         return;
     }
     std::vector<HandValue> values;
@@ -880,15 +862,7 @@ void Table::award_board_share(std::vector<Payout>& payouts,
     for (std::size_t w = 0; w < winners.size(); ++w) {
         const int award =
             share + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-        auto it = std::find_if(payouts.begin(), payouts.end(),
-                               [&](const Payout& p) {
-                                   return p.seat == winners[w];
-                               });
-        if (it == payouts.end()) {
-            payouts.push_back({winners[w], award});
-        } else {
-            it->amount += award;
-        }
+        merge_payout(payouts, winners[w], award);
     }
 }
 
@@ -898,8 +872,7 @@ void Table::award_board_share(std::vector<Payout>& payouts,
 // refunded levels (settle() returns the unmatched top band first, since
 // a const method cannot touch stacks).
 void Table::award_multi_board(
-    std::vector<Payout>& payouts, const std::vector<int>& alive,
-    const std::vector<int>& levels,
+    std::vector<Payout>& payouts, const std::vector<int>& levels,
     const std::vector<std::vector<Card>>& boards) const {
     int prev = 0;
     for (int level : levels) {
@@ -923,7 +896,7 @@ void Table::award_multi_board(
                               each + (b < extra ? 1 : 0));
         }
     }
-    (void)alive;  // Eligibility comes from the bands, as in settle().
+    // Eligibility comes from the contribution bands, as in settle().
 }
 
 // Splits one side pot's worth of chips between the best high hand(s) and
@@ -977,25 +950,16 @@ void Table::award_hilo_pot(std::vector<Payout>& payouts,
         for (std::size_t w = 0; w < ordered.size(); ++w) {
             const int award =
                 each + (w < static_cast<std::size_t>(remainder) ? 1 : 0);
-            auto it = std::find_if(payouts.begin(), payouts.end(),
-                                   [&](const Payout& p) {
-                                       return p.seat == ordered[w];
-                                   });
-            if (it == payouts.end()) {
-                payouts.push_back({ordered[w], award});
-            } else {
-                it->amount += award;
-            }
+            merge_payout(payouts, ordered[w], award);
         }
     };
     if (low_winners.empty()) {
         pay_share(high_winners, amount);  // No low: high scoops.
         return;
     }
-    const int low_half = amount / 2;
-    const int high_half = amount - low_half;  // Odd chip goes high.
-    pay_share(high_winners, high_half);
-    pay_share(low_winners, low_half);
+    const int high = high_half(amount);  // Odd chip goes high.
+    pay_share(high_winners, high);
+    pay_share(low_winners, amount - high);
 }
 
 void Table::record_hand_started(std::uint64_t seed, bool seeded) {
@@ -1063,9 +1027,11 @@ void Table::restore(const Snapshot& saved) {
     }
     button_ = saved.button;
     street_ = Street::None;
+    kill_live_ = false;
     board_.clear();
     community_.clear();
     shoe_.clear();
+    shoe_pos_ = 0;
     acting_ = -1;
     acting_since_ = -1;
     current_bet_ = 0;
@@ -1188,10 +1154,10 @@ int Table::stud_opener() const {
 
 Card Table::take_card(Deck* deck) {
     if (deck != nullptr) return deck->deal();
-    if (shoe_.empty()) throw std::logic_error("shoe too short for stud");
-    Card c = shoe_.front();
-    shoe_.erase(shoe_.begin());
-    return c;
+    if (shoe_pos_ >= shoe_.size()) {
+        throw std::logic_error("shoe too short for stud");
+    }
+    return shoe_[shoe_pos_++];
 }
 
 void Table::deal_stud_third(Deck& deck) {
@@ -1303,7 +1269,7 @@ void Table::deal_stud_round(bool face_up, Street street) {
     StudDealtEvent dealt;
     dealt.street = street;
     dealt.face_up = face_up;
-    if (!face_up && street == Street::Seventh && shoe_.size() < live.size()) {
+    if (!face_up && street == Street::Seventh && shoe_remaining() < live.size()) {
         community_.push_back(take_card(nullptr));
         dealt.community = true;
         dealt.face_up = true;  // The shared river card is face-up.
@@ -1437,6 +1403,7 @@ void Table::start_hand_common() {
     board_.clear();
     community_.clear();
     shoe_.clear();
+    shoe_pos_ = 0;
 
     // Stud posts no blinds: the deal below antes up and brings in.
     if (config_.showdown == HandConstruction::StudSeven) {

@@ -47,7 +47,7 @@ struct StudDealtEvent {
     Street street = Street::Fourth;
     bool face_up = true;
     bool community = false;  // True: `cards` is the shared river card.
-    std::vector<Card> cards;  // Face-up cards in seat order (community: 1).
+    std::vector<Card> cards;  // Face-up cards in seat order (community: 1); tagged lines list per_seat deal order.
     struct SeatCard {
         int seat = -1;
         Card card{};

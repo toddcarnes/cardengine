@@ -409,6 +409,104 @@ int main() {
         check(t.committed(0) == 0, "sitter posts nothing");
     }
 
+    // HiLo odd pot: the high half takes the extra chip.
+    {
+        GameConfig c = three_max();
+        c.small_blind = 25;
+        c.big_blind = 25;
+        c.hole_cards = 4;
+        c.board_cards = 5;
+        c.showdown = HandConstruction::OmahaHiLo;
+        Table t(c);
+        // 75 pot, all three call: seat1 Ah 2c 7s 8d (A-2-3-4-6 low),
+        // seat2 9d Tc Jh Qc (junk: Q-high, no low), seat0 Ks Kd Qs Qd
+        // (trip kings high, no low). Board 3h 4d 6s 9c Kh.
+        // High takes 38, low takes 37.
+        t.start_hand_from_deck(cards({"Ah", "9d", "Ks", "2c", "Tc", "Kd",
+                                     "7s", "Jh", "Qs", "8d", "Qc", "Qd",
+                                     "3h", "4d", "6s", "9c", "Kh"}));
+        call(t, 0);
+        chk(t, 1);
+        chk(t, 2);
+        check_down_streets(t);
+        auto payouts = t.settle();
+        check(t.went_to_showdown(), "hilo split is a showdown");
+        int p0 = -1, p1 = -1;
+        for (const auto& p : payouts) {
+            if (p.seat == 0) p0 = p.amount;
+            if (p.seat == 1) p1 = p.amount;
+        }
+        check(p0 == 38 && p1 == 37, "odd chip to high");
+        check(t.stack(0) == 10013 && t.stack(1) == 10012 &&
+                  t.stack(2) == 9975,
+              "hilo odd stacks");
+        check(total_chips(t) == 30000, "hilo odd chips conserved");
+    }
+
+    // A snapshot taken with a pending kill restores without the kill.
+    {
+        GameConfig c;
+        c.num_players = 2;
+        c.kill = true;
+        Table t(c);
+        // Hand 1: shove preflop so the pot clears 1000 (10x 100).
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d"}));
+        raise_to(t, 0, 5000);
+        call(t, 1);
+        check_down_streets(t);
+        t.settle();
+        const auto snap = t.snapshot();
+        t.restore(snap);
+        // Next hand plays normal blinds: SB 50, BB 100.
+        t.start_hand_from_deck(cards({"7c", "As", "2d", "Ad", "Ks", "Qh",
+                                     "Jh", "9c", "3d"}));
+        check(t.committed(0) + t.committed(1) == 150, "restore clears kill");
+        check(t.current_bet() == 100, "restored BB is 100");
+    }
+
+    // Uncontested top band with tied contributors refunds every owner:
+    // A and B fold on the flop holding 200 each while live C and D sit
+    // all-in at 150, so the top 50x2 was never matched by a live hand.
+    // (Regression: the excess used to vanish whenever no single leader
+    // held the top level.)
+    {
+        GameConfig c;
+        c.num_players = 4;
+        Table t(c);
+        t.set_stack(0, 10000);
+        t.set_stack(1, 10000);
+        t.set_stack(2, 150);
+        t.set_stack(3, 150);
+        // 13 cards: 4x2 hole + 5 board. Winners don't matter here.
+        t.start_hand_from_deck(cards({"As", "Ks", "Qh", "Qd", "Jc", "Jd",
+                                      "Tc", "9c", "7c", "7d", "7h", "2c",
+                                      "2d"}));
+        call(t, 3);          // D calls the 100 BB.
+        raise_to(t, 0, 200);  // A raises to 200 total.
+        call(t, 1);          // B calls 200 total.
+        call(t, 2);          // C calls 50 short, all-in at 150.
+        call(t, 3);          // D calls 50 short, all-in at 150.
+        check(t.acting() == -1, "short all-ins close the round");
+        t.deal_next_street();
+        fold(t, t.acting());
+        fold(t, t.acting());
+        while (!t.hand_complete()) {
+            check(t.acting() == -1, "only all-ins remain");
+            t.deal_next_street();
+        }
+        check(t.committed(0) == 200 && t.committed(1) == 200 &&
+                  t.committed(2) == 150 && t.committed(3) == 150,
+              "tied top above the live cap");
+        check(t.went_to_showdown() == false, "no showdown before settle");
+        const int before = total_chips(t);
+        t.settle();
+        check(t.went_to_showdown(), "two live all-ins reach showdown");
+        check(total_chips(t) == before, "tied top band is refunded");
+        check(t.stack(0) == 9850 && t.stack(1) == 9850,
+              "each top owner gets 50 back");
+    }
+
     std::cout << "test_table ok\n";
     return 0;
 }

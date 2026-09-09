@@ -3,7 +3,7 @@
 How outside programs talk to the engine. The engine runs as its own program
 in the background; a user interface (or a bot, or a script) starts it, sends
 it one text line per command, and reads back replies. This works the same
-from any programming language — see `examples/cli.py` (about 150 lines of
+from any programming language — see `examples/cli.py` (about 340 lines of
 Python, using nothing but typed and printed lines) for the reference example.
 (The design follows the same idea as chess engines, which is part of why
 this project is called CardEngine.)
@@ -11,7 +11,7 @@ this project is called CardEngine.)
 ## Framing rules (clients must follow these)
 
 - One command per line, one reply per command.
-- Most replies are a single line (`ok ...` / `error ...` / `bye`). Three
+- Most replies are a single line (`ok ...` / `error ...` / `bye`). Four
   commands reply multi-line: `state` and `log` send a block terminated by
   an `end` line; `settle` and `tstatus` send prelude lines and a final `ok`.
 - The engine flushes after every reply, so piped clients never deadlock.
@@ -82,8 +82,11 @@ seventh adds one down card (or a single shared `community` up card when
 the shoe runs dry 8-handed). `hole` carries down cards (owner-only), `up`
 carries face-up cards (public — every live seat's shown, like the board).
 `deal` advances street by street; the log records each round as
-`stud <street> <ups...>` (`stud seventh community Qh` for the shared
-river, bare `stud seventh` for down cards).
+`stud <street> <seat:up ...>` (e.g. `stud fourth 1:Kd 0:Qs` —
+per-seat tags, since only live seats are dealt;
+`stud seventh community Qh` for the shared river, bare `stud seventh`
+for down cards). Older bare-cards lines (`stud fourth Kd Qs`) still
+parse.
 
 `acting_since` is the action-clock start (seconds on the engine's monotonic
 clock, `-1` when nobody holds the action). A host enforces its own limit —
@@ -218,7 +221,7 @@ settle showdown yes payouts 0:300 committed 200,100
 - `begin_hand`: pre-hand stacks, the seed (`-` for from-deck testing deals),
   and dealt hole cards per seat (`|`-separated, positionally).
 - `action`: seat, action, and pot after the action.
-- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards; stud games log each round as `stud <street> <ups...>`, with `stud seventh community Qh` for the shared river and bare `stud seventh` for down cards).
+- `street`: only the newly dealt cards (draw games log an empty `street draw` line for the exchange, then betting resumes on `street flop` with no board cards; stud games log each round as `stud <street> <seat:up ...>`, with `stud seventh community Qh` for the shared river and bare `stud seventh` for down cards; pre-tag bare-cards lines still parse).
 - `draw`: one seat's exchange as counts, never cards (`draw 1 drew 3`, `draw 0 drew 0` for pat) — discards stay private like folded hands.
 - `settle`: payouts as `seat:amount` pairs plus per-seat `committed` totals
   (pot accounting for analysis and learning bots). Never contains hole cards —
@@ -292,7 +295,7 @@ further `start` hands are refused.
 ## Example session (real transcript)
 ```
 > help
-ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act timeout deal settle log addbot bots step quit
+ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options act discard draws timeout deal settle log addbot bots step quit
 > start 7
 ok
 > options
