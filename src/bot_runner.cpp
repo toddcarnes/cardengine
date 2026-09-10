@@ -80,10 +80,18 @@ std::string decide_from_text(Bot& bot, int seat,
     bool saw_street = false;
     bool saw_seat = false;
     int bet = 0;
+    int button = 0;
+    bool saw_button = false;
+    int num_seats = 0;
+    int live_seats = 0;
+    std::vector<std::vector<Card>> other_up;
     for (const std::string& line : lines_of(state_text)) {
         const std::vector<std::string> toks = tokens(line);
         if (toks.empty() || toks[0] == "end") continue;
-        if (toks[0] == "street" && toks.size() == 2) {
+        if (toks[0] == "button" && toks.size() == 2) {
+            button = to_int(toks[1], "button");
+            saw_button = true;
+        } else if (toks[0] == "street" && toks.size() == 2) {
             view.street = parse_street(toks[1]);
             saw_street = true;
         } else if (toks[0] == "showdown" && toks.size() == 2) {
@@ -113,7 +121,10 @@ std::string decide_from_text(Bot& bot, int seat,
         } else if (toks[0] == "current" && toks.size() == 2) {
             view.current_bet = to_int(toks[1], "current bet");
             saw_current = true;
-        } else if (toks[0] == "seat" && toks.size() >= 11 && toks[1] == std::to_string(seat)) {
+        } else if (toks[0] == "seat" && toks.size() >= 11 &&
+                   toks[1] == std::to_string(seat)) {
+            ++num_seats;
+            ++live_seats;  // Own line already proved live below (else throw).
             view.stack = to_int(after(toks, "stack"), "stack");
             bet = to_int(after(toks, "bet"), "bet");
             bool alive = false;
@@ -152,6 +163,26 @@ std::string decide_from_text(Bot& bot, int seat,
                 throw std::invalid_argument("own hole cards are missing");
             }
             saw_seat = true;
+        } else if (toks[0] == "seat" && toks.size() >= 11) {
+            // Every seat line counts toward table size; live rivals' `up`
+            // cards are public (stud). `--` hole is the filtered norm here.
+            ++num_seats;
+            bool alive = false;
+            for (std::size_t i = 0; i < toks.size(); ++i) {
+                if (toks[i] == "live") alive = true;
+            }
+            if (alive) ++live_seats;
+            for (std::size_t i = 0; i + 1 < toks.size(); ++i) {
+                if (toks[i] == "up") {
+                    std::vector<Card> ups;
+                    for (std::size_t k = i + 1; k < toks.size(); ++k) {
+                        if (toks[k] == "--") continue;
+                        ups.push_back(parse_card(toks[k]));
+                    }
+                    if (!ups.empty()) other_up.push_back(std::move(ups));
+                    break;
+                }
+            }
         } else if (toks[0] == "community" && toks.size() >= 2) {
             for (std::size_t i = 1; i < toks.size(); ++i) {
                 if (toks[i] == "-") continue;
@@ -163,6 +194,18 @@ std::string decide_from_text(Bot& bot, int seat,
         throw std::invalid_argument("incomplete state block");
     }
     view.to_call = view.current_bet > bet ? view.current_bet - bet : 0;
+    // Position and table size ride the state block (button + seat lines),
+    // so out-of-process bots play the same game as in-process ones. Stud
+    // opens by hand strength, so a missing button degrades to button (0).
+    view.table_size = live_seats > 0 ? live_seats : num_seats;
+    view.num_seats = view.table_size;
+    view.position =
+        (saw_button && num_seats > 0)
+            ? ((seat - button) % num_seats + num_seats) % num_seats
+            : 0;
+    if (view.showdown == HandConstruction::StudSeven) {
+        view.rival_up = std::move(other_up);
+    }
 
     const std::vector<std::string> opts = tokens(options_text);
     if (opts.empty() || opts[0] != "options") {

@@ -6,6 +6,8 @@
 
 #include "cardengine/bot.h"
 #include "cardengine/bot_runner.h"
+#include "cardengine/protocol.h"
+#include "cardengine/table.h"
 #include "helpers.h"
 
 namespace {
@@ -75,6 +77,80 @@ int main() {
             "options seat 1 check yes call 0 raise yes min 100 max 10000";
         check(decide_from_text(*bot, 1, state, options) == "act check",
               "trash checks free card");
+    }
+
+    // Position and table size ride the state block: the runner rebuilds
+    // the same view an in-process bot would get (button distance + live
+    // seats), and live rivals' stud up-cards come along.
+    {
+        cardengine::GameConfig config;
+        config.num_players = 6;
+        cardengine::Table table(config);
+        table.start_hand(7);
+        // Mirror make_view through the exact text the protocol emits.
+        cardengine::Session session;
+        check(session.execute("start 7") == "ok", "protocol hand");
+        const std::string block = session.execute("state 3");
+        const std::string opts = session.execute("options");
+        // Seat 3 holds the action here (UTG in 6-max off button 0).
+        check(starts_with(opts, "options seat 3"), "seat 3 to act");
+        const cardengine::SeatView direct =
+            cardengine::make_view(table, table.acting());
+        // Rebuild the runner's view from the same hand: position and size
+        // must match the authoritative view (not defaults -1/0).
+        const std::string state_for_runner = session.execute("state 3");
+        // Parse the runner view indirectly: a position-aware probe bot
+        // reports what it saw via its decision path.
+        struct Probe : public cardengine::Bot {
+            cardengine::SeatView seen;
+            const std::string& name() const override {
+                static const std::string n = "probe";
+                return n;
+            }
+            cardengine::Action decide(const cardengine::SeatView& view) override {
+                seen = view;
+                return {cardengine::ActionType::Fold, 0};
+            }
+        };
+        Probe probe;
+        (void)decide_from_text(probe, 3, state_for_runner,
+                               "options seat 3 check no call 100 raise yes "
+                               "min 200 max 10000");
+        check(probe.seen.position == 3, "position is button distance");
+        check(probe.seen.position == direct.position, "position matches");
+        check(probe.seen.table_size == 6, "table size is live seats");
+        check(probe.seen.num_seats == direct.num_seats,
+              "seat count matches");
+        (void)block;
+    }
+
+    // Stud rival up-cards survive the text contract (public, like a board).
+    {
+        const std::string state =
+            "street fourth\nshowdown stud\nbutton 0\nacting 1\npot 60\n"
+            "current 0\nboard -\n"
+            "seat 0 stack 9900 bet 0 committed 20 in live hole -- up Kh\n"
+            "seat 1 stack 9900 bet 0 committed 20 in live hole 2c 3d up Ac\n"
+            "end\n";
+        struct UpProbe : public cardengine::Bot {
+            cardengine::SeatView seen;
+            const std::string& name() const override {
+                static const std::string n = "up-probe";
+                return n;
+            }
+            cardengine::Action decide(const cardengine::SeatView& view) override {
+                seen = view;
+                return {cardengine::ActionType::Check, 0};
+            }
+        };
+        UpProbe probe;
+        (void)decide_from_text(
+            probe, 1, state,
+            "options seat 1 check yes call 0 raise yes min 100 max 9900");
+        check(probe.seen.rival_up.size() == 1 &&
+                  probe.seen.rival_up[0].size() == 1 &&
+                  cardengine::to_string(probe.seen.rival_up[0][0]) == "Kh",
+              "rival up-cards parsed");
     }
 
     // Malformed input fails loudly, never silently.
