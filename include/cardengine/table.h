@@ -67,7 +67,9 @@ public:
     bool has_folded(int seat) const;
     bool is_all_in(int seat) const;
     // Stud only: the third-street bring-in seat (-1 outside stud).
-    // Recomputed live from visible upcards (folds don't change it).
+    // Recomputed live from visible upcards among live (unfolded) seats, so
+    // the reported seat can change after the low door folds (betting is
+    // unaffected: the forced bet already posted and action already opened).
     int bring_in_seat() const;
     // Draw games: true once the seat has taken its exchange this hand.
     bool drew(int seat) const;
@@ -95,9 +97,12 @@ public:
     // The host gave up waiting: folds the acting seat by the clock and logs
     // a timeout event (the seat's cards stay hidden, like any other fold).
     // Stamps `at` (seconds, see clock.h); the plain form reads the wall
-    // clock. Throws std::logic_error unless that seat holds the action.
+    // clock. The stamp is the host's own record (replay it against
+    // acting_since()): the engine orders the timeout in the event log
+    // instead of carrying the stamp in TimeoutEvent. Throws
+    // std::logic_error unless that seat holds the action.
     void timeout(int seat);
-    void timeout_at(int seat, std::int64_t /*at*/);
+    void timeout_at(int seat, std::int64_t at);
     // Stamp of the last action-clock (re)start: hand deal, a taken action,
     // or a new street (-1 when no action is pending). Seconds, see clock.h.
     // Hosts poll `expired(now, acting_since(), limit)` and call timeout().

@@ -209,7 +209,9 @@ ActionOptions Table::options(int seat) const {
         max_to = min_full;
     }
     // An all-in short of a full raise is still legal (it just doesn't
-    // reopen betting for others).
+    // reopen betting for others) — but a raise-to-nothing is not a raise:
+    // a degenerate pot (ante 0, bring-in 0, empty pot) offers call only.
+    if (max_to <= current_bet_) return out;
     out.min_raise_to = max_to < min_full ? max_to : min_full;
     out.max_raise_to = max_to;
     return out;
@@ -381,7 +383,7 @@ void Table::act(int seat, const Action& action) {
 
 void Table::timeout(int seat) { timeout_at(seat, now_seconds()); }
 
-void Table::timeout_at(int seat, std::int64_t /*at*/) {
+void Table::timeout_at(int seat, std::int64_t at) {
     check_seat(seat);
     if (street_ == Street::None || street_ == Street::Complete) {
         throw std::logic_error("no hand running");
@@ -392,9 +394,10 @@ void Table::timeout_at(int seat, std::int64_t /*at*/) {
     timed.folded = true;
     timed.acted = true;
     timed.seen_seq = round_seq_;
-    // The stamp lives in the order of events, not the event: `at` is kept
-    // in the signature (callers pass the clock reading) but intentionally
-    // unused — no TimeoutEvent field carries it.
+    // Clock stream only: `at` replays against acting_since() (clock.h) in
+    // the host's own log, not the engine's — the timeout event orders after
+    // the action it replaced, and hosts stamp `at` alongside when they call.
+    (void)at;
     advance_acting(seat + 1);
     acting_since_ = now_seconds();
     events_.push_back(TimeoutEvent{seat, pot_total()});
@@ -1300,6 +1303,9 @@ void Table::deal_stud_round(bool face_up, Street street) {
     dealt.street = street;
     dealt.face_up = face_up;
     if (!face_up && street == Street::Seventh && shoe_remaining() < live.size()) {
+        if (shoe_remaining() == 0) {
+            throw std::logic_error("shoe exhausted: no card for the river");
+        }
         community_.push_back(take_card());
         dealt.community = true;
         dealt.face_up = true;  // The shared river card is face-up.
