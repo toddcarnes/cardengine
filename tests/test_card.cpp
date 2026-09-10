@@ -12,6 +12,7 @@ using cardengine::Card;
 using cardengine::Rank;
 using cardengine::Suit;
 using testutil::check;
+using testutil::expect_throws;
 
 }  // namespace
 
@@ -36,6 +37,20 @@ int main() {
         threw = true;
     }
     check(threw, "bad card text throws");
+
+    expect_throws<std::invalid_argument>([] { parse_card(""); },
+                                         "empty card text throws");
+    expect_throws<std::invalid_argument>([] { parse_card("10"); },
+                                         "rank without suit throws");
+    expect_throws<std::invalid_argument>([] { parse_card("10x"); },
+                                         "bad suit with 10-rank throws");
+    expect_throws<std::invalid_argument>([] { parse_card("Qz"); },
+                                         "bad suit with good rank throws");
+    expect_throws<std::invalid_argument>([] { parse_card("1h"); },
+                                         "lone 1 rank throws");
+    expect_throws<std::invalid_argument>([] { parse_card("Qh "); },
+                                         "trailing space throws");
+    check(parse_card("qh") == parse_card("Qh"), "rank case-insensitive");
 
     threw = false;
     try {

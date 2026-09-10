@@ -71,7 +71,8 @@ constexpr char to_char(Suit suit) {
 // Compact notation, e.g. "Qh", "Ts", "7c".
 std::string to_string(Card card);
 
-// Inverse of to_string; also accepts "10h" for "Th". Case-insensitive suit.
+// Inverse of to_string; also accepts "10h" for "Th". Ranks 2-9 are exact;
+// T/J/Q/K/A accept either case; suits are case-insensitive.
 // Throws std::invalid_argument on bad input.
 Card parse_card(std::string_view text);
 
