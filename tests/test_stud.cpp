@@ -213,6 +213,54 @@ int main() {
     // 8-handed: the file-game shape loads, deals, and plays (folds shrink
     // demand; the river goes community only if the shoe actually runs dry).
 
+    // Short stacks into Fourth with no opener still deal out: the bring-in
+    // leaves every seat able to post only the small fourth-street bet, so
+    // after one more round everyone is all in — later streets have no
+    // opener (advance_acting(-1) must not index seats_ out of bounds),
+    // acting stays -1, and the hand settles.
+    {
+        GameConfig broke = stud_config(3);
+        broke.ante = 50;
+        broke.bring_in = 40;
+        broke.starting_stack = 200;
+        Table tallin(broke);
+        tallin.start_hand_from_deck(cards(
+            {"Ac", "Qh", "9s", "Kd", "Jc", "8d", "2c", "Kh", "Ah",
+             "2d", "3d", "4d", "5d", "6d", "7d", "8c", "9d", "Td",
+             "Jd", "Qd", "Kd", "Ad", "2s", "3s", "4s", "5s", "6s"}));
+        tallin.act(tallin.acting(), {ActionType::Call, 0});
+        tallin.act(tallin.acting(), {ActionType::Call, 0});
+        tallin.act(tallin.acting(), {ActionType::Check, 0});
+        check(tallin.acting() == -1, "third closes");
+        tallin.deal_next_street();
+        check(tallin.street() == Street::Fourth, "fourth deals");
+        // Fourth opens on the best visible hand with real stacks behind.
+        check(tallin.acting() != -1, "fourth opens with stacks behind");
+        // Bet the small fourth-street size until everyone is all in.
+        for (int guards = 0; guards < 10 && tallin.acting() != -1;
+             ++guards) {
+            const int seat = tallin.acting();
+            const ActionOptions opts = tallin.options(seat);
+            if (opts.can_raise) {
+                tallin.act(seat, {ActionType::Raise, opts.min_raise_to});
+            } else if (opts.call_amount > 0 || !opts.can_check) {
+                tallin.act(seat, {ActionType::Call, 0});
+            } else {
+                tallin.act(seat, {ActionType::Check, 0});
+            }
+        }
+        check(tallin.acting() == -1, "all-in street needs no action");
+        tallin.deal_next_street();
+        check(tallin.street() == Street::Fifth, "fifth deals all-in");
+        check(tallin.acting() == -1, "no opener with empty stacks");
+        tallin.deal_next_street();
+        tallin.deal_next_street();
+        check(tallin.street() == Street::Seventh, "seventh deals all-in");
+        check(tallin.hand_complete(), "all-in stud completes");
+        tallin.settle();
+        check(tallin.went_to_showdown(), "all-in stud shows down");
+    }
+
     std::cout << "test_stud ok\n";
     return 0;
 }

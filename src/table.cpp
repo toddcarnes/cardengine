@@ -1342,8 +1342,10 @@ void Table::advance_acting(int from) {
         if (cand.in_hand && !cand.folded) ++remaining;
     }
     if (remaining <= 1) return;  // Last player wins immediately.
-    for (int k = 0; k < num_seats(); ++k) {
-        const int cur = (from + k) % num_seats();
+    if (from < 0) return;        // No opener (all-in stud street): no action.
+    const int n = num_seats();
+    for (int k = 0; k < n; ++k) {
+        const int cur = ((from % n) + n + k) % n;
         if (needs_action(cur)) {
             acting_ = cur;
             return;
