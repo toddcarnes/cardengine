@@ -296,12 +296,14 @@ void Tournament::restore(const Snapshot& saved) {
     felt.kill_pending = saved.kill_pending;
     table_.restore(felt);
     // Blinds track the level: restore what begin_hand would have set.
-    const BlindLevel current = level();
-    table_.set_blinds(current.small_blind, current.big_blind);
-    table_.set_ante(current.ante);
+    // Order matters: level() reads level_index_, so assign the saved books
+    // first or a cross-level restore sets the wrong blinds.
     level_index_ = saved.level_index;
     hands_into_level_ = saved.hands_into_level;
     level_elapsed_ = saved.level_elapsed;
+    const BlindLevel current = level();
+    table_.set_blinds(current.small_blind, current.big_blind);
+    table_.set_ante(current.ante);
     level_started_at_ = 0;  // Fresh boot: clock restarts at the next deal.
     clock_live_ = false;
     prize_pool_ = saved.prize_pool;

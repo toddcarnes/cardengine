@@ -176,6 +176,42 @@ int main() {
         check(resumed.level_index() == 1, "level survives restore");
     }
 
+    // Restoring a snapshot from another level sets the new level's
+    // blinds, not the old table's (level_index_ must land before level()).
+    {
+        TournamentConfig config;
+        config.game.num_players = 2;
+        config.levels = {BlindLevel{50, 100, 0, 99},
+                         BlindLevel{500, 1000, 0, 99}};
+        Tournament tournament(config);
+        tournament.begin_hand(1);
+        play_out(tournament.table());
+        tournament.finish_hand();
+        // One hand into a 99-hand level: still level 0 — force the jump.
+        check(tournament.level_index() == 0, "still level 0 after one hand");
+        tournament.advance_level();
+        check(tournament.level_index() == 1, "manual advance to level 1");
+        const Tournament::Snapshot books = tournament.snapshot();
+        check(books.level_index == 1, "snapshot at level 1");
+        TournamentConfig older(config);
+        Tournament reboot(older);
+        // Reboot sits at level 0: the restore must still deal level-1
+        // blinds, proving the saved index (not the stale table) won.
+        check(reboot.level_index() == 0, "reboot starts at level 0");
+        reboot.restore(books);
+        check(reboot.level_index() == 1, "restore carries the level");
+        // The restored felt carries the restored level's blinds (the
+        // stale-order bug set level-0 blinds here: 50/100, not 500/1000).
+        check(reboot.table().config().small_blind == 500 &&
+                  reboot.table().config().big_blind == 1000,
+              "restore sets the new level blinds");
+        reboot.begin_hand(2);
+        check(reboot.table().committed(0) == 1000, "restored BB is level 1");
+        check(reboot.table().committed(1) == 500, "restored SB is level 1");
+        play_out(reboot.table());
+        reboot.finish_hand();
+    }
+
     // Busts take places and prizes; the champion takes the remainder.
     {
         TournamentConfig config;
@@ -479,6 +515,26 @@ int main() {
             std::remove("tmp_proto_cash.txt");
         }
         std::remove(path);
+    }
+
+    // A thinning field names the problem up front instead of failing deep
+    // in the deal with Table's generic player count.
+    {
+        TournamentConfig config = two_player();
+        Tournament tournament(config);
+        tournament.table().set_sitting_out(0, true);
+        expect_throws<std::logic_error>([&] { tournament.begin_hand(1); },
+                                        "lone funded seat named");
+        TournamentConfig decked = two_player();
+        Tournament from_deck(decked);
+        from_deck.table().set_sitting_out(1, true);
+        expect_throws<std::logic_error>(
+            [&] {
+                from_deck.begin_hand_from_deck(cards({"Ac", "Qh", "9s", "Kd",
+                                                     "Jc", "8d", "2c", "Kh",
+                                                     "Ah"}));
+            },
+            "from-deck lone seat named");
     }
 
     std::cout << "test_tournament ok\n";
