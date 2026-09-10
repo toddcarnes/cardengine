@@ -1,6 +1,6 @@
 #include "cardengine/deck.h"
 
-#include <algorithm>
+#include <cstddef>
 #include <random>
 #include <stdexcept>
 
@@ -17,8 +17,16 @@ Deck::Deck() {
 
 void Deck::shuffle(std::uint64_t seed) {
     next_ = 0;
+    // Portable Fisher-Yates on raw mt19937_64 output: std::shuffle is
+    // specified via uniform_int_distribution, whose mapping may differ per
+    // stdlib, so seed N must not go through it for cross-platform replay.
     std::mt19937_64 rng{seed};
-    std::shuffle(cards_.begin(), cards_.end(), rng);
+    for (std::size_t i = cards_.size() - 1; i > 0; --i) {
+        const std::size_t j = static_cast<std::size_t>(rng() % (i + 1));
+        const Card tmp = cards_[i];
+        cards_[i] = cards_[j];
+        cards_[j] = tmp;
+    }
 }
 
 Card Deck::deal() {
