@@ -97,10 +97,7 @@ void validate(const GameConfig& config) {
         if (config.kill) {
             throw std::invalid_argument("stud has no kill");
         }
-        if (config.bring_in < 0) {
-            throw std::invalid_argument("bring_in cannot be negative");
-        }
-        if (config.bring_in >= config.small_blind && config.bring_in > 0) {
+        if (config.bring_in >= config.small_blind) {
             throw std::invalid_argument("bring_in must be below small_blind");
         }
     } else if (config.showdown == HandConstruction::DrawFive ||
@@ -134,6 +131,16 @@ void validate(const GameConfig& config) {
     if (config.showdown != HandConstruction::StudSeven &&
         config.num_players * config.hole_cards + config.board_cards > 52) {
         throw std::invalid_argument("not enough cards in the deck");
+    }
+    if (config.showdown != HandConstruction::StudSeven &&
+        config.runouts > 1 &&
+        config.num_players * config.hole_cards +
+                config.board_cards * config.runouts >
+            52) {
+        // Spare boards come off the remaining shoe at settle: a shoe that
+        // cannot deal them falls back to one board instead of half a runout.
+        throw std::invalid_argument(
+            "not enough cards in the deck for these runouts");
     }
     if (config.board_cards == 0 && config.runouts != 1) {
         throw std::invalid_argument("runouts need board cards");
