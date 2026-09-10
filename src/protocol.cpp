@@ -124,7 +124,7 @@ std::string Session::execute(const std::string& raw_line) {
                 file.buy_in = books.config.buy_in;
                 file.level_index = books.level_index;
                 file.hands_into_level = books.hands_into_level;
-                file.level_elapsed = static_cast<int>(books.level_elapsed);
+                file.level_elapsed = books.level_elapsed;
                 file.prize_pool = books.prize_pool;
                 file.prize_awarded = books.prize_awarded;
                 file.eliminated = books.eliminated;
@@ -677,6 +677,7 @@ int run_protocol(std::istream& in, std::ostream& out) {
     while (std::getline(in, line)) {
         const std::string reply = session.execute(line);
         out << reply << "\n" << std::flush;
+        // Bare `quit` only: `quit <args>` is a usage error, not an exit.
         if (trim(line) == "quit") return 0;
     }
     return 0;

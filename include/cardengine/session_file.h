@@ -33,6 +33,7 @@
 // restore (adaptive reads rebuild from the restored log as new hands are
 // observed). A snapshot is always between hands — saving or restoring
 // mid-hand is refused, never half-done.
+#include <cstdint>
 #include <istream>
 #include <ostream>
 #include <string>
@@ -54,7 +55,7 @@ struct SessionFile {
     int buy_in = 0;
     int level_index = 0;
     int hands_into_level = 0;
-    int level_elapsed = 0;  // Seconds banked in this level (timed levels).
+    std::int64_t level_elapsed = 0;  // Seconds banked in this level.
     int prize_pool = 0;
     int prize_awarded = 0;
     std::vector<bool> eliminated;
