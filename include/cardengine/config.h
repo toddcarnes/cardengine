@@ -52,7 +52,10 @@ struct GameConfig {
                              // poker; 2+ deals that many boards from the
                              // remaining shoe and splits each pot across them
                              // (run-it-twice: all-in cash-game practice that
-                             // cuts variance without changing equity).
+                             // cuts variance without changing equity). The
+                             // shoe must cover every spare board up front
+                             // (num_players*hole + board*runouts <= 52); a
+                             // short shoe falls back to one board at settle.
     int hole_cards = 2;      // Cards dealt to each seat (7 for stud: 3 down,
                              // 4 up — see upcards below).
     int board_cards = 5;     // Community cards, dealt 3-1-1 across streets

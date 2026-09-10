@@ -13,6 +13,12 @@ namespace cardengine {
 // `discard ...` (or bare `discard` to stand pat). This unit is the whole
 // contract except process plumbing, so the thin exe loop stays trivially
 // correct and this is tested directly.
+//
+// The state block already carries everything position-aware logic needs:
+// `button` plus one `seat` line per seat (live flags give table size, `up`
+// carries live rivals' stud cards). The runner rebuilds position, table
+// size, and rival_up from those lines, so out-of-process bots play the same
+// game as in-process ones.
 // Returns e.g. "act call", "act raise 300", or "discard As Td".
 // Throws std::invalid_argument on malformed input.
 std::string decide_from_text(Bot& bot, int seat,

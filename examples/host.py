@@ -442,8 +442,9 @@ class Host:
                         if alive <= 1:
                             print("host: champion crowned")
                             break
-                    elif any("need at least 2 players" in line
-                             for line in self.start_refusal):
+                    elif any("need at least 2 players" in line or
+                              "at least 2 funded seats" in line
+                              for line in self.start_refusal):
                         print("host: game over, one player holds all the chips")
                         if self.args.save:
                             self.engine.send(f"save {self.args.save}")

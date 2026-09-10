@@ -9,8 +9,10 @@
 namespace cardengine {
 
 // Standard 52-card deck. Shuffle is deterministic per seed on every platform:
-// std::mt19937_64 and std::shuffle are both fully specified by the C++
-// standard, so seed N produces the same order on Windows, macOS, and Linux.
+// Fisher-Yates driven by raw std::mt19937_64 output (both fully specified
+// by the C++ standard), so seed N produces the same order on Windows,
+// macOS, and Linux. (std::shuffle goes through uniform_int_distribution,
+// whose mapping may differ per stdlib — never use it here.)
 class Deck {
 public:
     Deck();

@@ -1,5 +1,6 @@
 // Deck: full 52, uniqueness, deterministic seeded shuffle, deal semantics.
 #include <cassert>
+#include <cstdint>
 #include <iostream>
 #include <set>
 #include <stdexcept>
@@ -12,6 +13,7 @@
 namespace {
 
 using testutil::check;
+using testutil::shuffled_deck;
 
 std::vector<std::string> deal_all(cardengine::Deck& deck) {
     std::vector<std::string> seen;
@@ -54,6 +56,24 @@ int main() {
     c.shuffle(1);
     d.shuffle(2);
     check(deal_all(c) != deal_all(d), "different seeds differ");
+
+    // Portable construction: the engine's shuffle matches raw-mt19937_64
+    // Fisher-Yates (tests/helpers.h) bit for bit, on any stdlib.
+    {
+        Deck e;
+        e.shuffle(777);
+        const std::vector<cardengine::Card> want = shuffled_deck(777);
+        std::vector<std::string> got;
+        while (!e.empty()) got.push_back(to_string(e.deal()));
+        check(got.size() == want.size(), "portable shuffle covers the deck");
+        for (std::size_t i = 0; i < want.size(); ++i) {
+            if (got[i] != to_string(want[i])) {
+                check(false,
+                      "portable shuffle order (seed 777, card " +
+                          std::to_string(i) + ")");
+            }
+        }
+    }
 
     // Shuffled deck still holds all 52 unique cards.
     Deck e;

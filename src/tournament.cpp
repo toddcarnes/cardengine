@@ -96,6 +96,15 @@ void Tournament::begin_hand(std::uint64_t seed) {
 
 void Tournament::begin_hand_at(std::uint64_t seed, std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
+    // Two funded seats minimum, named up front (Table's own "need at least
+    // 2 players" would otherwise surface mid-deal with no tournament word).
+    int funded = 0;
+    for (int seat = 0; seat < table_.num_seats(); ++seat) {
+        if (!table_.sitting_out(seat) && table_.stack(seat) > 0) ++funded;
+    }
+    if (funded < 2) {
+        throw std::logic_error("tournament needs at least 2 funded seats");
+    }
     advance_level_if_due(now);
     level_started_at_ = now;
     clock_live_ = true;
@@ -113,6 +122,13 @@ void Tournament::begin_hand_from_deck(std::vector<Card> top_first) {
 void Tournament::begin_hand_from_deck_at(std::vector<Card> top_first,
                                          std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
+    int funded = 0;
+    for (int seat = 0; seat < table_.num_seats(); ++seat) {
+        if (!table_.sitting_out(seat) && table_.stack(seat) > 0) ++funded;
+    }
+    if (funded < 2) {
+        throw std::logic_error("tournament needs at least 2 funded seats");
+    }
     advance_level_if_due(now);
     level_started_at_ = now;
     clock_live_ = true;
@@ -296,12 +312,14 @@ void Tournament::restore(const Snapshot& saved) {
     felt.kill_pending = saved.kill_pending;
     table_.restore(felt);
     // Blinds track the level: restore what begin_hand would have set.
-    const BlindLevel current = level();
-    table_.set_blinds(current.small_blind, current.big_blind);
-    table_.set_ante(current.ante);
+    // Order matters: level() reads level_index_, so assign the saved books
+    // first or a cross-level restore sets the wrong blinds.
     level_index_ = saved.level_index;
     hands_into_level_ = saved.hands_into_level;
     level_elapsed_ = saved.level_elapsed;
+    const BlindLevel current = level();
+    table_.set_blinds(current.small_blind, current.big_blind);
+    table_.set_ante(current.ante);
     level_started_at_ = 0;  // Fresh boot: clock restarts at the next deal.
     clock_live_ = false;
     prize_pool_ = saved.prize_pool;

@@ -36,8 +36,8 @@ this project is called CardEngine.)
 | `state` | block, then `end` | Full table dump — local trust only (below). |
 | `state <seat>` | block, then `end` | That seat's view: own hole cards shown, all other seats `--`. |
 | `options` | `options seat S check yes\|no call N raise yes\|no [min M max X]` | For the acting seat; `error no action pending` otherwise. |
-| `act fold\|check\|call` | `ok` | Acts for the current seat. |
-| `act raise <amount>` | `ok` | Amount is the target *total* bet for the round. |
+| `act fold\|check\|call` | `ok` | Acts for the current seat. Bare words take no extras (`act fold now` errors). |
+| `act raise <amount>` | `ok` | Amount is the target *total* bet for the round. Exactly one amount (`act raise 200 extra` errors; leading `+` rejected). |
 | `discard [cards...]` | `ok` | Draw games only: exchanges the named hole cards for replacements (bare `discard` stands pat). Only the pending drawer may move; `draws` names them in turn order. |
 | `draws` | `draws -` or `draws <seat...>` | Draw games only: seats still owed the exchange, button-out. Empty outside the draw street. |
 | `timeout` | `ok` | Folds the acting seat by the clock (disconnect/stalled client). Logged as `timeout <seat> pot <pot>` — bots read it as a fold. Betting only; the draw exchange has no clock (a stuck drawer blocks `deal`). |
@@ -47,7 +47,7 @@ this project is called CardEngine.)
 | `addbot <seat> <bot-file>` | `ok` | Seats an engine-side bot (see below). |
 | `bots` | `bots -` or `bots <seat...>` | Lists automated seats. |
 | `step` | `ok <seat> <fold\|check\|call\|raise> [amount]` | The botted acting seat acts. Manual `act` on a botted seat errors. On the draw street steps the pending drawer instead (`ok <seat> discard ...`, `-` for pat). |
-| `quit` | `bye` | |
+| `quit` | `bye` | Bare `quit` only (`quit <args>` is a usage error). |
 
 ## State block
 
@@ -189,6 +189,9 @@ their own hole cards by construction via `SeatView`). In-process bots study
 each finished hand through `observe` (public action frequencies only).
 Out-of-process runners (`cardengine_bot`, `examples/match.py`) decide from
 filtered `state <seat>` views plus `options` (see "Separate bot programs").
+The state block carries `button` plus one `seat` line per seat, so the
+runner rebuilds the same position (button distance), table size (live
+seats), and stud rival up-cards an in-process bot sees — no degraded game.
 On the draw street the runner takes a `draws` line instead and answers
 `discard ...` (bare `discard` stands pat).
 

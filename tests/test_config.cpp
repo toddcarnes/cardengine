@@ -103,6 +103,20 @@ int main() {
     expect_throws<std::invalid_argument>([&] { validate(c); }, "four runouts");
     c.runouts = 3;
     validate(c);
+    // Spare boards come off the same shoe: a shoe that cannot deal them
+    // fails up front instead of falling back to one board at settle.
+    {
+        GameConfig r;
+        r.num_players = 10;
+        r.hole_cards = 4;
+        r.board_cards = 5;
+        r.runouts = 1;
+        r.showdown = HandConstruction::OmahaTwoAndThree;
+        validate(r);  // 10*4 + 5 = 45: fits without spares.
+        r.runouts = 3;
+        expect_throws<std::invalid_argument>([&] { validate(r); },
+                                             "runouts need shoe room");
+    }
 
     // Stud: 7 down/up cards, no board, 4 up, bring-in below the small
     // blind, 2..8 seats (8-max is the standard full table — street

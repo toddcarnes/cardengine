@@ -182,6 +182,45 @@ int main() {
         check(contains(s.execute("log"), "timeout 3 pot "), "timeout logged");
     }
 
+    // Arg shapes: quit takes no args; act words take no extras.
+    {
+        Session s;
+        check(contains(s.execute("quit now"), "error"), "quit takes no args");
+        check(s.execute("start 7") == "ok", "start");
+        check(contains(s.execute("act fold now"), "error"), "fold is bare");
+        check(contains(s.execute("act call 100"), "error"), "call is bare");
+        check(contains(s.execute("act raise 200 extra"), "error"),
+              "raise takes one amount");
+        check(contains(s.execute("act raise +200"), "error"),
+              "plus amounts rejected");
+        check(s.execute("act fold") == "ok", "plain fold still works");
+    }
+
+    // Tournament bots step on the tournament felt, not the idle cash table.
+    {
+        const char* path = "tmp_proto_step_tourney.txt";
+        {
+            std::ofstream file(path);
+            file << "format_version = 1\nname = S\nnum_players = 2\n"
+                    "starting_stack = 10000\nbuy_in = 100\nprizes = 100\n"
+                    "level = 50, 100, 0, 99\n";
+        }
+        const char* bot_path = "tmp_proto_step_bot.txt";
+        {
+            std::ofstream bot(bot_path);
+            bot << "format_version = 1\nname = S\nstyle = random\nseed = 1\n";
+        }
+        Session s;
+        check(s.execute(std::string("tload ") + path) == "ok", "tload");
+        check(s.execute("start 3") == "ok", "tourney start");
+        check(s.execute(std::string("addbot 0 ") + bot_path) == "ok",
+              "bot seats in tournament");
+        const std::string stepped = s.execute("step");
+        check(contains(stepped, "ok 0"), "tournament step acts: " + stepped);
+        std::remove(path);
+        std::remove(bot_path);
+    }
+
     std::cout << "test_protocol ok\n";
     return 0;
 }

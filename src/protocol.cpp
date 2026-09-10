@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -47,6 +48,9 @@ std::vector<std::string> words(const std::string& s) {
 }
 
 int parse_amount(const std::string& text) {
+    if (text.empty() || text[0] == '+' || text[0] == '-') {
+        throw std::invalid_argument("bad amount '" + text + "'");
+    }
     std::size_t used = 0;
     const int value = std::stoi(text, &used);
     if (used != text.size() || value < 0) {
@@ -100,7 +104,10 @@ std::string Session::execute(const std::string& raw_line) {
             return "ok commands: help load tload tstatus tlevel trebuy tchop sitout resume save restore start state options "
                    "act discard draws timeout deal settle log addbot bots step quit";
         }
-        if (command == "quit") return "bye";
+        if (command == "quit") {
+            if (!rest.empty()) return "error usage: quit";
+            return "bye";
+        }
         if (command == "save") {
             if (rest.empty()) return "error usage: save <session-file>";
             if (active_table().street() != Street::None &&
@@ -117,7 +124,7 @@ std::string Session::execute(const std::string& raw_line) {
                 file.buy_in = books.config.buy_in;
                 file.level_index = books.level_index;
                 file.hands_into_level = books.hands_into_level;
-                file.level_elapsed = static_cast<int>(books.level_elapsed);
+                file.level_elapsed = books.level_elapsed;
                 file.prize_pool = books.prize_pool;
                 file.prize_awarded = books.prize_awarded;
                 file.eliminated = books.eliminated;
@@ -391,15 +398,21 @@ std::string Session::execute(const std::string& raw_line) {
             if (args.empty()) {
                 return "error usage: act fold|check|call|raise [amount]";
             }
-            if (args[0] == "fold") {
-                active_table().act(seat, {ActionType::Fold, 0});
-            } else if (args[0] == "check") {
-                active_table().act(seat, {ActionType::Check, 0});
-            } else if (args[0] == "call") {
-                active_table().act(seat, {ActionType::Call, 0});
-            } else if (args[0] == "raise") {
-                if (args.size() < 2) return "error usage: act raise <amount>";
+            if (args[0] == "raise") {
+                if (args.size() != 2) return "error usage: act raise <amount>";
                 active_table().act(seat, {ActionType::Raise, parse_amount(args[1])});
+            } else if (args[0] == "fold" || args[0] == "check" ||
+                       args[0] == "call") {
+                if (args.size() != 1) {
+                    return "error usage: act " + args[0];
+                }
+                if (args[0] == "fold") {
+                    active_table().act(seat, {ActionType::Fold, 0});
+                } else if (args[0] == "check") {
+                    active_table().act(seat, {ActionType::Check, 0});
+                } else {
+                    active_table().act(seat, {ActionType::Call, 0});
+                }
             } else {
                 return "error unknown action '" + args[0] + "'";
             }
@@ -440,6 +453,23 @@ std::string Session::execute(const std::string& raw_line) {
             return "ok";
         }
         if (command == "settle") {
+            // Summarize BEFORE settle: the log's hand range must be complete
+            // when observe runs, and finish_hand must book even when a bot
+            // misbehaves. A throwing summarize must not convert a settled
+            // hand into an `error` (which promises no state changed).
+            HandSummary summary;
+            bool have_summary = false;
+            try {
+                summary = summarize_hand(active_table().events(),
+                                         hand_events_begin_,
+                                         active_table().events().size());
+                have_summary = true;
+            } catch (const std::exception& e) {
+                // Debug only: the hand already settled below either way.
+                std::cerr << "cardengine: summarize failed: " << e.what()
+                          << "\n";
+                have_summary = false;
+            }
             const std::vector<Payout> payouts = active_table().settle();
             std::ostringstream out;
             out << "showdown " << (active_table().went_to_showdown() ? "yes" : "no")
@@ -449,10 +479,18 @@ std::string Session::execute(const std::string& raw_line) {
             }
             out << "ok";
             // Seated bots study the finished hand before the next deal.
-            const HandSummary summary = summarize_hand(
-                active_table().events(), hand_events_begin_, active_table().events().size());
-            for (auto& [seat, bot] : bots_) {
-                bot->observe(seat, summary);
+            if (have_summary) {
+                for (auto& [seat, bot] : bots_) {
+                    try {
+                        bot->observe(seat, summary);
+                    } catch (const std::exception& e) {
+                        // A misbehaving bot must not fail the settle.
+                        // Debug only: the reply stays `ok`; the hand
+                        // booked either way.
+                        std::cerr << "cardengine: bot " << seat
+                                  << " observe failed: " << e.what() << "\n";
+                    }
+                }
             }
             // Tournaments book eliminations, prizes, and levels at settle.
             if (tournament_) {
@@ -505,7 +543,7 @@ std::string Session::execute(const std::string& raw_line) {
                 }
                 const std::vector<std::string> discards =
                     it->second->choose_discards(
-                        make_view(table_, drawer));
+                        make_view(active_table(), drawer));
                 active_table().discard(drawer, discards);
                 std::ostringstream out;
                 out << "ok " << drawer << " discard";
@@ -521,7 +559,8 @@ std::string Session::execute(const std::string& raw_line) {
             if (it == bots_.end()) {
                 return "error seat " + std::to_string(seat) + " is manual";
             }
-            const Action action = it->second->decide(make_view(table_, seat));
+            const Action action =
+                it->second->decide(make_view(active_table(), seat));
             active_table().act(seat, action);
             std::ostringstream out;
             out << "ok " << seat << " ";
@@ -536,6 +575,8 @@ std::string Session::execute(const std::string& raw_line) {
         return "error unknown command '" + command + "'";
     } catch (const std::exception& e) {
         return std::string("error ") + e.what();
+    } catch (...) {
+        return "error internal error";
     }
 }
 
@@ -636,6 +677,7 @@ int run_protocol(std::istream& in, std::ostream& out) {
     while (std::getline(in, line)) {
         const std::string reply = session.execute(line);
         out << reply << "\n" << std::flush;
+        // Bare `quit` only: `quit <args>` is a usage error, not an exit.
         if (trim(line) == "quit") return 0;
     }
     return 0;
