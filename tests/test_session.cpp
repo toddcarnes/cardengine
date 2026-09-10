@@ -15,7 +15,9 @@
 namespace {
 
 using cardengine::Session;
+using cardengine::SessionFile;
 using cardengine::Table;
+using cardengine::load_session_file;
 using cardengine::Tournament;
 using cardengine::TournamentConfig;
 using testutil::check;
@@ -51,11 +53,87 @@ void play_out_table(Table& table) {
             } else {
                 table.act(seat, {ActionType::Call, 0});
             }
+        } else if (!table.draws_pending().empty()) {
+            table.discard(table.draws_pending()[0], {});
         } else {
             table.deal_next_street();
         }
     }
     table.settle();
+}
+
+// Hands the draw/stud protocol can drive to a decision without knowing the
+// variant: fold or check/call acting seats, stand pat on draws, deal
+// streets, until nothing moves. Returns false when the hand needs a variant
+// choice the driver cannot make (never for these shapes).
+bool drive_hand(Session& session) {
+    for (int guards = 0; guards < 200; ++guards) {
+        const std::string state = session.execute("state");
+        // Draw street: acting is -1 but an exchange is pending.
+        if (contains(state, "acting -1")) {
+            if (session.execute("draws") != "draws -") {
+                if (session.execute("discard") != "ok") return false;
+                continue;
+            }
+            if (session.execute("deal") == "ok") continue;
+            break;
+        }
+        const std::string options = session.execute("options");
+        if (!contains(options, "options seat")) return false;
+        if (contains(options, "check yes")) {
+            if (session.execute("act check") != "ok") return false;
+        } else {
+            if (session.execute("act call") != "ok") {
+                // Short all-ins and capped rounds still call; a refusal
+                // means the driver, not the engine, is stuck.
+                if (session.execute("act fold") != "ok") return false;
+            }
+        }
+    }
+    return contains(session.execute("settle"), "ok");
+}
+
+// One save/restore round-trip for a non-default game file: save, reboot,
+// restore, then deal and settle a full hand on the restored config.
+void round_trip_game(const std::string& game_path, const std::string& tag) {
+    Session session;
+    check(session.execute("load " + game_path) == "ok", tag + " loads");
+    check(session.execute("start 11") == "ok", tag + " starts");
+    // Save mid-hand must refuse; settle the opener, then save between.
+    check(contains(session.execute("save tmp_session_variant.txt"), "error"),
+          tag + " no mid-hand save");
+    check(drive_hand(session), tag + " opener settles");
+    check(session.execute("save tmp_session_variant.txt") == "ok",
+          tag + " saves");
+    const SessionFile on_disk =
+        load_session_file("tmp_session_variant.txt");
+    Session reboot;
+    check(reboot.execute("restore tmp_session_variant.txt") == "ok",
+          tag + " restores");
+    // The restored rules deal the restored shape: the state block names
+    // the variant (stud up-cards, draw max_draw, omaha hole counts).
+    check(reboot.execute("start 12") == "ok", tag + " deals after restore");
+    const std::string dealt = reboot.execute("state");
+    if (tag == "stud") {
+        check(contains(dealt, " up "), tag + " deals up-cards");
+    } else if (tag == "draw" || tag == "deuce") {
+        check(contains(dealt, "max_draw"), tag + " deals the draw street");
+    } else if (tag == "omaha" || tag == "hilo") {
+        check(contains(dealt, "seat 0 ") && contains(dealt, "board"),
+              tag + " deals omaha shape");
+    }
+    check(drive_hand(reboot), tag + " settles after restore");
+    check(reboot.execute("save tmp_session_variant.txt") == "ok",
+          tag + " saves again");
+    const SessionFile again =
+        load_session_file("tmp_session_variant.txt");
+    check(again.game.showdown == on_disk.game.showdown &&
+              again.game.hole_cards == on_disk.game.hole_cards &&
+              again.game.board_cards == on_disk.game.board_cards &&
+              again.game.max_draw == on_disk.game.max_draw &&
+              again.game.bring_in == on_disk.game.bring_in,
+          tag + " rules survive the file");
+    std::remove("tmp_session_variant.txt");
 }
 
 }  // namespace
@@ -512,6 +590,18 @@ int main() {
         check(committed == 300, "restored kill doubles blinds");
         std::remove("tmp_session_kill.txt");
         std::remove(game_path);
+    }
+
+    // Every non-default shape round-trips through save/restore end to end:
+    // stud (up-cards, bring-in), draw/deuce (max_draw, exchange), omaha
+    // and hilo (4-hole exact-2+3 deal) all save, reboot, deal, and settle.
+    {
+        round_trip_game("../../games/stud-8max.txt", "stud");
+        round_trip_game("../../games/draw-6max.txt", "draw");
+        round_trip_game("../../games/deuce-6max.txt", "deuce");
+        round_trip_game("../../games/omaha-plo-6max.txt", "omaha");
+        round_trip_game("../../games/omaha-hilo-6max.txt", "hilo");
+        round_trip_game("../../games/holdem-limit-6max.txt", "limit");
     }
 
     std::cout << "test_session ok\n";
