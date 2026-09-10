@@ -96,6 +96,15 @@ void Tournament::begin_hand(std::uint64_t seed) {
 
 void Tournament::begin_hand_at(std::uint64_t seed, std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
+    // Two funded seats minimum, named up front (Table's own "need at least
+    // 2 players" would otherwise surface mid-deal with no tournament word).
+    int funded = 0;
+    for (int seat = 0; seat < table_.num_seats(); ++seat) {
+        if (!table_.sitting_out(seat) && table_.stack(seat) > 0) ++funded;
+    }
+    if (funded < 2) {
+        throw std::logic_error("tournament needs at least 2 funded seats");
+    }
     advance_level_if_due(now);
     level_started_at_ = now;
     clock_live_ = true;
@@ -113,6 +122,13 @@ void Tournament::begin_hand_from_deck(std::vector<Card> top_first) {
 void Tournament::begin_hand_from_deck_at(std::vector<Card> top_first,
                                          std::int64_t now) {
     if (complete()) throw std::logic_error("tournament is over");
+    int funded = 0;
+    for (int seat = 0; seat < table_.num_seats(); ++seat) {
+        if (!table_.sitting_out(seat) && table_.stack(seat) > 0) ++funded;
+    }
+    if (funded < 2) {
+        throw std::logic_error("tournament needs at least 2 funded seats");
+    }
     advance_level_if_due(now);
     level_started_at_ = now;
     clock_live_ = true;
