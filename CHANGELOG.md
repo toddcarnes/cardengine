@@ -5,6 +5,28 @@ minor bumps add features, patches fix bugs.
 
 ## Unreleased
 
+- Review fixes: tournament `step` acts on the tournament felt (was reading
+  the idle cash table, so botted tournaments always errored);
+  `Tournament::restore` assigns the saved level before computing blinds
+  (cross-level restores dealt the old level's blinds); `settle` summarizes
+  before mutating so a throwing bot `observe` can no longer convert a
+  settled hand into an `error` or skip `finish_hand`; `Session::execute`
+  catches everything (`catch (...)`); `Deck::shuffle` is Fisher-Yates on
+  raw `mt19937_64` output (portable across stdlibs — `std::shuffle` goes
+  through `uniform_int_distribution`, whose mapping is not); the bot
+  runner rebuilds position, table size, and stud rival up-cards from the
+  state block (was defaulting to -1/0/empty); configs validate runout shoe
+  room up front (`seats × hole + board × runouts ≤ 52`); stud's degenerate
+  raise-to-0 offers call-only; tournament deals name a short field
+  (`tournament needs at least 2 funded seats`); `quit` takes no args and
+  `act` words take no extras; `parse_amount` rejects `+5`; `level_elapsed`
+  stays `int64` end to end; empty-shoe stud rivers throw a named error;
+  `bring_in_seat` docs match the live-seat computation. Tests: variant
+  session round-trips (stud/draw/deuce/omaha/hilo/limit save/restore/deal/
+  settle), tournament step, cross-level restore, all-in stud streets,
+  runner position/size/rival_up, portable shuffle order, `parse_card`
+  rejects, runout shoe validation.
+
 - Cleanup: `Table::take_card` drops its dead `Deck*` parameter (every
   caller passed `nullptr`); the short-shoe error is now the generic
   `"shoe exhausted"`. `examples/cli.py` no longer crashes on empty
