@@ -575,6 +575,8 @@ std::string Session::execute(const std::string& raw_line) {
         return "error unknown command '" + command + "'";
     } catch (const std::exception& e) {
         return std::string("error ") + e.what();
+    } catch (...) {
+        return "error internal error";
     }
 }
 
